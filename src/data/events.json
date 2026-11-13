@@ -2147,5 +2147,88 @@
     "ai": "1 - pers.reliability"
    }
   ]
+ },
+ {
+  "id": "pandemia",
+  "title": "Pandemia en el país",
+  "category": "salud",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 30,
+  "text": "El brote se extiende por {country}: los hospitales se saturan y crece el miedo.",
+  "condition": "pandemic > 0.03",
+  "weight": "70",
+  "options": [
+   {
+    "text": "Confinamiento estricto",
+    "hint": "Frena mucho los contagios; golpe económico fuerte.",
+    "modifiers": [
+     {
+      "id": "ev_confinamiento",
+      "name": "Confinamiento estricto",
+      "duration": 4,
+      "mods": {
+       "growth": -3,
+       "pandemicSpread": -0.6,
+       "protest": 4
+      }
+     }
+    ],
+    "effects": [
+     {
+      "path": "budget.health",
+      "add": 0.5
+     }
+    ],
+    "groups": {
+     "business": -6,
+     "youth": -4
+    },
+    "ai": "pers.riskAversion * 2"
+   },
+   {
+    "text": "Restricciones moderadas y refuerzo sanitario",
+    "hint": "Equilibrio entre salud y economía.",
+    "modifiers": [
+     {
+      "id": "ev_restricciones",
+      "name": "Restricciones sanitarias",
+      "duration": 6,
+      "mods": {
+       "growth": -0.9,
+       "pandemicSpread": -0.3
+      }
+     }
+    ],
+    "effects": [
+     {
+      "path": "budget.health",
+      "add": 0.4
+     }
+    ],
+    "ai": "1.2"
+   },
+   {
+    "text": "Mantener la economía abierta",
+    "hint": "Sin coste económico directo… a costa de más muertes.",
+    "modifiers": [
+     {
+      "id": "ev_abierta",
+      "name": "Economía abierta en pandemia",
+      "duration": 6,
+      "mods": {
+       "pandemicSpread": 0.3,
+       "death": 1
+      }
+     }
+    ],
+    "groups": {
+     "business": 4,
+     "religious": -3,
+     "workers": -3
+    },
+    "ai": "ideo.econ + pers.aggression - 0.5"
+   }
+  ]
  }
 ]

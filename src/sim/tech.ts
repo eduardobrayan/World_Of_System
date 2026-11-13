@@ -11,7 +11,7 @@ export function techModifierId(t: TechDef) {
   return `tech_${t.id}`;
 }
 
-function grantTech(world: World, c: Country, t: TechDef, silent = false) {
+export function grantTech(world: World, c: Country, t: TechDef, silent = false) {
   if (c.tech.done.includes(t.id)) return;
   c.tech.done.push(t.id);
   addModifier(world, c, { id: techModifierId(t), name: `Tecnología: ${t.name}`, duration: -1, mods: t.mods }, 'tecnologia');

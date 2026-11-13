@@ -389,6 +389,7 @@ export function makePeace(world: World, w: War, terms: PeaceTerms, reason: strin
     c.mil.mobilization = Math.min(c.mil.mobilization, 1);
     c.pol.warWeariness *= 0.5;
     const won = winners.includes(c);
+    if (won) c.pol.flags.guerras_ganadas = (c.pol.flags.guerras_ganadas ?? 0) + 1;
     addModifier(world, c, { id: `fin_guerra_${w.id}`, name: won ? 'Victoria en la guerra' : 'Derrota en la guerra', duration: 24, mods: won ? { 'group.military': 8, 'group.all': 3, legitimacy: 4 } : { 'group.military': -10, 'group.all': -4, legitimacy: -6 } }, 'paz');
   }
   if (terms.regime) for (const l of losers) {

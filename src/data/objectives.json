@@ -1,0 +1,8 @@
+[
+ {"id":"libre","name":"Modo libre","icon":"🌐","desc":"Sin condición de victoria. Gobierna mientras puedas: solo existen las derrotas.","targets":{}},
+ {"id":"hegemonia_economica","name":"Hegemonía económica","icon":"💰","desc":"Aumenta tu cuota del PIB mundial un 35 % respecto a 2026 sin hundir la estabilidad.","targets":{"gdpShareRatio":1.35,"stability":40}},
+ {"id":"dominio_militar","name":"Dominio militar","icon":"🎖","desc":"Aumenta tu cuota del poder militar mundial un 40 % y gana al menos una guerra (o termina sin guerras perdidas).","targets":{"powerShareRatio":1.4,"warsWon":1}},
+ {"id":"liderazgo_diplomatico","name":"Liderazgo diplomático","icon":"🤝","desc":"Consigue que las grandes potencias te aprecien, una reputación excelente, aliados y resoluciones aprobadas.","targets":{"avgMajorOpinion":45,"reputation":75,"allies":4,"resolutions":3}},
+ {"id":"supervivencia","name":"Supervivencia del régimen","icon":"🛡","desc":"Mantente en el poder durante 20 años (hasta enero de 2046).","targets":{"months":240}},
+ {"id":"prosperidad","name":"Prosperidad interna","icon":"🏡","desc":"Sube tu índice de desarrollo humano 10 puntos y mantén la estabilidad por encima de 60 durante 12 meses seguidos.","targets":{"hdiGain":10,"stability":60,"stableMonths":12}}
+]

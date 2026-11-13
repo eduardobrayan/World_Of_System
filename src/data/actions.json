@@ -2645,5 +2645,216 @@
   "ai": {
    "utility": "0"
   }
+ },
+ {
+  "id": "op_espionaje",
+  "name": "Red de espionaje",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Infiltra agentes y fuentes: mejora la precisión de tu información y facilita futuras operaciones.",
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0002"
+  },
+  "cooldown": 3,
+  "handler": "intel_op",
+  "params": {
+   "op": "espionaje",
+   "months": 4,
+   "difficulty": 0,
+   "exposure": 0.15
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_financiar_oposicion",
+  "name": "Financiar a la oposición",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Dinero y apoyo encubierto a partidos y movimientos opositores: menos estabilidad y aprobación del gobierno objetivo.",
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.0004"
+  },
+  "cooldown": 6,
+  "handler": "intel_op",
+  "params": {
+   "op": "oposicion",
+   "months": 6,
+   "difficulty": 0.1,
+   "exposure": 0.3
+  },
+  "risks": [
+   "Si se descubre: grave crisis diplomática"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_sabotaje",
+  "name": "Sabotaje industrial",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Ataques encubiertos contra infraestructuras energéticas e industriales.",
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.0004"
+  },
+  "cooldown": 6,
+  "handler": "intel_op",
+  "params": {
+   "op": "sabotaje",
+   "months": 3,
+   "difficulty": 0.15,
+   "exposure": 0.35
+  },
+  "risks": [
+   "Si se descubre: acto hostil grave"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_robo_tecnologia",
+  "name": "Robar tecnología",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Espionaje industrial: obtén investigaciones que el objetivo ya domina.",
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.0003"
+  },
+  "cooldown": 6,
+  "handler": "intel_op",
+  "params": {
+   "op": "tecnologia",
+   "months": 5,
+   "difficulty": 0.15,
+   "exposure": 0.25
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_desinformacion",
+  "name": "Campaña de desinformación",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Bots, medios afines y bulos para dividir a su sociedad y erosionar la confianza en sus instituciones.",
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0002"
+  },
+  "cooldown": 6,
+  "handler": "intel_op",
+  "params": {
+   "op": "desinformacion",
+   "months": 4,
+   "difficulty": 0.05,
+   "exposure": 0.2
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_ciberataque",
+  "name": "Ciberataque",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Ataque informático contra bancos, red eléctrica y administración.",
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.0003"
+  },
+  "cooldown": 6,
+  "handler": "intel_op",
+  "params": {
+   "op": "ciber",
+   "months": 2,
+   "difficulty": 0.1,
+   "exposure": 0.3
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_golpe",
+  "name": "Apoyar un golpe de Estado",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Contacta con militares descontentos para derrocar al gobierno. Extremadamente arriesgado.",
+  "cost": {
+   "ap": 4,
+   "money": "gdp * 0.001"
+  },
+  "cooldown": 24,
+  "handler": "intel_op",
+  "params": {
+   "op": "golpe",
+   "months": 6,
+   "difficulty": 0.35,
+   "exposure": 0.5
+  },
+  "risks": [
+   "Si se descubre: casus belli para el objetivo y aislamiento internacional"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "contraespionaje",
+  "name": "Reforzar el contraespionaje",
+  "category": "inteligencia_propia",
+  "target": "none",
+  "desc": "Más agentes y ciberdefensa: dificulta las operaciones enemigas durante tres años.",
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0005"
+  },
+  "cooldown": 12,
+  "modifiers": [
+   {
+    "id": "contraespionaje",
+    "name": "Contraespionaje reforzado",
+    "duration": 36,
+    "mods": {
+     "counter": 10
+    }
+   }
+  ],
+  "params": {},
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "servicios_inteligencia",
+  "name": "Ampliar los servicios de inteligencia",
+  "category": "inteligencia_propia",
+  "target": "none",
+  "desc": "Más presupuesto y analistas para tus servicios secretos.",
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0006"
+  },
+  "cooldown": 12,
+  "effects": [
+   {
+    "path": "intel.level",
+    "add": 4
+   }
+  ],
+  "params": {},
+  "ai": {
+   "utility": "0"
+  }
  }
 ]

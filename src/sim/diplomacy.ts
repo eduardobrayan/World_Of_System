@@ -283,6 +283,8 @@ function applyResolution(world: World, r: Resolution) {
     }
   }
   if (!r.passed) return;
+  const prop = world.countries[r.proposer];
+  if (prop) prop.pol.flags.resoluciones = (prop.pol.flags.resoluciones ?? 0) + 1;
   if (world.player?.country === r.proposer) timeline(world, `Resolución aprobada en ${o.short}: ${r.text}`, 'diplomacia');
   switch (r.kind) {
     case 'condena':

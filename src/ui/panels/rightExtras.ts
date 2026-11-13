@@ -6,6 +6,7 @@ import { DATA, personalityOf } from '../../sim/data';
 import { relationTarget } from '../../sim/diplomacy';
 import { diplomaticButtons, decisionItem } from './diplomacy';
 import { militaryButtons } from './militar';
+import { intelButtons } from './intel';
 import { dateLabel } from '../../sim/util';
 import { h } from '../dom';
 import { bar, section, plainStat } from '../components';
@@ -41,7 +42,7 @@ export function rightExtras(app: App, c: Country): HTMLElement[] {
       plainStat('Amenaza que percibe de ti', (c.ai.threat[me.id] ?? 0).toFixed(2), 'Amenaza percibida: tu poder militar, tu hostilidad y la cercanía. Un valor alto le lleva a rearmarse y buscar aliados contra ti.'),
       mem.length ? h('div', { style: 'margin-top:6px' }, h('div', { class: 'small muted' }, 'Lo que recuerda de ti:'),
         mem.map((m) => h('div', { class: `small ${m.value >= 0 ? 'good' : 'bad'}` }, `${m.text} (${m.value >= 0 ? '+' : ''}${m.value.toFixed(0)}, ${dateLabel(m.turn)})`))) : null));
-    out.push(h('div', { class: 'card' }, h('h3', null, 'Acciones'), diplomaticButtons(app, c), militaryButtons(app, c)));
+    out.push(h('div', { class: 'card' }, h('h3', null, 'Acciones'), diplomaticButtons(app, c), militaryButtons(app, c), intelButtons(app, c)));
     const dec = [...c.ai.lastDecisions].reverse().slice(0, 6);
     out.push(section(`Decisiones recientes de ${c.short}`, dec.length ? h('div', { class: 'list' }, dec.map((d) => decisionItem(app, d))) : h('div', { class: 'muted small' }, 'Sin decisiones registradas.'),
       h('div', { class: 'small muted', style: 'margin-top:4px' }, `Personalidad: ${personalityOf(c.ai.personality).name} · agresividad ${(c.ai.aggression * 100).toFixed(0)} · pragmatismo ${(c.ai.pragmatism * 100).toFixed(0)} · aversión al riesgo ${(c.ai.riskAversion * 100).toFixed(0)} · fiabilidad ${(c.ai.reliability * 100).toFixed(0)}`)));

@@ -2,7 +2,7 @@
 import type { Contribution, Country, World } from './types';
 import { BUDGET_ITEMS, COMMODITIES } from './types';
 import { modParts, modSum, sanctionLevelOn } from './vars';
-import { approach, clamp, gdppc } from './util';
+import { approach, clamp, gdppc, news, timeline } from './util';
 import { commodityValue, supplyStress } from './market';
 import { regimeOf } from './data';
 
@@ -226,6 +226,11 @@ export function updateEconomy(world: World, c: Country) {
   ];
   e.debt = Math.max(0, e.debt + deficitBn / 12 - (e.debt * clamp(e.inflation, -5, 200)) / 1200);
   e.riskPremium = approach(e.riskPremium, riskPremiumTarget(world, c), 0.15);
+  // Impago soberano: sin acceso a los mercados y sin reservas
+  const months = (e.gdp * e.imports) / 100 / 12;
+  if (!world.forecast && world.turn - e.defaulted > 24 && (e.riskPremium > 13 || (e.riskPremium > 8 && e.reserves < months * 0.5 && !e.euro))) {
+    sovereignDefault(world, c);
+  }
   const drTarget = clamp(e.policyRate * 0.7 + 1.0 + e.riskPremium + e.calibDebtRate, 0.2, 90);
   e.debtRate = approach(e.debtRate, drTarget, 1 / 36);
   e.calibDebtRate *= 0.997;
@@ -336,3 +341,17 @@ function updateSectors(world: World, c: Country) {
   s.services = clamp(100 - s.energy - s.agriculture - s.tech - s.industry, 10, 90);
 }
 
+
+export function sovereignDefault(world: World, c: Country) {
+  const e = c.eco;
+  e.debt *= 0.65;
+  e.defaulted = world.turn;
+  e.defaults += 1;
+  (e.defaultTurns ??= []).push(world.turn);
+  e.currency *= 0.8;
+  e.inflation += 8;
+  c.reputation = clamp(c.reputation - 10, 0, 100);
+  c.mods.push({ id: `impago_${world.turn}`, name: 'Impago soberano', source: 'economia', remaining: 24, mods: { growth: -2.5, investment: -3, 'group.business': -10, 'group.workers': -5 } });
+  news(world, `💸 ${c.name} suspende pagos de su deuda soberana.`, 'crisis', [c.id], 3);
+  if (world.player?.country === c.id) timeline(world, 'Impago de la deuda soberana', 'crisis');
+}

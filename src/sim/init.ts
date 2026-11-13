@@ -18,6 +18,7 @@ import { initPolicies } from './policies';
 import { initTech } from './tech';
 import { snapshot } from './history';
 import { ensureHandlers } from './registry';
+import { baselineMetrics } from './goals';
 
 export interface NewGameOptions {
   seed: string;
@@ -457,7 +458,7 @@ export function createWorld(opts: NewGameOptions): World {
     const c = world.countries[opts.player];
     world.player = {
       country: c.id, difficulty: opts.difficulty ?? 'normal', objective: opts.objective ?? 'libre',
-      objectiveStart: {}, objectiveHistory: [{ turn: 0, objective: opts.objective ?? 'libre', reason: 'Elegido al inicio' }],
+      objectiveStart: baselineMetrics(world, c), objectiveHistory: [{ turn: 0, objective: opts.objective ?? 'libre', reason: 'Elegido al inicio' }],
       actionsThisTurn: 0, intelAccuracy: {},
     };
     c.pol.ap = 5;

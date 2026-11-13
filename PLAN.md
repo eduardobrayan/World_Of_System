@@ -72,11 +72,20 @@ indexar alianzas, barreras comerciales y relaciones por turno.
 **Verificación F4:** tests en verde; 200 turnos con 3 semillas: la guerra ruso-ucraniana arranca calibrada en tablas,
 1–2 guerras simultáneas, paces negociadas, sin escalada nuclear catastrófica ni colapsos.
 
-## F5 — Inteligencia, tecnología, objetivos, fin de partida, guardado
-- [ ] Operaciones encubiertas con riesgo de descubrimiento; información incierta
-- [ ] Árbol tecnológico, transición energética, clima, pandemias
-- [ ] Objetivos (cambiantes), victorias y derrotas, resumen final con cronología y gráficas
-- [ ] Guardado en localStorage + exportar/importar JSON
+## F5 — Inteligencia, tecnología, objetivos, fin de partida, guardado ✅
+- [x] 7 operaciones encubiertas (espionaje, financiar oposición, sabotaje, robo de tecnología, desinformación,
+      ciberataque, apoyo a golpe) con éxito y riesgo de descubrimiento por capacidad, contrainteligencia y red; la IA
+      también las usa; ser descubierto daña relaciones, reputación y da casus belli
+- [x] Información incierta: precisión según red, capacidad, transparencia y alianzas ("≈" en la interfaz)
+- [x] Árbol tecnológico de 45 tecnologías en 10 ramas, difusión mundial, robo; transición energética y clima
+- [x] Pandemias que surgen, se propagan por comercio y fronteras, y terminan por inmunidad o vacunas (con evento propio)
+- [x] Impago soberano automático; derrota por quiebra (dos impagos en diez años o 18 meses de hiperinflación)
+- [x] 6 objetivos con progreso medible, cambio sugerido por los acontecimientos (gratis) o voluntario (⚡3), victoria,
+      límite de 30 años y resumen final con cronología y gráficas
+- [x] Guardado: 3 ranuras + autoguardado cada 3 meses en localStorage (gzip) y exportación/importación en JSON
+- [x] IU: pestañas Inteligencia, Tecnología y Objetivos; menú de partida; tutorial breve
+
+**Verificación F5:** tests en verde; 200 turnos estables con pandemias e impagos; guardar y cargar probado en navegador.
 
 ## F6 — Equilibrado, tutorial y pulido
 - [ ] Ajuste de parámetros con simulaciones largas

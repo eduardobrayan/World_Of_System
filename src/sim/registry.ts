@@ -2,6 +2,7 @@
 import { registerGovHandlers } from './govhandlers';
 import { registerDiploHandlers } from './diplohandlers';
 import { registerMilHandlers } from './milhandlers';
+import { registerIntelHandlers } from './intel';
 
 let done = false;
 
@@ -11,4 +12,5 @@ export function ensureHandlers() {
   registerGovHandlers();
   registerDiploHandlers();
   registerMilHandlers();
+  registerIntelHandlers();
 }

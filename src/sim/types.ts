@@ -97,6 +97,7 @@ export interface Economy {
   sectors: Record<Sector, number>; // % PIB
   defaulted: number; // turno del último impago (-999 si nunca)
   defaults: number;
+  defaultTurns?: number[];
   hyperMonths: number;
   calibGrowth: number;
   calibPot: number;
@@ -483,6 +484,7 @@ export interface PlayerState {
   objective: string;
   objectiveStart: Dict<number>;
   objectiveHistory: { turn: number; objective: string; reason: string }[];
+  objectiveSuggestion?: string;
   actionsThisTurn: number;
   intelAccuracy: Dict<number>;
 }

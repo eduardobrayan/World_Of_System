@@ -42,7 +42,7 @@ export class App implements MapHost {
   private timer = 0;
   private refreshQueued = false;
 
-  constructor(world: World, private container: HTMLElement, public onExit: () => void) {
+  constructor(world: World, private container: HTMLElement, public onExit: () => void, public onLoad: (w: World) => void = () => undefined) {
     this.world = world;
     this.selected = world.player?.country ?? null;
     this.build();

@@ -8,7 +8,8 @@ import { updateRegions } from './regions';
 import { updateMilitary } from './military';
 import { updateTech } from './tech';
 import { processScheduled, tickModifiers } from './effects';
-import { updateGlobals } from './globals';
+import { updateGlobals, updatePandemic } from './globals';
+import { checkGoals } from './goals';
 import { snapshot, worldSnapshot } from './history';
 import { applyAidFlows } from './init';
 import { fiscalAutopilot } from './autopilot';
@@ -19,6 +20,7 @@ import { aiTurn } from './ai';
 import { updateRelations, updateTreaties, resolveResolutions, autoResolutions } from './diplomacy';
 import { expireProposals } from './diplohandlers';
 import { updateWars } from './war';
+import { updateIntel } from './intel';
 
 export function advanceTurn(world: World) {
   if (world.gameOver) return;
@@ -43,6 +45,8 @@ export function advanceTurn(world: World) {
   updateMarket(world);
   updateWars(world);
   if (world.gameOver) return;
+  updateIntel(world);
+  updatePandemic(world);
 
   for (const id of ids) {
     const c = world.countries[id];
@@ -66,4 +70,5 @@ export function advanceTurn(world: World) {
   for (const id of ids) snapshot(world, world.countries[id]);
   worldSnapshot(world);
   if (!world.gameOver) generateEvents(world);
+  checkGoals(world);
 }

@@ -6,6 +6,7 @@ import { IND } from '../info';
 import { indicatorTip, tip } from '../tooltip';
 import { dateLabel } from '../../sim/util';
 import { delta } from '../components';
+import { openGameMenu } from '../menu';
 import type { Snapshot } from '../../sim/types';
 
 const KEYS: [string, keyof Snapshot | null][] = [
@@ -40,6 +41,7 @@ export function renderTopbar(app: App): HTMLElement[] {
     out.push(ap);
   } else out.push(h('div', { class: 'grow muted' }, 'Modo observador'));
   out.push(h('button', { class: 'btn primary', disabled: !!w.gameOver || app.busy, title: 'Avanzar un mes', onclick: () => app.endTurn() }, 'Fin de turno ▸'));
+  out.push(h('button', { class: 'btn ghost icon', title: 'Menú de partida (guardar, cargar, exportar)', onclick: () => openGameMenu(app, app.onLoad) }, '☰'));
   out.push(h('button', { class: 'btn ghost icon mobile-only', title: 'País seleccionado', onclick: () => { app.root.classList.toggle('show-right'); app.root.classList.remove('show-left'); app.root.classList.remove('right-collapsed'); } }, 'ⓘ'));
   return out;
 }

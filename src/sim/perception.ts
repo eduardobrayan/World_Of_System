@@ -3,13 +3,14 @@ import type { Id, World } from './types';
 import { hashNoise } from './rng';
 import { allied } from './vars';
 import { clamp } from './util';
+import { intelLevel, counterLevel } from './intel';
 
 /** Precisión (0.3..1) con la que `obs` conoce los datos de `tgt`. */
 export function intelAccuracy(world: World, obs: Id, tgt: Id): number {
   if (obs === tgt) return 1;
   const o = world.countries[obs], t = world.countries[tgt];
   if (!o || !t) return 0.5;
-  let a = 0.42 + o.intel.level / 260 + (o.intel.networks[tgt] ?? 0) / 180 + t.pol.pressFreedom / 380 - t.intel.counter / 420;
+  let a = 0.42 + intelLevel(o) / 260 + (o.intel.networks[tgt] ?? 0) / 180 + t.pol.pressFreedom / 380 - counterLevel(t) / 420;
   if (allied(world, obs, tgt)) a += 0.15;
   return clamp(a, 0.3, 1);
 }
