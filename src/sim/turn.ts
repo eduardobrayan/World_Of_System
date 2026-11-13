@@ -15,6 +15,9 @@ import { fiscalAutopilot } from './autopilot';
 import { updateElections } from './elections';
 import { generateEvents } from './events';
 import { ensureHandlers } from './registry';
+import { aiTurn } from './ai';
+import { updateRelations, updateTreaties, resolveResolutions, autoResolutions } from './diplomacy';
+import { expireProposals } from './diplohandlers';
 
 export function advanceTurn(world: World) {
   if (world.gameOver) return;
@@ -27,6 +30,13 @@ export function advanceTurn(world: World) {
     c.eco.extraSpending = 0;
   }
 
+  aiTurn(world);
+  for (const w of world.wars) if (w.ceasefire > 0) w.ceasefire -= 1;
+  updateRelations(world);
+  updateTreaties(world);
+  resolveResolutions(world);
+  autoResolutions(world);
+  expireProposals(world);
   applyAidFlows(world);
   updateTradeAccess(world);
   updateMarket(world);

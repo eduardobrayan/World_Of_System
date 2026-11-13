@@ -78,15 +78,28 @@ export function relTrust(world: World, a: Id, b: Id): number {
   return world.rel[a]?.[b]?.trust ?? 50;
 }
 
+const allyCache = new WeakMap<World, { sig: string; set: Set<string> }>();
+
+function allySet(world: World): Set<string> {
+  const sig = `${world.turn}:${world.rev ?? 0}`;
+  let c = allyCache.get(world);
+  if (!c || c.sig !== sig) {
+    const set = new Set<string>();
+    const addPair = (x: Id, y: Id) => { set.add(`${x}|${y}`); set.add(`${y}|${x}`); };
+    for (const t of world.treaties) if (t.type === 'alliance' || t.type === 'defense') addPair(t.parties[0], t.parties[1]);
+    for (const o of Object.values(world.orgs)) {
+      if (!o.mutualDefense) continue;
+      for (let i = 0; i < o.members.length; i++) for (let j = i + 1; j < o.members.length; j++) addPair(o.members[i], o.members[j]);
+    }
+    c = { sig, set };
+    allyCache.set(world, c);
+  }
+  return c.set;
+}
+
 export function allied(world: World, a: Id, b: Id): boolean {
   if (a === b) return true;
-  for (const t of world.treaties) {
-    if ((t.type === 'alliance' || t.type === 'defense') && t.parties.includes(a) && t.parties.includes(b)) return true;
-  }
-  for (const o of Object.values(world.orgs)) {
-    if (o.mutualDefense && o.members.includes(a) && o.members.includes(b)) return true;
-  }
-  return false;
+  return allySet(world).has(`${a}|${b}`);
 }
 
 export function hasTreaty(world: World, a: Id, b: Id, type: string): boolean {
@@ -261,13 +274,30 @@ export function neighborsSea(id: Id): string[] {
 }
 
 /** Proporción del comercio total de a que va a/viene de b. */
+const shareCache = new WeakMap<World, { turn: number; m: Map<string, number> }>();
+
 export function tradeShare(world: World, a: Id, b: Id): number {
-  const row = world.trade[a];
-  if (!row) return 0;
-  let tot = 0;
-  for (const k in row) tot += row[k];
-  const ab = (row[b] ?? 0) + (world.trade[b]?.[a] ?? 0);
-  let totB = tot;
-  for (const k in world.trade) if (k !== a) totB += world.trade[k][a] ?? 0;
-  return totB > 0 ? ab / totB : 0;
+  let e = shareCache.get(world);
+  if (!e || e.turn !== world.turn) { e = { turn: world.turn, m: new Map() }; shareCache.set(world, e); }
+  const k = a + '|' + b;
+  let v = e.m.get(k);
+  if (v === undefined) { v = tradeShareRaw(world, a, b); e.m.set(k, v); }
+  return v;
+}
+
+const totalCache = new WeakMap<object, Record<string, number>>();
+
+function tradeShareRaw(world: World, a: Id, b: Id): number {
+  let tot = totalCache.get(world.trade);
+  if (!tot) {
+    tot = {};
+    for (const x in world.trade) for (const y in world.trade[x]) {
+      const v = world.trade[x][y];
+      tot[x] = (tot[x] ?? 0) + v;
+      tot[y] = (tot[y] ?? 0) + v;
+    }
+    totalCache.set(world.trade, tot);
+  }
+  const ab = (world.trade[a]?.[b] ?? 0) + (world.trade[b]?.[a] ?? 0);
+  return (tot[a] ?? 0) > 0 ? ab / tot[a] : 0;
 }

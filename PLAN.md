@@ -38,14 +38,22 @@ una "regla fiscal" a los gobiernos IA. Los tipos efectivos de la deuda de paíse
 **Verificación F2:** tests en verde; 200 turnos estables (PIB mundial ~2 %/año, ~48 cambios de gobierno en 60 entidades,
 cientos de eventos), ~25 ms/turno.
 
-## F3 — Diplomacia e IA
-- [ ] Relaciones dirigidas, confianza, memoria, reputación
-- [ ] Tratados, alianzas, acuerdos comerciales/energéticos, ayuda, sanciones, aranceles,
-      ultimátums, mediación, cumbres, ruptura
-- [ ] Organismos con votaciones y veto
-- [ ] IA por utilidad con personalidad, amenazas, ruido controlado y motivos
-- [ ] Reacciones al jugador y coaliciones de contrapeso; IA ↔ IA
-- [ ] IU: Diplomacia, panel de motivos de la IA, capas de alianzas y relaciones
+## F3 — Diplomacia e IA ✅
+- [x] Relaciones dirigidas (opinión y confianza) que derivan hacia un objetivo explicable: afinidad estructural, memoria,
+      enemigos comunes, tratados, interdependencia, sanciones, guerra y reputación
+- [x] Memoria con 21 tipos de recuerdo (ayuda, traición, tratado roto, amenaza, espionaje…) con semivida propia
+- [x] Tratados (libre comercio, alianza, no agresión, cooperación tecnológica, energía, ayuda), sanciones por niveles,
+      aranceles, ultimátums con casus belli, mediación, ruptura de relaciones, expulsión de diplomáticos
+- [x] Organismos (13) con ingreso por votación, líneas rojas (p. ej. OTAN en la frontera rusa) y resoluciones de la ONU
+      (condena, sanciones con veto del Consejo de Seguridad, alto el fuego, ayuda, clima); el jugador vota
+- [x] IA por utilidad: amenazas percibidas, candidatas internas y diplomáticas ponderadas por personalidad, ruido de la
+      semilla, capital político y saturación de tratados; evalúa propuestas con motivos explicables
+- [x] Reacciones a incidentes (represalias, acercamiento a rivales, solidaridad de aliados) y coaliciones de contrapeso
+- [x] IU: pestaña Diplomacia (propuestas, votaciones, relaciones, tratados, sanciones, organismos, registro de la IA con
+      motivos) y acciones diplomáticas en el panel del país con probabilidad de aceptación
+
+**Verificación F3:** tests en verde; 200 turnos estables (~270 tratados en equilibrio, sin NaN), ~50 ms/turno tras
+indexar alianzas, barreras comerciales y relaciones por turno.
 
 ## F4 — Militar y guerras
 - [ ] Unidades por tipo, mantenimiento, producción, movilización, despliegues, maniobras, bloqueos

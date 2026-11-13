@@ -38,14 +38,50 @@ function baseWeight(world: World, a: Country, b: Country): number {
   return w;
 }
 
+interface BarrierCache { sig: string; m: Map<string, number>; sanc: Map<string, number[]>; fta: Map<string, number> }
+const barrierCache = new WeakMap<World, BarrierCache>();
+
+function barrierSig(world: World): string {
+  return `${world.turn}:${world.rev ?? 0}`;
+}
+
+function getCache(world: World): BarrierCache {
+  const sig = barrierSig(world);
+  let c = barrierCache.get(world);
+  if (!c || c.sig !== sig) {
+    const sanc = new Map<string, number[]>();
+    for (const s of world.sanctions) {
+      const k = s.by < s.target ? `${s.by}|${s.target}` : `${s.target}|${s.by}`;
+      (sanc.get(k) ?? sanc.set(k, []).get(k)!).push(s.level);
+    }
+    const fta = new Map<string, number>();
+    for (const t of world.treaties) {
+      if (t.start > 0 && t.type === 'trade') {
+        const [x, y] = t.parties;
+        const k = x < y ? `${x}|${y}` : `${y}|${x}`;
+        fta.set(k, (fta.get(k) ?? 0) + 0.12);
+      }
+    }
+    c = { sig, m: new Map(), sanc, fta };
+    barrierCache.set(world, c);
+  }
+  return c;
+}
+
 /** Barrera comercial efectiva entre a y b (−0.5 = impulso, 1 = cerrado). */
 export function tradeBarrier(world: World, a: Id, b: Id): number {
+  const cache = getCache(world);
+  const key = a < b ? `${a}|${b}` : `${b}|${a}`;
+  const hit = cache.m.get(key);
+  if (hit !== undefined) return hit;
+  const v = computeBarrier(world, a, b, cache, key);
+  cache.m.set(key, v);
+  return v;
+}
+
+function computeBarrier(world: World, a: Id, b: Id, cache: BarrierCache, key: string): number {
   let open = 1;
-  for (const s of world.sanctions) {
-    if ((s.by === a && s.target === b) || (s.by === b && s.target === a)) {
-      open *= 1 - [0, 0.3, 0.6, 0.95][clamp(s.level, 0, 3)];
-    }
-  }
+  for (const lv of cache.sanc.get(key) ?? []) open *= 1 - [0, 0.3, 0.6, 0.95][clamp(lv, 0, 3)];
   const tAB = world.tariffs[a]?.[b] ?? 0;
   const tBA = world.tariffs[b]?.[a] ?? 0;
   open *= 1 - clamp((tAB + tBA) / 200, 0, 0.7);
@@ -59,10 +95,7 @@ export function tradeBarrier(world: World, a: Id, b: Id): number {
   }
   const op = Math.min(world.rel[a]?.[b]?.op ?? 0, world.rel[b]?.[a]?.op ?? 0);
   if (op < -60) open *= 0.9;
-  let bonus = 0;
-  for (const t of world.treaties) {
-    if (t.start > 0 && (t.type === 'trade') && t.parties.includes(a) && t.parties.includes(b)) bonus += 0.25;
-  }
+  const bonus = cache.fta.get(key) ?? 0;
   const ca = world.countries[a], cb = world.countries[b];
   if (ca && cb) {
     // Variación del arancel general respecto al inicial

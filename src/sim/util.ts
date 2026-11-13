@@ -86,3 +86,8 @@ export function haversine(a: [number, number], b: [number, number]): number {
 export function pairKey(a: Id, b: Id): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
 }
+
+/** Marca que han cambiado tratados, sanciones, aranceles, organismos o guerras (invalida cachés). */
+export function bumpRev(world: World) {
+  world.rev = (world.rev ?? 0) + 1;
+}

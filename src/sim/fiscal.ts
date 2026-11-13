@@ -3,7 +3,7 @@ import type { BudgetItem, Country, TaxId, World } from './types';
 import { BUDGET_ITEMS, TAXES } from './types';
 import { forecastVote, type Lean, type VoteForecast } from './parliament';
 import { regimeOf } from './data';
-import { clamp, news, rngOf, timeline } from './util';
+import { bumpRev, clamp, news, rngOf, timeline } from './util';
 
 export interface FiscalDraft {
   budget: Record<BudgetItem, number>;
@@ -92,6 +92,7 @@ export function applyFiscal(world: World, c: Country, d: FiscalDraft): ApplyResu
   const dVat = d.taxes.consumption - c.eco.taxes.consumption;
   for (const k of BUDGET_ITEMS) c.eco.budget[k] = clamp(d.budget[k], 0, 60);
   for (const k of TAXES) c.eco.taxes[k] = clamp(d.taxes[k], 0, k === 'tariff' ? 80 : 70);
+  bumpRev(world);
   // Efecto precio inmediato del IVA
   if (dVat) c.eco.inflation = clamp(c.eco.inflation + dVat * 0.25, -5, 3000);
   news(world, `${c.name} aprueba nuevos presupuestos (cambio de ${info.deficitDelta >= 0 ? '+' : ''}${info.deficitDelta.toFixed(1)} pp en el saldo).`, 'economia', [c.id], 1);

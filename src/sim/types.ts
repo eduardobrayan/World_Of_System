@@ -380,7 +380,7 @@ export interface Resolution {
   proposer: Id;
   text: string;
   votes: Dict<'si' | 'no' | 'abs'>;
-  passed: boolean;
+  passed?: boolean;
   vetoedBy?: Id;
 }
 
@@ -441,6 +441,7 @@ export interface Incident {
   kind: string;
   magnitude: number;
   text: string;
+  processed?: boolean;
 }
 
 export interface Proposal {
@@ -521,6 +522,7 @@ export interface World {
   player: PlayerState | null;
   gameOver: GameOver | null;
   uid: number;
+  rev?: number; // revisión: cambia al modificar tratados, sanciones, aranceles, organismos o guerras
   worldHistory: { t: number; gdp: number; oil: number; tension: number; temp: number; wars: number }[];
   forecast?: boolean;
 }
