@@ -216,7 +216,9 @@ export function updateMarket(world: World) {
 function techProdBonus(c: Country, k: Commodity): number {
   let b = 0;
   for (const md of c.mods) b += md.mods[`capacity.${k}`] ?? 0;
-  return b / 100;
+  const ministry = k === 'food' ? 'agriculture' : k === 'oil' || k === 'gas' ? 'energy' : 'industry';
+  const comp = (c.pol.ministers.find((m) => m.ministry === ministry)?.competence ?? 50) - 50;
+  return (b + comp * 0.01) / 100;
 }
 
 /**

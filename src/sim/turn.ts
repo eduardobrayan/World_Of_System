@@ -12,9 +12,13 @@ import { updateGlobals } from './globals';
 import { snapshot, worldSnapshot } from './history';
 import { applyAidFlows } from './init';
 import { fiscalAutopilot } from './autopilot';
+import { updateElections } from './elections';
+import { generateEvents } from './events';
+import { ensureHandlers } from './registry';
 
 export function advanceTurn(world: World) {
   if (world.gameOver) return;
+  ensureHandlers();
   const ids = world.order.filter((id) => world.countries[id].alive);
 
   for (const id of ids) {
@@ -37,6 +41,10 @@ export function advanceTurn(world: World) {
     updatePolitics(world, c);
     updateTech(world, c);
   }
+  for (const id of ids) {
+    if (world.gameOver) break;
+    updateElections(world, world.countries[id]);
+  }
 
   updateGlobals(world);
   world.turn += 1;
@@ -44,4 +52,5 @@ export function advanceTurn(world: World) {
   for (const id of ids) tickModifiers(world.countries[id]);
   for (const id of ids) snapshot(world, world.countries[id]);
   worldSnapshot(world);
+  if (!world.gameOver) generateEvents(world);
 }

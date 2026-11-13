@@ -54,21 +54,39 @@ export function renderEconomy(app: App): HTMLElement[] {
   const forecastBox = h('div');
 
   const updateSummary = () => mount(summary, fiscalSummary(app, d, forecastBox));
-  const sliderRow = (label: string, desc: string, value: number, min: number, max: number, step: number, cur: number, set: (v: number) => void, unit = '%') => {
-    const val = h('span', { class: `val ${Math.abs(value - cur) > 1e-6 ? 'changed' : ''}` }, `${value.toFixed(step < 0.1 ? 2 : 1)}${unit === '%' ? ' %' : ''}`);
-    const input = h('input', { type: 'range', min: String(min), max: String(max), step: String(step), value: String(value), 'aria-label': label });
-    input.addEventListener('input', () => {
-      const v = Number(input.value);
+  /** Control por pasos (−− / − / valor / + / ++) en lugar de deslizadores. */
+  const stepRow = (label: string, desc: string, value: number, min: number, max: number, small: number, big: number, cur: number, set: (v: number) => void) => {
+    let v = value;
+    const decimals = small < 0.5 ? 2 : 1;
+    const valEl = h('span', { class: 'val' });
+    const diffEl = h('span', { class: 'diff' });
+    const resetBtn = h('button', { class: 'step reset', title: 'Volver al valor actual', 'aria-label': `Restablecer ${label}` }, '↺');
+    const paint = () => {
+      const changed = Math.abs(v - cur) > 1e-6;
+      valEl.textContent = `${v.toFixed(decimals)} %`;
+      valEl.classList.toggle('changed', changed);
+      diffEl.textContent = changed ? `${v > cur ? '+' : '−'}${Math.abs(v - cur).toFixed(decimals)}` : '';
+      diffEl.className = `diff ${changed ? (v > cur ? 'up' : 'down') : ''}`;
+      resetBtn.style.visibility = changed ? 'visible' : 'hidden';
+    };
+    const change = (nv: number) => {
+      v = Math.round(Math.max(min, Math.min(max, nv)) * 1000) / 1000;
       set(v);
-      val.textContent = `${v.toFixed(step < 0.1 ? 2 : 1)}${unit === '%' ? ' %' : ''}`;
-      val.classList.toggle('changed', Math.abs(v - cur) > 1e-6);
+      paint();
       app.ui.forecast = undefined;
       mount(forecastBox);
       updateSummary();
-    });
+    };
+    const btn = (txt: string, delta: number, title: string) =>
+      h('button', { class: 'step', title, 'aria-label': `${title}: ${label}`, onclick: () => change(v + delta) }, txt);
+    resetBtn.addEventListener('click', () => change(cur));
     const lab = h('label', null, label);
-    tip(lab, () => h('div', null, h('div', { class: 't' }, label), h('div', { class: 'desc' }, desc), h('div', { class: 'small muted' }, `Valor actual: ${cur.toFixed(2)}${unit === '%' ? ' %' : ''}`)));
-    return h('div', { class: 'slider-row' }, lab, input, val);
+    tip(lab, () => h('div', null, h('div', { class: 't' }, label), h('div', { class: 'desc' }, desc),
+      h('div', { class: 'small muted' }, `Valor actual: ${cur.toFixed(2)} % · pasos de ${small} y ${big} puntos`)));
+    paint();
+    return h('div', { class: 'step-row' }, lab,
+      h('div', { class: 'stepper' }, btn('−−', -big, `Bajar ${big}`), btn('−', -small, `Bajar ${small}`), valEl, btn('+', small, `Subir ${small}`), btn('++', big, `Subir ${big}`)),
+      diffEl, resetBtn);
   };
 
   const out: HTMLElement[] = [];
@@ -77,11 +95,11 @@ export function renderEconomy(app: App): HTMLElement[] {
     ...['growth', 'inflation', 'unemployment', 'deficit', 'debt', 'reserves'].map((k) => kpi(app, k, c))));
 
   out.push(section('Presupuesto (% del PIB)',
-    h('div', { class: 'small muted', style: 'margin-bottom:4px' }, 'Mueve los controles y aprueba el presupuesto. Los efectos tardan meses en notarse.'),
-    ...BUDGET_ITEMS.map((k) => sliderRow(BUDGET_INFO[k][0], BUDGET_INFO[k][1], d.budget[k], 0, Math.max(30, c.eco.budget[k] * 2), 0.05, c.eco.budget[k], (v) => { d.budget[k] = v; }))));
+    h('div', { class: 'small muted', style: 'margin-bottom:4px' }, 'Ajusta cada partida con los botones (− / + pasos pequeños, −− / ++ grandes) y aprueba el presupuesto. Los efectos tardan meses en notarse.'),
+    ...BUDGET_ITEMS.map((k) => stepRow(BUDGET_INFO[k][0], BUDGET_INFO[k][1], d.budget[k], 0, Math.max(30, c.eco.budget[k] * 2), 0.1, 0.5, c.eco.budget[k], (v) => { d.budget[k] = v; }))));
 
   out.push(section('Impuestos (tipos efectivos)',
-    ...TAXES.map((k) => sliderRow(TAX_INFO[k][0], TAX_INFO[k][1], d.taxes[k], 0, TAX_INFO[k][2], 0.5, c.eco.taxes[k], (v) => { d.taxes[k] = v; }))));
+    ...TAXES.map((k) => stepRow(TAX_INFO[k][0], TAX_INFO[k][1], d.taxes[k], 0, TAX_INFO[k][2], 0.5, 2, c.eco.taxes[k], (v) => { d.taxes[k] = v; }))));
 
   const indep = cbIndependent(c);
   out.push(section('Política monetaria',
@@ -91,7 +109,7 @@ export function renderEconomy(app: App): HTMLElement[] {
         plainStat('Regla de Taylor (objetivo del banco)', `${taylorRate(c).toFixed(2)} %`),
         plainStat('Meta de inflación', `${c.eco.cbTarget.toFixed(1)} %`),
         h('div', { class: 'small muted', style: 'margin-top:4px' }, 'El banco central es independiente: fija los tipos con una regla de Taylor. Puedes subordinarlo con la política «Banco central» (pestaña Gobierno), a costa de credibilidad.'))
-      : sliderRow('Tipo de interés oficial', 'El banco central está subordinado: tú fijas los tipos. Bajarlos impulsa el crecimiento y deprecia la moneda; subirlos frena la inflación.', d.rate, 0, Math.max(40, c.eco.policyRate * 1.5), 0.25, c.eco.policyRate, (v) => { d.rate = v; })));
+      : stepRow('Tipo de interés oficial', 'El banco central está subordinado: tú fijas los tipos. Bajarlos impulsa el crecimiento y deprecia la moneda; subirlos frena la inflación.', d.rate, 0, Math.max(40, c.eco.policyRate * 1.5), 0.25, 1, c.eco.policyRate, (v) => { d.rate = v; })));
 
   updateSummary();
   out.push(h('div', { class: 'card', style: 'border-color:#2a4a70' }, summary, forecastBox));

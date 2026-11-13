@@ -19,7 +19,7 @@ export function forecastVote(world: World, c: Country, lean: Lean, extraWhip = 0
   const reg = regimeOf(c.pol.regime);
   const parties = c.pol.parties.map((p) => {
     const ideo = ideologyOf(p.ideology);
-    const agree = -(ideo.econ * lean.econ) * 1.6 - Math.abs(ideo.auth - lean.auth) * 0.4 + (lean.auth > 0.3 && ideo.auth < 0 ? -0.6 : 0);
+    const agree = ideo.econ * lean.econ * 1.6 + ideo.auth * lean.auth * 1.2 - Math.abs(lean.auth) * 0.2 + (lean.auth > 0.3 && ideo.auth < 0 ? -0.6 : 0);
     let yesProb: number;
     if (p.gov) {
       const discipline = 0.75 + c.pol.approval / 400 + extraWhip * 0.06;

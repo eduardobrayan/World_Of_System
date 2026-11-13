@@ -139,7 +139,8 @@ export function revenue(world: World, c: Country): { value: number; parts: Contr
   const p: Contribution[] = [];
   const t = c.eco.taxes;
   const compliance = 1 - c.pol.corruption / 250;
-  const eff = c.eco.taxEfficiency * compliance * (1 + modSum(c, 'taxEfficiency') + regionalSum(c, 'taxEfficiency'));
+  const econMin = (c.pol.ministers.find((m) => m.ministry === 'economy')?.competence ?? 50) - 50;
+  const eff = c.eco.taxEfficiency * compliance * (1 + modSum(c, 'taxEfficiency') + regionalSum(c, 'taxEfficiency') + econMin * 0.0015);
   const occ = c.regions.filter((r) => r.owner === c.id && r.controller !== c.id).reduce((a, r) => a + r.popShare, 0);
   const base = c.eco.gdp * (1 - occ * 0.8);
   let v = part(p, 'Impuesto sobre la renta', (base * 0.45 * t.income * eff) / 100);
@@ -162,7 +163,8 @@ export function rawRevenueParts(world: World, c: Country): { taxesAtEff1: number
   const t = c.eco.taxes;
   const compliance = 1 - c.pol.corruption / 250;
   const occ = c.regions.filter((r) => r.owner === c.id && r.controller !== c.id).reduce((a, r) => a + r.popShare, 0);
-  const extraEff = 1 + modSum(c, 'taxEfficiency') + regionalSum(c, 'taxEfficiency');
+  const econMin = (c.pol.ministers.find((m) => m.ministry === 'economy')?.competence ?? 50) - 50;
+  const extraEff = 1 + modSum(c, 'taxEfficiency') + regionalSum(c, 'taxEfficiency') + econMin * 0.0015;
   const taxesAtEff1 = (c.eco.gdp * (1 - occ * 0.8) * (0.45 * t.income + 0.1 * t.corporate + 0.35 * t.consumption) * compliance * extraEff) / 100;
   const tariffs = ((c.eco.gdp * c.eco.imports) / 100) * (t.tariff / 100) * 0.7 * c.eco.tradeAccess;
   let resRev = 0;

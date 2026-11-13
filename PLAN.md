@@ -23,14 +23,20 @@ sin NaN ni colapsos. ~17 ms/turno.
 estructural de la cuenta corriente, haciendo relativos al punto de partida los efectos de tipos y sanciones y añadiendo
 una "regla fiscal" a los gobiernos IA. Los tipos efectivos de la deuda de países con inflación alta o en impago se fijan en datos.
 
-## F2 — Política interna, grupos de apoyo, eventos, sistema local
-- [ ] Grupos (expresiones de datos), aprobación, estabilidad, protestas, huelgas
-- [ ] Régimen, parlamento, partidos, elecciones, golpe, revolución, ministros
-- [ ] Motor de acciones genérico (requisitos → costes → efectos → retardos → modificadores)
-- [ ] Políticas por niveles y leyes; previsualización con efectos y riesgos
-- [ ] Eventos dinámicos ponderados con opciones (y consecuencias ocultas)
-- [ ] Edificios y construcción regional con efectos nacionales
-- [ ] IU: Gobierno, Sociedad, Territorio, bandeja de eventos, noticias, tooltips con causas
+## F2 — Política interna, grupos de apoyo, eventos, sistema local ✅
+- [x] Grupos con factores definidos como expresiones en `groups.json`; aprobación, base de poder, estabilidad, protestas, huelgas
+- [x] Régimen, parlamento (voto por ideología de cada partido), elecciones con voto previsto, golpes, revoluciones,
+      cambios de gobierno con efectos en cadena (ideología, personalidad, relaciones, ministros, "luna de miel")
+- [x] Motor de acciones genérico (`actions.ts` + `actions.json`): requisitos → costes → efectos → retardos → modificadores,
+      con *handlers* para mecánicas especiales (políticas, ministros, elecciones anticipadas, referéndum, fraude, cambio de régimen)
+- [x] 10 políticas por niveles y 33 leyes, programas y acciones de gobierno; previsualización con efectos, voto y riesgos
+- [x] 31 eventos dinámicos ponderados por el estado del mundo, con opciones y consecuencias ocultas o retardadas
+- [x] Edificios regionales con efectos nacionales (hecho en F1) y efectos de los ministros (competencia y lealtad)
+- [x] IU: pestañas Gobierno y Sociedad, ventana de eventos obligatoria, bandeja de eventos, fin de partida con cronología
+- [x] Controles de presupuesto por pasos (−− / − / + / ++) en lugar de deslizadores (petición del usuario)
+
+**Verificación F2:** tests en verde; 200 turnos estables (PIB mundial ~2 %/año, ~48 cambios de gobierno en 60 entidades,
+cientos de eventos), ~25 ms/turno.
 
 ## F3 — Diplomacia e IA
 - [ ] Relaciones dirigidas, confianza, memoria, reputación

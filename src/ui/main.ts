@@ -4,6 +4,9 @@ import type { World } from '../sim/types';
 import { App } from './app';
 import { showStart } from './start';
 import { h, mount } from './dom';
+import { ensureHandlers } from '../sim/registry';
+
+ensureHandlers();
 
 const container = document.getElementById('app')!;
 let app: App | null = null;

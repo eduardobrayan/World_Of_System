@@ -17,6 +17,7 @@ import { initialBuildings, recomputeFx } from './regions';
 import { initPolicies } from './policies';
 import { initTech } from './tech';
 import { snapshot } from './history';
+import { ensureHandlers } from './registry';
 
 export interface NewGameOptions {
   seed: string;
@@ -392,6 +393,7 @@ function calibrate(world: World, c: Country) {
 }
 
 export function createWorld(opts: NewGameOptions): World {
+  ensureHandlers();
   const world: World = {
     version: 1, seed: opts.seed, rng: seedRng(opts.seed), turn: 0, countries: {}, order: [], rel: {}, trade: {},
     treaties: [], orgs: {}, resolutions: [], sanctions: [], tariffs: {}, wars: [],

@@ -1,0 +1,2151 @@
+[
+ {
+  "id": "huelga_general",
+  "title": "Huelga general",
+  "category": "social",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "Los sindicatos de {country} convocan una huelga general contra la pérdida de poder adquisitivo y la política laboral del Gobierno.",
+  "condition": "groups.workers < 40",
+  "weight": "(40 - groups.workers) * 0.12 + soc.strikes * 0.03",
+  "options": [
+   {
+    "text": "Negociar una subida salarial",
+    "hint": "Calma a los trabajadores a costa de algo de inflación.",
+    "effects": [
+     {
+      "path": "soc.strikes",
+      "mul": 0.4
+     },
+     {
+      "path": "budget.social",
+      "add": 0.3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_subida_salarial",
+      "name": "Subida salarial pactada",
+      "duration": 12,
+      "mods": {
+       "inflation": 0.6,
+       "group.workers": 4
+      }
+     }
+    ],
+    "groups": {
+     "workers": 6,
+     "business": -4
+    },
+    "ai": "groups.workers < 30 ? 2 : 1 - ideo.econ"
+   },
+   {
+    "text": "Aguantar el pulso",
+    "hint": "La huelga paraliza la economía unas semanas.",
+    "effects": [
+     {
+      "path": "soc.strikes",
+      "add": 10
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_huelga",
+      "name": "Huelga general",
+      "duration": 2,
+      "mods": {
+       "growth": -1.2
+      }
+     }
+    ],
+    "groups": {
+     "workers": -6,
+     "business": 2
+    },
+    "ai": "ideo.econ + pers.riskAversion * -0.5"
+   },
+   {
+    "text": "Decretar servicios mínimos abusivos y cargas policiales",
+    "hint": "Acaba con la huelga, pero radicaliza a los trabajadores.",
+    "effects": [
+     {
+      "path": "pol.repression",
+      "add": 20
+     },
+     {
+      "path": "soc.strikes",
+      "mul": 0.5
+     },
+     {
+      "path": "pol.legitimacy",
+      "add": -3
+     }
+    ],
+    "groups": {
+     "workers": -12,
+     "youth": -4,
+     "military": 2
+    },
+    "ai": "ideo.auth * 2 - regime.competitive"
+   }
+  ]
+ },
+ {
+  "id": "protestas_masivas",
+  "title": "Protestas masivas",
+  "category": "social",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 12,
+  "text": "Cientos de miles de personas toman las calles de las principales ciudades de {country} exigiendo cambios.",
+  "condition": "soc.protest > 35",
+  "weight": "(soc.protest - 30) * 0.12",
+  "options": [
+   {
+    "text": "Abrir una mesa de diálogo",
+    "hint": "Cuesta capital político; reduce las protestas.",
+    "effects": [
+     {
+      "path": "pol.ap",
+      "add": -1
+     },
+     {
+      "path": "soc.protest",
+      "mul": 0.8
+     },
+     {
+      "path": "groups.all",
+      "add": 2
+     }
+    ],
+    "ai": "regime.competitive + 0.5"
+   },
+   {
+    "text": "Aprobar concesiones sociales",
+    "hint": "Más gasto social; las protestas bajan con fuerza.",
+    "effects": [
+     {
+      "path": "budget.social",
+      "add": 0.5
+     },
+     {
+      "path": "soc.protest",
+      "mul": 0.6
+     }
+    ],
+    "groups": {
+     "workers": 4,
+     "youth": 3,
+     "business": -3
+    },
+    "ai": "1 - ideo.econ * 0.5 - (deficit - 4) * 0.2"
+   },
+   {
+    "text": "Reprimir las manifestaciones",
+    "hint": "Eficaz a corto plazo; daña la legitimidad y la imagen exterior.",
+    "effects": [
+     {
+      "path": "pol.repression",
+      "add": 30
+     },
+     {
+      "path": "soc.protest",
+      "mul": 0.5
+     },
+     {
+      "path": "pol.legitimacy",
+      "add": -5
+     },
+     {
+      "path": "reputation",
+      "add": -3
+     },
+     {
+      "type": "relation",
+      "target": "all",
+      "value": -1
+     }
+    ],
+    "groups": {
+     "youth": -8,
+     "minorities": -6,
+     "military": 2
+    },
+    "ai": "ideo.auth * 2.5 - regime.competitive * 1.5"
+   },
+   {
+    "text": "Ignorarlas",
+    "hint": "No cuesta nada… hoy.",
+    "effects": [
+     {
+      "path": "groups.all",
+      "add": -1
+     }
+    ],
+    "delayed": [
+     {
+      "in": 2,
+      "effects": [
+       {
+        "path": "soc.protest",
+        "add": 10,
+        "hidden": true
+       }
+      ],
+      "text": "Las protestas ignoradas se recrudecen."
+     }
+    ],
+    "ai": "pers.riskAversion * -1 + 0.3"
+   }
+  ]
+ },
+ {
+  "id": "escandalo_corrupcion",
+  "title": "Escándalo de corrupción",
+  "category": "politica",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "La prensa revela que el ministro {minister} cobró comisiones ilegales en contratos públicos.",
+  "condition": "pol.corruption > 25",
+  "weight": "(pol.corruption - 20) * 0.03 + pol.pressFreedom * 0.01",
+  "options": [
+   {
+    "text": "Cesar al ministro de inmediato",
+    "hint": "Daña al gobierno a corto plazo, protege tu legitimidad.",
+    "effects": [
+     {
+      "path": "pol.legitimacy",
+      "add": 2
+     },
+     {
+      "path": "groups.all",
+      "add": -2
+     },
+     {
+      "path": "pol.ap",
+      "add": -1
+     }
+    ],
+    "ai": "regime.competitive + pers.pragmatism"
+   },
+   {
+    "text": "Defenderlo públicamente",
+    "hint": "Puede salir caro si aparecen más pruebas.",
+    "effects": [
+     {
+      "path": "soc.trust",
+      "add": -6
+     },
+     {
+      "path": "groups.all",
+      "add": -3
+     }
+    ],
+    "delayed": [
+     {
+      "in": 3,
+      "effects": [
+       {
+        "path": "soc.protest",
+        "add": 8,
+        "hidden": true
+       },
+       {
+        "path": "pol.legitimacy",
+        "add": -4,
+        "hidden": true
+       }
+      ],
+      "text": "Nuevas revelaciones agravan el escándalo."
+     }
+    ],
+    "ai": "ideo.auth - regime.competitive * 0.5"
+   },
+   {
+    "text": "Encargar una investigación independiente",
+    "hint": "Reduce la corrupción a medio plazo; molesta a las élites.",
+    "effects": [
+     {
+      "path": "groups.business",
+      "add": -3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_investigacion",
+      "name": "Investigación independiente",
+      "duration": 24,
+      "mods": {
+       "corruption": -3,
+       "trust": 3
+      }
+     }
+    ],
+    "ai": "0.8"
+   }
+  ]
+ },
+ {
+  "id": "crisis_deuda",
+  "title": "Crisis de deuda soberana",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 36,
+  "text": "Los mercados se niegan a refinanciar la deuda de {country}: la prima de riesgo se dispara y las subastas quedan desiertas.",
+  "condition": "debt > 80 && eco.riskPremium > 4",
+  "weight": "eco.riskPremium * 0.8",
+  "options": [
+   {
+    "text": "Pedir un rescate al FMI con condiciones",
+    "hint": "Liquidez inmediata a cambio de un duro ajuste.",
+    "effects": [
+     {
+      "path": "eco.reserves",
+      "add": "gdp * 0.04"
+     },
+     {
+      "path": "eco.riskPremium",
+      "add": -3
+     },
+     {
+      "path": "budget.social",
+      "mul": 0.9
+     },
+     {
+      "path": "budget.subsidies",
+      "mul": 0.7
+     },
+     {
+      "path": "pol.ap",
+      "add": -1
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_rescate",
+      "name": "Programa del FMI",
+      "duration": 24,
+      "mods": {
+       "growth": -1,
+       "group.workers": -6,
+       "group.business": 3
+      }
+     }
+    ],
+    "groups": {
+     "workers": -6,
+     "youth": -4
+    },
+    "ai": "pers.pragmatism * 2 + regime.competitive"
+   },
+   {
+    "text": "Financiar el déficit con el banco central",
+    "hint": "Evita recortes… a cambio de inflación.",
+    "effects": [
+     {
+      "path": "eco.riskPremium",
+      "add": -1
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_monetizacion",
+      "name": "Monetización del déficit",
+      "duration": 18,
+      "mods": {
+       "inflation": 6,
+       "currency": -0.6
+      }
+     }
+    ],
+    "groups": {
+     "business": -5
+    },
+    "ai": "ideo.econ * -1 + 0.5"
+   },
+   {
+    "text": "Declarar una moratoria y reestructurar la deuda",
+    "hint": "Quita de deuda, pero años de aislamiento financiero.",
+    "effects": [
+     {
+      "path": "eco.defaulted",
+      "set": "world.turn"
+     },
+     {
+      "path": "eco.defaults",
+      "add": 1
+     },
+     {
+      "path": "reputation",
+      "add": -10
+     },
+     {
+      "type": "relation",
+      "target": "all",
+      "value": -3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_impago",
+      "name": "Impago soberano",
+      "duration": 24,
+      "mods": {
+       "growth": -2,
+       "investment": -3,
+       "group.business": -10
+      }
+     }
+    ],
+    "groups": {
+     "business": -8,
+     "workers": 3
+    },
+    "ai": "ideo.nat + pers.aggression - 1",
+    "debtCut": 0.3
+   }
+  ]
+ },
+ {
+  "id": "crisis_cambiaria",
+  "title": "Ataque contra la moneda",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "La moneda de {country} se desploma ante la salida masiva de capitales y la caída de las reservas.",
+  "condition": "!eco.euro && !eco.reserveCurrency && reserves < gdp * imports / 100 / 6",
+  "weight": "2 + eco.riskPremium * 0.3",
+  "options": [
+   {
+    "text": "Dejar flotar y devaluar",
+    "hint": "Exportaciones más competitivas, inflación importada.",
+    "effects": [
+     {
+      "path": "eco.currency",
+      "mul": 0.82
+     },
+     {
+      "path": "eco.inflation",
+      "add": 4
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_devaluacion",
+      "name": "Devaluación",
+      "duration": 18,
+      "mods": {
+       "exports": 0.06
+      }
+     }
+    ],
+    "groups": {
+     "workers": -4
+    },
+    "ai": "pers.pragmatism + 0.3"
+   },
+   {
+    "text": "Subir los tipos de interés con fuerza",
+    "hint": "Defiende la moneda y frena la economía.",
+    "effects": [
+     {
+      "path": "eco.policyRate",
+      "add": 5
+     },
+     {
+      "path": "eco.currency",
+      "mul": 0.95
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_tipos_emergencia",
+      "name": "Subida de tipos de emergencia",
+      "duration": 9,
+      "mods": {
+       "growth": -1.2
+      }
+     }
+    ],
+    "groups": {
+     "business": -4
+    },
+    "ai": "ideo.econ + 0.5"
+   },
+   {
+    "text": "Imponer controles de capital",
+    "hint": "Frena la sangría, ahuyenta la inversión.",
+    "effects": [
+     {
+      "path": "eco.currency",
+      "mul": 0.92
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_corralito",
+      "name": "Controles de capital",
+      "duration": 24,
+      "mods": {
+       "investment": -2,
+       "currency": 0.3,
+       "group.business": -8
+      }
+     }
+    ],
+    "groups": {
+     "business": -6
+    },
+    "ai": "ideo.auth - ideo.econ"
+   }
+  ]
+ },
+ {
+  "id": "terremoto",
+  "title": "Terremoto devastador",
+  "category": "desastre",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Un terremoto de magnitud 7 sacude la región de {region}: hay miles de víctimas y graves daños en infraestructuras.",
+  "condition": "hazard.earthquake > 0",
+  "weight": "hazard.earthquake * 0.18 * (1 - mod.disasterResist)",
+  "options": [
+   {
+    "text": "Plan de reconstrucción masivo",
+    "hint": "Caro, pero recupera la región y gana apoyo.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.012"
+     },
+     {
+      "type": "pop",
+      "value": -0.01
+     },
+     {
+      "path": "groups.all",
+      "add": 3
+     },
+     {
+      "type": "damage",
+      "value": 8
+     }
+    ],
+    "ai": "1.5"
+   },
+   {
+    "text": "Solicitar ayuda internacional",
+    "hint": "Menos coste; dependes de la buena voluntad ajena.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.004"
+     },
+     {
+      "type": "pop",
+      "value": -0.01
+     },
+     {
+      "type": "damage",
+      "value": 15
+     },
+     {
+      "type": "relation",
+      "target": "all",
+      "value": 2
+     }
+    ],
+    "ai": "1 - pers.ambition"
+   },
+   {
+    "text": "Respuesta mínima",
+    "hint": "Ahorro inmediato; la población no lo olvidará.",
+    "effects": [
+     {
+      "type": "pop",
+      "value": -0.015
+     },
+     {
+      "type": "damage",
+      "value": 25
+     },
+     {
+      "path": "groups.all",
+      "add": -5
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_terremoto",
+      "name": "Secuelas del terremoto",
+      "duration": 12,
+      "mods": {
+       "growth": -0.4
+      }
+     }
+    ],
+    "ai": "(deficit - 5) * 0.3"
+   }
+  ]
+ },
+ {
+  "id": "inundaciones",
+  "title": "Inundaciones catastróficas",
+  "category": "desastre",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "Lluvias torrenciales desbordan los ríos de {region}. Miles de evacuados y cosechas perdidas.",
+  "condition": "hazard.flood > 0",
+  "weight": "hazard.flood * 0.2 * (1 + (world.temperature - 1.45) * 2) * (1 - mod.disasterResist)",
+  "options": [
+   {
+    "text": "Ayudas inmediatas y obras de contención",
+    "hint": "Coste alto, recuperación rápida.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.006"
+     },
+     {
+      "path": "groups.all",
+      "add": 2
+     },
+     {
+      "type": "damage",
+      "value": 5
+     }
+    ],
+    "ai": "1.2"
+   },
+   {
+    "text": "Ayudas limitadas",
+    "hint": "Recuperación lenta.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.002"
+     },
+     {
+      "type": "damage",
+      "value": 12
+     },
+     {
+      "path": "groups.all",
+      "add": -2
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_inundacion",
+      "name": "Daños por inundaciones",
+      "duration": 9,
+      "mods": {
+       "growth": -0.3,
+       "prod.food": -0.05
+      }
+     }
+    ],
+    "ai": "(deficit - 4) * 0.3"
+   }
+  ]
+ },
+ {
+  "id": "huracan",
+  "title": "Huracán",
+  "category": "desastre",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 12,
+  "text": "Un huracán de categoría 4 golpea la costa de {region}.",
+  "condition": "hazard.storm > 0 && coastal",
+  "weight": "hazard.storm * 0.22 * (1 + (world.temperature - 1.45) * 2) * (1 - mod.disasterResist)",
+  "options": [
+   {
+    "text": "Movilizar al ejército y reconstruir",
+    "hint": "Coste alto; el ejército gana prestigio.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.007"
+     },
+     {
+      "path": "groups.military",
+      "add": 3
+     },
+     {
+      "path": "groups.all",
+      "add": 2
+     },
+     {
+      "type": "damage",
+      "value": 6
+     }
+    ],
+    "ai": "1.2"
+   },
+   {
+    "text": "Dejar la reconstrucción a aseguradoras y ayuntamientos",
+    "hint": "Barato y lento.",
+    "effects": [
+     {
+      "type": "damage",
+      "value": 14
+     },
+     {
+      "path": "groups.all",
+      "add": -3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_huracan",
+      "name": "Daños del huracán",
+      "duration": 6,
+      "mods": {
+       "growth": -0.4
+      }
+     }
+    ],
+    "ai": "(deficit - 4) * 0.3"
+   }
+  ]
+ },
+ {
+  "id": "sequia",
+  "title": "Sequía extrema",
+  "category": "desastre",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "La peor sequía en décadas arruina las cosechas de {country} y obliga a restringir el agua.",
+  "condition": "hazard.drought > 0",
+  "weight": "hazard.drought * 0.18 * (1 + (world.temperature - 1.45) * 2.5) * (1 - mod.disasterResist)",
+  "options": [
+   {
+    "text": "Ayudas al campo e importación de alimentos",
+    "hint": "Contiene precios a costa del presupuesto.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.004"
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_sequia",
+      "name": "Sequía",
+      "duration": 12,
+      "mods": {
+       "prod.food": -0.1,
+       "inflation": 0.5
+      }
+     }
+    ],
+    "groups": {
+     "workers": 2
+    },
+    "ai": "1"
+   },
+   {
+    "text": "Racionar el agua y dejar que suban los precios",
+    "hint": "Sin gasto; inflación y descontento.",
+    "modifiers": [
+     {
+      "id": "ev_sequia_dura",
+      "name": "Sequía sin ayudas",
+      "duration": 12,
+      "mods": {
+       "prod.food": -0.15,
+       "inflation": 1.5,
+       "protest": 5
+      }
+     }
+    ],
+    "groups": {
+     "workers": -5
+    },
+    "ai": "(deficit - 4) * 0.3"
+   }
+  ]
+ },
+ {
+  "id": "ola_calor",
+  "title": "Ola de calor histórica",
+  "category": "desastre",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 12,
+  "text": "Temperaturas récord provocan miles de muertes, incendios y apagones en {country}.",
+  "condition": "world.temperature > 1.5",
+  "weight": "(world.temperature - 1.45) * 1.2",
+  "options": [
+   {
+    "text": "Plan de emergencia sanitaria y climática",
+    "hint": "Reduce la mortalidad y gana apoyo de los jóvenes.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.002"
+     },
+     {
+      "path": "groups.youth",
+      "add": 2
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_calor",
+      "name": "Adaptación al calor",
+      "duration": 24,
+      "mods": {
+       "renewablesGrowth": 0.2
+      }
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "Medidas mínimas",
+    "hint": "Más muertes y críticas.",
+    "effects": [
+     {
+      "type": "pop",
+      "value": -0.005
+     },
+     {
+      "path": "groups.all",
+      "add": -2
+     }
+    ],
+    "ai": "(deficit - 4) * 0.2"
+   }
+  ]
+ },
+ {
+  "id": "yacimiento",
+  "title": "Descubrimiento de un gran yacimiento",
+  "category": "economia",
+  "tone": "good",
+  "scope": "country",
+  "cooldown": 120,
+  "once": true,
+  "text": "Geólogos confirman un enorme yacimiento de hidrocarburos y minerales en {region}.",
+  "condition": "tech.level > 30",
+  "weight": "0.08",
+  "options": [
+   {
+    "text": "Explotarlo cuanto antes",
+    "hint": "Más producción y renta; daño ambiental.",
+    "effects": [
+     {
+      "path": "res.oil.prod",
+      "add": "max(0.05, res.oil.prod * 0.08)"
+     },
+     {
+      "path": "res.oil.baseProd",
+      "add": "max(0.05, res.oil.baseProd * 0.08)"
+     },
+     {
+      "path": "res.minerals.prod",
+      "add": 0.3
+     },
+     {
+      "path": "res.minerals.baseProd",
+      "add": 0.3
+     },
+     {
+      "path": "tech.renewables",
+      "add": -1
+     }
+    ],
+    "groups": {
+     "business": 6,
+     "workers": 3,
+     "youth": -4
+    },
+    "ai": "1.5 - ideo.prefs_green"
+   },
+   {
+    "text": "Explotarlo con estándares ambientales estrictos",
+    "hint": "La mitad de producción, sin coste político.",
+    "effects": [
+     {
+      "path": "res.oil.prod",
+      "add": "max(0.02, res.oil.prod * 0.04)"
+     },
+     {
+      "path": "res.oil.baseProd",
+      "add": "max(0.02, res.oil.baseProd * 0.04)"
+     },
+     {
+      "path": "res.minerals.prod",
+      "add": 0.15
+     },
+     {
+      "path": "res.minerals.baseProd",
+      "add": 0.15
+     }
+    ],
+    "groups": {
+     "business": 3
+    },
+    "ai": "1"
+   },
+   {
+    "text": "Declararlo reserva natural",
+    "hint": "Renuncias a la riqueza, los jóvenes lo celebran.",
+    "effects": [
+     {
+      "path": "reputation",
+      "add": 3
+     }
+    ],
+    "groups": {
+     "youth": 6,
+     "business": -4
+    },
+    "ai": "ideo.prefs_green - 0.8"
+   }
+  ]
+ },
+ {
+  "id": "avance_cientifico",
+  "title": "Avance científico nacional",
+  "category": "tecnologia",
+  "tone": "good",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Un equipo de investigadores de {country} logra un avance que puede acelerar el programa tecnológico nacional.",
+  "condition": "budget.research > 0.3",
+  "weight": "tech.level * 0.012 + budget.research * 0.5",
+  "options": [
+   {
+    "text": "Financiar su desarrollo",
+    "hint": "Coste moderado, gran salto de investigación.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.001"
+     },
+     {
+      "path": "tech.progress",
+      "add": "tech.points * 6"
+     }
+    ],
+    "groups": {
+     "youth": 2
+    },
+    "ai": "1.5"
+   },
+   {
+    "text": "Dejarlo en manos del sector privado",
+    "hint": "Sin coste; avance menor.",
+    "effects": [
+     {
+      "path": "tech.progress",
+      "add": "tech.points * 2"
+     }
+    ],
+    "groups": {
+     "business": 2
+    },
+    "ai": "ideo.econ + 0.5"
+   }
+  ]
+ },
+ {
+  "id": "fuga_cerebros",
+  "title": "Fuga de cerebros",
+  "category": "social",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 36,
+  "text": "Decenas de miles de jóvenes titulados de {country} emigran por falta de oportunidades.",
+  "condition": "soc.education > 60 && unemployment > 9",
+  "weight": "(unemployment - 8) * 0.12",
+  "options": [
+   {
+    "text": "Programa de retorno de talento",
+    "hint": "Incentivos fiscales y becas.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.002"
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_retorno",
+      "name": "Retorno de talento",
+      "duration": 36,
+      "mods": {
+       "research": 0.05,
+       "group.youth": 3
+      }
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "No intervenir",
+    "hint": "Menos capital humano a medio plazo.",
+    "modifiers": [
+     {
+      "id": "ev_fuga",
+      "name": "Fuga de cerebros",
+      "duration": 36,
+      "mods": {
+       "potentialGrowth": -0.12,
+       "migration": -1,
+       "group.youth": -3
+      }
+     }
+    ],
+    "ai": "(deficit - 4) * 0.2"
+   }
+  ]
+ },
+ {
+  "id": "refugiados",
+  "title": "Llegada masiva de refugiados",
+  "category": "social",
+  "tone": "bad",
+  "scope": "pair",
+  "pickTarget": "neighbor_at_war",
+  "cooldown": 18,
+  "text": "La guerra en {target} empuja a cientos de miles de refugiados hacia las fronteras de {country}.",
+  "condition": "1",
+  "weight": "3",
+  "options": [
+   {
+    "text": "Acogerlos y pedir ayuda internacional",
+    "hint": "Reputación y apoyo de minorías; tensiones sociales.",
+    "effects": [
+     {
+      "path": "soc.refugees",
+      "add": "pop * 0.01"
+     },
+     {
+      "path": "reputation",
+      "add": 5
+     },
+     {
+      "type": "relation",
+      "target": "all",
+      "value": 1
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_refugiados",
+      "name": "Acogida de refugiados",
+      "duration": 24,
+      "mods": {
+       "migration": 5,
+       "group.minorities": 4,
+       "group.religious": -3,
+       "group.workers": -2
+      }
+     }
+    ],
+    "ai": "1 - ideo.nat"
+   },
+   {
+    "text": "Cerrar la frontera",
+    "hint": "Condena internacional; aplausos de los nacionalistas.",
+    "effects": [
+     {
+      "path": "reputation",
+      "add": -5
+     }
+    ],
+    "groups": {
+     "religious": 3,
+     "minorities": -5,
+     "workers": 2
+    },
+    "ai": "ideo.nat + 0.2"
+   }
+  ]
+ },
+ {
+  "id": "tension_fronteriza",
+  "title": "Incidente fronterizo",
+  "category": "diplomacia",
+  "tone": "bad",
+  "scope": "pair",
+  "pickTarget": "hostile_neighbor",
+  "cooldown": 24,
+  "text": "Un tiroteo en la frontera con {target} deja varios soldados muertos. Ambos gobiernos se acusan mutuamente.",
+  "condition": "1",
+  "weight": "0.6 + world.tension * 0.015",
+  "options": [
+   {
+    "text": "Responder con dureza y reforzar la frontera",
+    "hint": "Unidad nacional; escalada con el vecino.",
+    "effects": [
+     {
+      "type": "opinion",
+      "value": -10
+     },
+     {
+      "type": "relation",
+      "value": -12
+     },
+     {
+      "type": "tension",
+      "value": 2
+     },
+     {
+      "type": "memory",
+      "id": "amenaza",
+      "value": -10,
+      "text": "Respuesta dura a un incidente fronterizo"
+     }
+    ],
+    "groups": {
+     "military": 5,
+     "youth": -2
+    },
+    "modifiers": [
+     {
+      "id": "ev_frontera",
+      "name": "Frontera reforzada",
+      "duration": 12,
+      "mods": {
+       "group.military": 2
+      }
+     }
+    ],
+    "ai": "pers.aggression * 2"
+   },
+   {
+    "text": "Pedir una investigación conjunta",
+    "hint": "Desescala; los halcones lo verán como debilidad.",
+    "effects": [
+     {
+      "type": "relation",
+      "value": 3
+     }
+    ],
+    "groups": {
+     "military": -4
+    },
+    "ai": "pers.pragmatism * 2"
+   },
+   {
+    "text": "Llevarlo a Naciones Unidas",
+    "hint": "Coste político bajo; resultado incierto.",
+    "effects": [
+     {
+      "path": "pol.ap",
+      "add": -1
+     },
+     {
+      "type": "relation",
+      "value": -4
+     },
+     {
+      "path": "reputation",
+      "add": 2
+     }
+    ],
+    "ai": "1"
+   }
+  ]
+ },
+ {
+  "id": "ciberataque_sufrido",
+  "title": "Ciberataque contra infraestructuras",
+  "category": "inteligencia",
+  "tone": "bad",
+  "scope": "pair",
+  "pickTarget": "rival",
+  "cooldown": 24,
+  "text": "Un ciberataque paraliza la red eléctrica y varios bancos de {country}. Las pistas apuntan a {target}.",
+  "condition": "1",
+  "weight": "0.3 + target.intel.level * 0.008",
+  "options": [
+   {
+    "text": "Acusar públicamente y responder",
+    "hint": "Represalia; deterioro de relaciones.",
+    "effects": [
+     {
+      "type": "opinion",
+      "value": -15
+     },
+     {
+      "type": "relation",
+      "value": -10
+     },
+     {
+      "type": "memory",
+      "id": "ciberataque",
+      "value": -8,
+      "text": "Acusación pública por un ciberataque"
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_ciber",
+      "name": "Daños del ciberataque",
+      "duration": 2,
+      "mods": {
+       "growth": -0.6
+      }
+     }
+    ],
+    "groups": {
+     "military": 3
+    },
+    "ai": "pers.aggression * 2"
+   },
+   {
+    "text": "Reforzar en silencio la ciberdefensa",
+    "hint": "Mejora la contrainteligencia; sin escalada.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.001"
+     },
+     {
+      "path": "intel.counter",
+      "add": 5
+     },
+     {
+      "type": "opinion",
+      "value": -5
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_ciber",
+      "name": "Daños del ciberataque",
+      "duration": 2,
+      "mods": {
+       "growth": -0.6
+      }
+     }
+    ],
+    "ai": "pers.pragmatism * 2"
+   }
+  ]
+ },
+ {
+  "id": "crisis_energetica",
+  "title": "Crisis energética",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "El encarecimiento del gas y el petróleo amenaza con apagones y cierres industriales en {country}.",
+  "condition": "(res.gas.dep > 0.3 || res.oil.dep > 0.5) && (world.price.gas > 1.35 || world.price.oil > 1.35)",
+  "weight": "(max(world.price.gas, world.price.oil) - 1.2) * 8",
+  "options": [
+   {
+    "text": "Topar el precio de la energía con subvenciones",
+    "hint": "Protege a familias e industria; muy caro.",
+    "effects": [
+     {
+      "path": "budget.subsidies",
+      "add": 1
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_tope_energia",
+      "name": "Tope al precio de la energía",
+      "duration": 12,
+      "mods": {
+       "inflation": -1.5
+      }
+     }
+    ],
+    "groups": {
+     "workers": 4,
+     "business": 4
+    },
+    "ai": "1 - (deficit - 4) * 0.2"
+   },
+   {
+    "text": "Plan de ahorro y racionamiento",
+    "hint": "Barato y doloroso.",
+    "modifiers": [
+     {
+      "id": "ev_racionamiento",
+      "name": "Racionamiento energético",
+      "duration": 9,
+      "mods": {
+       "growth": -0.8,
+       "renewablesGrowth": 0.3
+      }
+     }
+    ],
+    "groups": {
+     "workers": -4,
+     "business": -4
+    },
+    "ai": "(deficit - 4) * 0.3"
+   },
+   {
+    "text": "Acelerar renovables y nuclear",
+    "hint": "Coste inicial, menor dependencia futura.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.004"
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_transicion_urgente",
+      "name": "Transición acelerada",
+      "duration": 36,
+      "mods": {
+       "renewablesGrowth": 1.2
+      }
+     }
+    ],
+    "groups": {
+     "youth": 4
+    },
+    "ai": "ideo.prefs_green"
+   }
+  ]
+ },
+ {
+  "id": "burbuja_inmobiliaria",
+  "title": "Burbuja inmobiliaria",
+  "category": "economia",
+  "tone": "neutral",
+  "scope": "country",
+  "cooldown": 48,
+  "text": "El precio de la vivienda en {country} sube un 20 % anual alimentado por el crédito barato. Los expertos advierten de una burbuja.",
+  "condition": "growth > 2.5 && rate - inflation < 1",
+  "weight": "1.2",
+  "options": [
+   {
+    "text": "Endurecer el crédito hipotecario",
+    "hint": "Menos crecimiento hoy, sin estallido mañana.",
+    "modifiers": [
+     {
+      "id": "ev_macroprudencial",
+      "name": "Medidas macroprudenciales",
+      "duration": 12,
+      "mods": {
+       "growth": -0.5
+      }
+     }
+    ],
+    "groups": {
+     "business": -3,
+     "youth": 2
+    },
+    "ai": "pers.riskAversion * 2"
+   },
+   {
+    "text": "Dejar que el mercado siga",
+    "hint": "Crecimiento alegre… mientras dure.",
+    "modifiers": [
+     {
+      "id": "ev_euforia",
+      "name": "Euforia inmobiliaria",
+      "duration": 12,
+      "mods": {
+       "growth": 0.6
+      }
+     }
+    ],
+    "delayed": [
+     {
+      "in": 18,
+      "effects": [
+       {
+        "path": "eco.unemployment",
+        "add": 1.5,
+        "hidden": true
+       }
+      ],
+      "mods": [
+       {
+        "id": "ev_estallido",
+        "name": "Estallido de la burbuja",
+        "duration": 15,
+        "mods": {
+         "growth": -2.5
+        }
+       }
+      ],
+      "text": "Estalla la burbuja inmobiliaria: quiebras y despidos."
+     }
+    ],
+    "groups": {
+     "business": 3
+    },
+    "ai": "1 - pers.riskAversion"
+   }
+  ]
+ },
+ {
+  "id": "crisis_bancaria",
+  "title": "Crisis bancaria",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 48,
+  "text": "Uno de los mayores bancos de {country} está al borde de la quiebra tras acumular créditos impagados.",
+  "condition": "growth < 0.5 && debt > 60",
+  "weight": "1 + max(0, 1 - growth) * 0.5",
+  "options": [
+   {
+    "text": "Rescatarlo con dinero público",
+    "hint": "Evita el contagio a costa de la deuda.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.03"
+     }
+    ],
+    "groups": {
+     "business": 5,
+     "workers": -6,
+     "youth": -4
+    },
+    "ai": "pers.pragmatism * 2"
+   },
+   {
+    "text": "Nacionalizarlo",
+    "hint": "Sin regalar dinero a accionistas; los mercados lo penalizan.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.02"
+     },
+     {
+      "path": "eco.riskPremium",
+      "add": 0.5
+     }
+    ],
+    "groups": {
+     "workers": 4,
+     "business": -8
+    },
+    "ai": "-ideo.econ * 2"
+   },
+   {
+    "text": "Dejarlo caer",
+    "hint": "Disciplina de mercado… y riesgo de pánico.",
+    "modifiers": [
+     {
+      "id": "ev_quiebra_banco",
+      "name": "Pánico bancario",
+      "duration": 12,
+      "mods": {
+       "growth": -2,
+       "unemployment": 1.5
+      }
+     }
+    ],
+    "groups": {
+     "business": -6
+    },
+    "ai": "ideo.econ - pers.riskAversion"
+   }
+  ]
+ },
+ {
+  "id": "rumores_golpe",
+  "title": "Ruido de sables",
+  "category": "politica",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 12,
+  "text": "Tus servicios de inteligencia detectan reuniones secretas de altos mandos militares descontentos.",
+  "condition": "pol.coupRisk > 1",
+  "weight": "pol.coupRisk * 2",
+  "options": [
+   {
+    "text": "Purgar a los conspiradores",
+    "hint": "Reduce mucho el riesgo de golpe; debilita al ejército.",
+    "effects": [
+     {
+      "path": "groups.military",
+      "add": -8
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_purga",
+      "name": "Purga preventiva",
+      "duration": 18,
+      "mods": {
+       "coupRisk": -2,
+       "morale": -8,
+       "militaryPower": -0.06
+      }
+     }
+    ],
+    "ai": "ideo.auth + 1"
+   },
+   {
+    "text": "Comprar su lealtad (sueldos y presupuesto)",
+    "hint": "Más gasto en defensa; los militares se calman.",
+    "effects": [
+     {
+      "path": "budget.defense",
+      "add": 0.4
+     },
+     {
+      "path": "groups.military",
+      "add": 12
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "No hacer nada",
+    "hint": "Quizá sean solo rumores…",
+    "effects": [],
+    "ai": "0"
+   }
+  ]
+ },
+ {
+  "id": "dimision_ministro",
+  "title": "Dimisión en el Gobierno",
+  "category": "politica",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "El ministro {minister} amenaza con dimitir por discrepancias con la línea del Gobierno.",
+  "condition": "minister.economy.loyalty < 50 || minister.defense.loyalty < 50 || minister.interior.loyalty < 50 || minister.foreign.loyalty < 50",
+  "weight": "0.5",
+  "options": [
+   {
+    "text": "Aceptar la dimisión",
+    "hint": "Pierdes a un ministro; ganas cohesión.",
+    "effects": [
+     {
+      "path": "groups.all",
+      "add": -1
+     }
+    ],
+    "replaceMinister": true,
+    "ai": "1"
+   },
+   {
+    "text": "Convencerle con concesiones",
+    "hint": "Cuesta capital político.",
+    "effects": [
+     {
+      "path": "pol.ap",
+      "add": -1
+     }
+    ],
+    "ai": "pers.pragmatism"
+   }
+  ]
+ },
+ {
+  "id": "atentado",
+  "title": "Atentado terrorista",
+  "category": "seguridad",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Un atentado en el centro de {region} causa decenas de muertos. El país está conmocionado.",
+  "condition": "pol.stability < 60 || atWar",
+  "weight": "0.4 + (60 - pol.stability) * 0.03 + atWar * 1",
+  "options": [
+   {
+    "text": "Reforzar la seguridad y restringir libertades",
+    "hint": "Orden a costa de derechos.",
+    "effects": [
+     {
+      "path": "budget.security",
+      "add": 0.2
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_seguridad",
+      "name": "Medidas antiterroristas",
+      "duration": 24,
+      "mods": {
+       "pressFreedom": -5,
+       "group.minorities": -4,
+       "group.religious": 2,
+       "stability": 2
+      }
+     }
+    ],
+    "groups": {
+     "military": 2
+    },
+    "ai": "ideo.auth + ideo.nat"
+   },
+   {
+    "text": "Llamar a la unidad nacional",
+    "hint": "Cohesión temporal sin perder libertades.",
+    "modifiers": [
+     {
+      "id": "ev_unidad",
+      "name": "Unidad nacional",
+      "duration": 6,
+      "mods": {
+       "group.all": 4
+      }
+     }
+    ],
+    "ai": "1 - ideo.auth"
+   }
+  ]
+ },
+ {
+  "id": "movimiento_independentista",
+  "title": "Desafío independentista",
+  "category": "politica",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 48,
+  "text": "El gobierno regional de {region} anuncia un referéndum de independencia unilateral.",
+  "condition": "regions >= 5 && (groups.minorities < 35 || soc.protest > 30)",
+  "weight": "0.5 + (35 - groups.minorities) * 0.03",
+  "options": [
+   {
+    "text": "Negociar más autonomía",
+    "hint": "Calma a las minorías, irrita a los nacionalistas.",
+    "effects": [
+     {
+      "path": "pol.ap",
+      "add": -1
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_autonomia",
+      "name": "Más autonomía regional",
+      "duration": -1,
+      "mods": {
+       "group.minorities": 6,
+       "group.religious": -2,
+       "group.military": -3,
+       "stability": 2
+      }
+     }
+    ],
+    "ai": "pers.pragmatism * 2 - ideo.nat"
+   },
+   {
+    "text": "Suspender la autonomía y procesar a sus líderes",
+    "hint": "Firmeza; protestas en la región.",
+    "effects": [
+     {
+      "path": "soc.protest",
+      "add": 12
+     },
+     {
+      "path": "pol.repression",
+      "add": 15
+     }
+    ],
+    "groups": {
+     "minorities": -10,
+     "military": 4,
+     "religious": 3
+    },
+    "ai": "ideo.nat * 2 + ideo.auth"
+   },
+   {
+    "text": "Ignorar el desafío",
+    "hint": "El problema puede crecer.",
+    "delayed": [
+     {
+      "in": 6,
+      "effects": [
+       {
+        "path": "pol.stability",
+        "add": -6,
+        "hidden": true
+       },
+       {
+        "path": "soc.protest",
+        "add": 8,
+        "hidden": true
+       }
+      ],
+      "text": "El desafío independentista se enquista."
+     }
+    ],
+    "ai": "0.2"
+   }
+  ]
+ },
+ {
+  "id": "inversion_extranjera",
+  "title": "Gran inversión extranjera",
+  "category": "economia",
+  "tone": "good",
+  "scope": "pair",
+  "pickTarget": "trade_partner",
+  "cooldown": 24,
+  "text": "Un conglomerado de {target} propone invertir miles de millones en una gigafactoría en {country}.",
+  "condition": "pol.stability > 50",
+  "weight": "1 + (pol.stability - 50) * 0.03",
+  "options": [
+   {
+    "text": "Aceptar con incentivos fiscales",
+    "hint": "Empleo y crecimiento; dependencia del socio.",
+    "effects": [
+     {
+      "type": "gdp",
+      "value": 0.4
+     },
+     {
+      "type": "opinion",
+      "value": 5
+     },
+     {
+      "type": "relation",
+      "value": 6
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_gigafactoria",
+      "name": "Gigafactoría extranjera",
+      "duration": 36,
+      "mods": {
+       "naturalUnemployment": -0.2,
+       "sector.industry": 0.03
+      }
+     }
+    ],
+    "groups": {
+     "business": 5,
+     "workers": 4
+    },
+    "ai": "1.5"
+   },
+   {
+    "text": "Exigir transferencia de tecnología",
+    "hint": "Menos inversión; más tecnología propia.",
+    "effects": [
+     {
+      "type": "gdp",
+      "value": 0.2
+     },
+     {
+      "path": "tech.progress",
+      "add": "tech.points * 3"
+     },
+     {
+      "type": "relation",
+      "value": -2
+     }
+    ],
+    "ai": "pers.ambition"
+   },
+   {
+    "text": "Rechazarla por seguridad nacional",
+    "hint": "Sin dependencia; el socio se ofende.",
+    "effects": [
+     {
+      "type": "relation",
+      "value": -8
+     }
+    ],
+    "groups": {
+     "military": 2,
+     "business": -4
+    },
+    "ai": "rival * 2"
+   }
+  ]
+ },
+ {
+  "id": "crisis_alimentaria",
+  "title": "Crisis alimentaria",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "El precio de los alimentos básicos se dispara en {country}: colas en las tiendas y riesgo de disturbios.",
+  "condition": "res.food.dep > 0.15 && world.foodPrice > 1.25",
+  "weight": "(world.foodPrice - 1.1) * 10 * res.food.dep",
+  "options": [
+   {
+    "text": "Subvencionar el pan y los básicos",
+    "hint": "Caro; evita disturbios.",
+    "effects": [
+     {
+      "path": "budget.subsidies",
+      "add": 0.8
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_pan",
+      "name": "Subsidio alimentario",
+      "duration": 12,
+      "mods": {
+       "inflation": -1,
+       "protest": -5
+      }
+     }
+    ],
+    "groups": {
+     "workers": 5
+    },
+    "ai": "1.5"
+   },
+   {
+    "text": "No intervenir",
+    "hint": "Disturbios probables.",
+    "effects": [
+     {
+      "path": "soc.protest",
+      "add": 15
+     }
+    ],
+    "groups": {
+     "workers": -8,
+     "youth": -4
+    },
+    "ai": "(deficit - 5) * 0.3"
+   }
+  ]
+ },
+ {
+  "id": "protestas_estudiantiles",
+  "title": "Revuelta estudiantil",
+  "category": "social",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "Los estudiantes ocupan las universidades de {country} contra el paro juvenil y el precio de la vivienda.",
+  "condition": "groups.youth < 35",
+  "weight": "(35 - groups.youth) * 0.1",
+  "options": [
+   {
+    "text": "Plan de vivienda y becas",
+    "hint": "Gasto adicional; los jóvenes lo agradecen.",
+    "effects": [
+     {
+      "path": "budget.education",
+      "add": 0.2
+     },
+     {
+      "path": "budget.social",
+      "add": 0.2
+     },
+     {
+      "path": "groups.youth",
+      "add": 8
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "Desalojar las universidades",
+    "hint": "Orden; radicalización.",
+    "effects": [
+     {
+      "path": "pol.repression",
+      "add": 15
+     }
+    ],
+    "groups": {
+     "youth": -10,
+     "religious": 2
+    },
+    "ai": "ideo.auth * 2"
+   }
+  ]
+ },
+ {
+  "id": "record_turismo",
+  "title": "Año récord de turismo",
+  "category": "economia",
+  "tone": "good",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "{country} bate su récord histórico de visitantes internacionales.",
+  "condition": "pol.stability > 55 && !atWar",
+  "weight": "0.8",
+  "options": [
+   {
+    "text": "Celebrarlo e invertir en promoción",
+    "hint": "Pequeño impulso a la economía.",
+    "effects": [
+     {
+      "type": "gdp",
+      "value": 0.15
+     }
+    ],
+    "groups": {
+     "business": 3
+    },
+    "ai": "1"
+   },
+   {
+    "text": "Aplicar una tasa turística",
+    "hint": "Recauda y calma el malestar vecinal.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "gdp * 0.001"
+     }
+    ],
+    "groups": {
+     "youth": 2,
+     "business": -2
+    },
+    "ai": "0.5"
+   }
+  ]
+ },
+ {
+  "id": "campana_electoral",
+  "title": "Campaña electoral",
+  "category": "politica",
+  "tone": "neutral",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Faltan pocos meses para las elecciones en {country}. Los asesores proponen estrategias de campaña.",
+  "condition": "regime.elections && pol.nextElection - world.turn <= 4 && pol.nextElection - world.turn >= 1",
+  "weight": "40",
+  "options": [
+   {
+    "text": "Promesas de gasto (pensiones y ayudas)",
+    "hint": "Sube la aprobación; el déficit lo pagará el próximo gobierno.",
+    "effects": [
+     {
+      "path": "budget.pensions",
+      "add": 0.4
+     },
+     {
+      "path": "budget.social",
+      "add": 0.3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_promesas",
+      "name": "Promesas electorales",
+      "duration": 6,
+      "mods": {
+       "group.all": 4
+      }
+     }
+    ],
+    "ai": "1 - (deficit - 4) * 0.2"
+   },
+   {
+    "text": "Campaña limpia centrada en la gestión",
+    "hint": "Legitimidad, sin coste fiscal.",
+    "effects": [
+     {
+      "path": "pol.legitimacy",
+      "add": 3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_gestion",
+      "name": "Campaña de gestión",
+      "duration": 6,
+      "mods": {
+       "group.all": 1.5
+      }
+     }
+    ],
+    "ai": "pers.pragmatism"
+   },
+   {
+    "text": "Campaña negativa contra la oposición",
+    "hint": "Moviliza a los tuyos; polariza.",
+    "effects": [
+     {
+      "path": "pol.legitimacy",
+      "add": -3
+     },
+     {
+      "path": "soc.trust",
+      "add": -3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_negativa",
+      "name": "Campaña negativa",
+      "duration": 6,
+      "mods": {
+       "group.all": 3,
+       "protest": 3
+      }
+     }
+    ],
+    "ai": "pers.aggression"
+   }
+  ]
+ },
+ {
+  "id": "auge_exportador",
+  "title": "Auge exportador",
+  "category": "economia",
+  "tone": "good",
+  "scope": "country",
+  "cooldown": 36,
+  "text": "La demanda mundial de productos de {country} se dispara.",
+  "condition": "exports > 20 && tradeAccess > 0.9",
+  "weight": "0.6",
+  "options": [
+   {
+    "text": "Aprovecharlo",
+    "hint": "Más crecimiento durante un año.",
+    "modifiers": [
+     {
+      "id": "ev_auge",
+      "name": "Auge exportador",
+      "duration": 12,
+      "mods": {
+       "exports": 0.05,
+       "growth": 0.4
+      }
+     }
+    ],
+    "groups": {
+     "business": 3,
+     "workers": 2
+    },
+    "ai": "1"
+   }
+  ]
+ },
+ {
+  "id": "apagon",
+  "title": "Gran apagón",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Un fallo en cascada deja sin electricidad a buena parte de {country} durante horas.",
+  "condition": "eco.infra < 70 || tech.renewables > 50",
+  "weight": "0.5 + max(0, 60 - eco.infra) * 0.02",
+  "options": [
+   {
+    "text": "Plan de inversión en la red eléctrica",
+    "hint": "Coste ahora; menos apagones después.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.003"
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_red",
+      "name": "Inversión en la red",
+      "duration": 36,
+      "mods": {
+       "infra": 3
+      }
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "Culpar a las eléctricas y multarlas",
+    "hint": "Popular; las empresas se resienten.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "gdp * 0.0005"
+     }
+    ],
+    "groups": {
+     "workers": 2,
+     "business": -5
+    },
+    "ai": "-ideo.econ"
+   }
+  ]
+ },
+ {
+  "id": "sanciones_impacto",
+  "title": "Asfixia por las sanciones",
+  "category": "economia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Las sanciones internacionales empiezan a provocar escasez de repuestos, medicinas y tecnología en {country}.",
+  "condition": "sanctioned > 4",
+  "weight": "sanctioned * 0.25",
+  "options": [
+   {
+    "text": "Economía de resistencia y sustitución de importaciones",
+    "hint": "Menos eficiencia, más autonomía.",
+    "modifiers": [
+     {
+      "id": "ev_autarquia",
+      "name": "Sustitución de importaciones",
+      "duration": 36,
+      "mods": {
+       "potentialGrowth": -0.15,
+       "sector.industry": 0.04,
+       "group.military": 2
+      }
+     }
+    ],
+    "groups": {
+     "business": -4
+    },
+    "ai": "ideo.nat + 0.5"
+   },
+   {
+    "text": "Buscar nuevos socios comerciales",
+    "hint": "Acercamiento a países no alineados.",
+    "effects": [
+     {
+      "path": "pol.ap",
+      "add": -1
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_nuevos_socios",
+      "name": "Nuevos socios comerciales",
+      "duration": 24,
+      "mods": {
+       "exports": 0.04
+      }
+     }
+    ],
+    "ai": "pers.pragmatism * 1.5"
+   },
+   {
+    "text": "Contrabando y redes de evasión",
+    "hint": "Funciona… si no te pillan.",
+    "modifiers": [
+     {
+      "id": "ev_contrabando",
+      "name": "Redes de evasión",
+      "duration": 24,
+      "mods": {
+       "growth": 0.4,
+       "corruption": 4
+      }
+     }
+    ],
+    "ai": "1 - pers.reliability"
+   }
+  ]
+ }
+]

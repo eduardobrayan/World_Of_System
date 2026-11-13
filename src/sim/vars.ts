@@ -151,6 +151,7 @@ function baseVar(world: World, c: Country, path: string): number {
     }
     case 'ideo': {
       if (p[1] === 'is') return c.pol.ideology === p[2] ? 1 : 0;
+      if (p[1].startsWith('prefs_')) return (ideologyOf(c.pol.ideology).prefs as unknown as Record<string, number>)[p[1].slice(6)] ?? 0;
       const v = (ideologyOf(c.pol.ideology) as unknown as Record<string, unknown>)[p[1]];
       return typeof v === 'number' ? v : 0;
     }

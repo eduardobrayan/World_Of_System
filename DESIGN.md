@@ -268,6 +268,21 @@ la IU muestra los datos con ruido y como "≈ valor".
 - Pandemias: se propagan por la matriz de comercio; frenan la economía y suben la mortalidad según la
   sanidad; terminan por inmunidad o por la tecnología de vacunas.
 
+### 4.9 Eventos
+
+Cada evento (`events.json`) tiene condición, peso (= probabilidad mensual en %, una expresión sobre el estado del
+mundo), enfriamiento y opciones. Máximo un evento aleatorio al mes por país IA y dos para el jugador. La IA elige la
+opción con mayor utilidad (`ai`) más ruido de la semilla; el jugador debe decidir antes de avanzar. Las consecuencias
+marcadas `hidden` se muestran como "consecuencia incierta". La dificultad escala el peso de los eventos buenos y malos.
+
+### 4.10 Elecciones y cambios de régimen
+
+`votoGobierno = 24 + 0.6·aprobación + economía(crecimiento 12 m, paro, inflación) + manipulación − cansancio de guerra`
+± ruido (σ 3.5). Por debajo del 50 % el gobierno pierde: el jugador es derrotado; en un país IA gobierna el mayor partido
+de la oposición. Golpe: probabilidad mensual `riesgoGolpe`, éxito `0.35 + 0.015·(35 − apoyoMilitar) + 0.01·(40 − estabilidad)`.
+Revolución: análogo con protestas y estabilidad. Todo cambio de gobierno recalcula la relación estructural con cada país,
+ajusta la personalidad y suaviza los rencores de la memoria.
+
 ## 5. Sistema local (regiones)
 
 - Los 43 países tienen 4–9 regiones definidas en datos (ciudad principal, coordenadas, peso de
@@ -300,6 +315,8 @@ la IU muestra los datos con ruido y como "≈ valor".
 7. **Unidades militares abstractas**: brigadas/batallones, escuadrones y buques; conteos aproximados.
 8. **Información incierta**: el ruido es determinista por (semilla, trimestre, observador, país, variable).
 9. **Tamaño del guardado**: historial mensual para el jugador y trimestral para el resto.
+11. **Controles por pasos**: el presupuesto y los impuestos se ajustan con botones de paso fijo (0,1/0,5 pp y 0,5/2 pp)
+    en lugar de deslizadores, por preferencia del usuario.
 10. **Previsiones**: la previsión de presupuesto/impuestos simula 12 meses con y sin el cambio
     (sin eventos ni IA) para mostrar el efecto aislado; las previsiones de reacciones usan la misma
     función de evaluación de la IA sin ruido.
