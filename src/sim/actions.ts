@@ -71,6 +71,7 @@ export const PATH_NAMES: Dict<string> = {
   'budget.research': 'Investigación (% PIB)', 'budget.security': 'Seguridad interior (% PIB)', 'budget.administration': 'Administración (% PIB)',
   'budget.subsidies': 'Subvenciones (% PIB)', 'taxes.income': 'IRPF', 'taxes.corporate': 'Impuesto de sociedades', 'taxes.consumption': 'IVA',
   'taxes.tariff': 'Aranceles',
+  'bio.defense': 'Defensa biológica', 'bio.lab': 'Seguridad de los laboratorios', 'bio.program': 'Programa de armas biológicas',
 };
 for (const g of GROUPS) PATH_NAMES[`groups.${g}`] = `Apoyo de ${DATA.groups[g].name.toLowerCase()}`;
 for (const k of Object.keys(DATA.groups)) PATH_NAMES[`groups.${k}`] ??= k;
@@ -85,12 +86,22 @@ export const MOD_NAMES: Dict<string> = {
   resourceShare: 'Renta estatal de recursos', ap: 'Capital político/mes', intel: 'Inteligencia', counter: 'Contrainteligencia', milTech: 'Tecnología militar',
   'group.all': 'Apoyo de todos los grupos', 'prod.food': 'Producción de alimentos', logistics: 'Logística', 'sector.industry': 'Peso de la industria',
   'sector.tech': 'Peso tecnológico',
+  crime: 'Criminalidad', 'police.training': 'Formación policial', 'police.militarization': 'Militarización policial',
+  'narco.cartels': 'Poder de los cárteles', 'narco.production': 'Producción de droga', 'narco.transit': 'Tránsito de droga',
+  'narco.violence': 'Violencia del narco', 'narco.consumption': 'Consumo de drogas',
+  'corr.politica': 'Corrupción política', 'corr.administrativa': 'Corrupción administrativa', 'corr.judicial': 'Corrupción judicial',
+  'corr.policial': 'Corrupción policial', 'corr.empresarial': 'Corrupción empresarial', 'corr.electoral': 'Corrupción electoral',
+  'need.vivienda': 'Vivienda', pandemicSpread: 'Contagio de epidemias', pandemicResist: 'Resistencia a epidemias', disasterResist: 'Resistencia a desastres',
+  nuclearDefense: 'Defensa antimisiles', 'capacity.oil': 'Capacidad petrolera', 'capacity.gas': 'Capacidad gasística', 'capacity.chips': 'Capacidad de chips',
+  'capacity.minerals': 'Capacidad minera',
 };
 for (const g of GROUPS) MOD_NAMES[`group.${g}`] = `Apoyo de ${DATA.groups[g].name.toLowerCase()}`;
 
 /** Indica si subir esta variable es bueno para el país (para colorear previsiones). */
 const BAD_UP = new Set(['eco.riskPremium', 'taxes.income', 'taxes.corporate', 'taxes.consumption', 'inflation', 'unemployment', 'naturalUnemployment', 'protest', 'strikes', 'corruption', 'gini', 'death', 'coupRisk', 'revolutionRisk',
-  'eco.inflation', 'eco.unemployment', 'soc.protest', 'soc.strikes', 'soc.gini', 'pol.corruption', 'pol.repression', 'pol.warWeariness']);
+  'eco.inflation', 'eco.unemployment', 'soc.protest', 'soc.strikes', 'soc.gini', 'pol.corruption', 'pol.repression', 'pol.warWeariness',
+  'crime', 'narco.cartels', 'narco.production', 'narco.transit', 'narco.violence', 'narco.consumption', 'pandemicSpread',
+  'corr.politica', 'corr.administrativa', 'corr.judicial', 'corr.policial', 'corr.empresarial', 'corr.electoral']);
 
 function sign(v: number, d = 1) {
   return `${v >= 0 ? '+' : ''}${Math.abs(v) < 0.1 && v !== 0 ? v.toFixed(2) : v.toFixed(d)}`;
@@ -121,7 +132,7 @@ function describeEffects(world: World, c: Country, effects: EffectDef[] | undefi
       out.push({ when, text: who + text, value: v, hidden: e.hidden });
       continue;
     }
-    if (!e.path) continue;
+    if (!e.path || e.path.startsWith('flags.')) continue; // marcas internas: no se muestran
     const name = PATH_NAMES[e.path] ?? e.path;
     if (e.add !== undefined) {
       const v = evalExpr(e.add, r);

@@ -124,7 +124,7 @@ export const LAYERS: MapLayer[] = [
     id: 'narco', name: 'Narcotráfico',
     color: (c, x) => {
       const idx = perceived(x, c, 'cartels', c.narco.cartels) + c.narco.transit * 0.5 + c.narco.production * 0.5;
-      return rampColor(ORANGE, Math.sqrt(Math.max(0, idx - 10) / 130));
+      return rampColor(ORANGE, Math.sqrt(Math.max(0, idx - 15) / 140));
     },
     legend: () => rampLegend('Narcotráfico (cárteles, rutas y cultivos)', ORANGE, 'Marginal', 'Narcoestado', 'Escala de raíz cuadrada. Los países consumidores financian el negocio aunque aparezcan oscuros.'),
   },

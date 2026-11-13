@@ -5,7 +5,7 @@
  */
 import type { Country, CorruptionType, Dict, World } from './types';
 import { CORRUPTION_TYPES } from './types';
-import { DATA, ideologyOf, regimeOf } from './data';
+import { ideologyOf, regimeOf } from './data';
 import { addShock, atWar, modSum } from './vars';
 import { regionalSum } from './economy';
 import { addModifier } from './effects';
@@ -222,4 +222,3 @@ export function corruptionBreakdown(c: Country): { type: CorruptionType; name: s
 }
 
 export const NARCO_NAMES: Dict<string> = { production: 'Producción', transit: 'Tránsito', cartels: 'Poder de los cárteles', violence: 'Violencia', consumption: 'Consumo' };
-void DATA;
