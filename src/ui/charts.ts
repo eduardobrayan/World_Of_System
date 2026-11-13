@@ -28,6 +28,10 @@ function niceTicks(lo: number, hi: number, n = 4): number[] {
 }
 
 export function lineChart(opts: ChartOpts): HTMLElement {
+  // Sin datos (p. ej. turno 1): una línea discreta en vez de un lienzo vacío que ocupa sitio
+  if (opts.xs.length < 2) {
+    return h('div', { class: 'chart small muted', style: 'padding:4px 0' }, `${opts.title ?? opts.series.map((x) => x.name).join(' / ')}: `, 'la gráfica aparecerá cuando haya historial (desde el segundo mes).');
+  }
   const height = opts.height ?? 150;
   const canvas = h('canvas', { style: `height:${height}px` });
   const tipEl = h('div', { class: 'ctip' });

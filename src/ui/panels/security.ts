@@ -9,6 +9,7 @@ import { corruptionBreakdown, narcoRevenue, NARCO_NAMES } from '../../sim/securi
 import { contributions, tip } from '../tooltip';
 import { modParts } from '../../sim/vars';
 import { flagEl } from '../flags';
+import { perceived, approxMark } from '../perceive';
 
 function actBtns(app: App, ids: string[]): HTMLElement {
   return h('div', { class: 'row wrap', style: 'margin-top:8px' }, ids.map((id) => ACTION_BY_ID[id]).filter(Boolean).map((d: ActionDef) => {
@@ -61,10 +62,15 @@ export function renderSecurity(app: App): HTMLElement[] {
     actBtns(app, ['ofensiva_antinarco', 'sustitucion_cultivos', 'tratamiento_adicciones', 'legalizar_cannabis', 'negociar_carteles']),
     h('div', { class: 'small muted', style: 'margin-top:6px' }, 'Cooperación antidroga con otro país: selecciónalo en el mapa (pestaña Diplomacia del panel derecho). Financiar cárteles de un rival: operaciones encubiertas.')));
 
-  const hot = w.order.map((id) => w.countries[id]).filter((x) => x.alive).sort((a, b2) => b2.narco.cartels + b2.narco.transit - (a.narco.cartels + a.narco.transit)).slice(0, 8);
+  // Datos de otros países: con el ruido de inteligencia, como el resto de indicadores extranjeros
+  const ctx = { world: w, player: c };
+  const pv = (x: typeof c, k: 'cartels' | 'transit' | 'production') => perceived(ctx, x, k === 'cartels' ? 'cartels' : `narco_${k}`, x.narco[k]);
+  const hot = w.order.map((id) => w.countries[id]).filter((x) => x.alive).map((x) => ({ x, v: pv(x, 'cartels') + pv(x, 'transit') }))
+    .sort((a, b2) => b2.v - a.v).slice(0, 8).map((e) => e.x);
+  const cell = (x: typeof c, k: 'cartels' | 'transit' | 'production') => h('td', { class: 'n' }, `${approxMark(w, c, x)}${pv(x, k).toFixed(0)}`);
   out.push(section('Rutas y focos mundiales',
     h('table', { class: 'tbl' }, h('thead', null, h('tr', null, h('th', null, 'País'), h('th', { class: 'n' }, 'Cárteles'), h('th', { class: 'n' }, 'Tránsito'), h('th', { class: 'n' }, 'Producción'))),
       h('tbody', null, hot.map((x) => h('tr', { class: 'click', onclick: () => app.onSelect(x.id) }, h('td', null, flagEl(x, 16, 11), ' ', x.short),
-        h('td', { class: 'n' }, x.narco.cartels.toFixed(0)), h('td', { class: 'n' }, x.narco.transit.toFixed(0)), h('td', { class: 'n' }, x.narco.production.toFixed(0))))))));
+        cell(x, 'cartels'), cell(x, 'transit'), cell(x, 'production')))))));
   return out;
 }

@@ -103,13 +103,12 @@ export function updateBio(world: World) {
       const worst = active.reduce((a, d) => (d.transmission > a.transmission ? d : a));
       const p = 0.0007 * active.length * (worst.transmission / 3) * (1.3 - b.lab / 100);
       if (rng.next() < p) {
-        const ob = startOutbreak(world, { name: worst.name, kind: worst.kind, transmission: worst.transmission, lethality: worst.lethality, stealth: worst.stealth, resistance: worst.resistance,
+        startOutbreak(world, { name: worst.name, kind: worst.kind, transmission: worst.transmission, lethality: worst.lethality, stealth: worst.stealth, resistance: worst.resistance,
           infected: { [c.id]: 0.004 }, origin: c.id, creator: c.id, attributed: false, vaccineFor: worst.vaccine ? c.id : null });
         if (world.player?.country === c.id) {
           news(world, `☣ ¡Fuga en un laboratorio secreto! El patógeno «${worst.name}» se ha escapado en ${c.name}.`, 'salud', [c.id], 3);
           timeline(world, `Fuga de laboratorio: «${worst.name}»`, 'crisis');
         }
-        void ob;
       }
     }
   }
@@ -170,14 +169,15 @@ function updateOutbreaks(world: World, rng: ReturnType<typeof rngOf>) {
       news(world, `🦠 Identificado un nuevo ${KIND_NAMES[o.kind].toLowerCase()}, «${o.name}», en ${where}.`, 'salud', Object.keys(o.infected), involved ? 3 : 2);
     }
     // Mutaciones
-    if (o.detected && rng.next() < 0.025) {
+    // (En la previsión no hay azar: ni mutaciones ni atribuciones)
+    if (!world.forecast && o.detected && rng.next() < 0.025) {
       if (rng.next() < 0.5) o.transmission = Math.min(5, o.transmission + 0.5);
       else o.resistance = Math.min(5, o.resistance + 0.5);
       o.vaccineFor = null;
       news(world, `🧬 Aparece una variante de «${o.name}» más ${o.transmission >= o.resistance ? 'contagiosa' : 'resistente'}.`, 'salud', [], 1);
     }
     // Atribución de los brotes artificiales
-    if (o.creator && !o.attributed && o.detected) {
+    if (!world.forecast && o.creator && !o.attributed && o.detected) {
       const victims = Object.keys(o.infected).filter((id) => id !== o.creator);
       let intel = 0;
       for (const id of victims) intel = Math.max(intel, intelLevel(world.countries[id]));

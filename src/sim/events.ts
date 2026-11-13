@@ -14,6 +14,8 @@ import eventsJson from '../data/events.json';
 export interface EventDefX extends EventDef {
   tone?: 'good' | 'bad' | 'neutral';
   options: (EventOption & { debtCut?: number; replaceMinister?: boolean })[];
+  /** Evento sobre algo secreto: no aparece en las noticias cuando lo resuelve la IA. */
+  secret?: boolean;
 }
 
 export const EVENTS: EventDefX[] = eventsJson as unknown as EventDefX[];
@@ -72,7 +74,7 @@ export function triggerEvent(world: World, c: Country, def: EventDefX, rng: Rng,
     if (u > bestU) { bestU = u; best = i; }
   });
   applyOption(world, c, def, best, vars, target);
-  if (def.tone !== 'neutral' && (def.category === 'desastre' || c.eco.gdp > 900 || def.scope === 'pair')) {
+  if (!def.secret && def.tone !== 'neutral' && (def.category === 'desastre' || c.eco.gdp > 900 || def.scope === 'pair')) {
     news(world, `${title} en ${c.name}: ${def.options[best].text.toLowerCase()}.`, 'evento', [c.id, ...(target ? [target.id] : [])], def.category === 'desastre' ? 1 : 0);
   }
 }
@@ -87,6 +89,8 @@ function applyOption(world: World, c: Country, def: EventDefX, idx: number, vars
   for (const m of o.modifiers ?? []) addModifier(world, c, m, src, target ?? undefined);
   for (const d of o.delayed ?? []) schedule(world, c, d.in, d.effects, src, d.mods, d.text, target?.id);
   if (o.debtCut) c.eco.debt *= 1 - o.debtCut;
+  // Desmantelar el programa biológico destruye también las cepas almacenadas
+  if (c.bio.program <= 0 && c.bio.designs.length) c.bio.designs = [];
   if (o.replaceMinister) {
     const rng = rngOf(world);
     const ministry = String(vars.ministry) as keyof typeof MINISTRY_NAMES;

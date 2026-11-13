@@ -273,6 +273,12 @@ function initWars(world: World) {
   }
 }
 
+/** Los nombres de líder se generan al azar: el cargo usa la forma genérica (no «Presidenta Eduardo»). */
+const NEUTRAL_TITLES: Record<string, string> = { 'Presidenta': 'Presidente', 'Presidenta del Consejo': 'Presidente del Consejo', 'Primera ministra': 'Primer ministro' };
+export function neutralTitle(t: string): string {
+  return NEUTRAL_TITLES[t] ?? t;
+}
+
 function makeName(rng: Rng, area: string): string {
   const pool = DATA.names[area] ?? DATA.names.anglo;
   return `${rng.pick(pool.first)} ${rng.pick(pool.last)}`;
@@ -448,6 +454,7 @@ export function createWorld(opts: NewGameOptions): World {
     }
     c.pol.ministers = MINISTRIES.map((m) => generateMinister(rng, c, m, rng.next() < 0.5 ? 'leal' : 'tecnocrata', 0));
     c.pol.leaderName = makeName(rng, c.area);
+    c.pol.leaderTitle = neutralTitle(c.pol.leaderTitle);
   }
   if (opts.player && opts.party?.mode === 'new' && opts.party.leader?.trim() && world.countries[opts.player]) world.countries[opts.player].pol.leaderName = opts.party.leader.trim().slice(0, 40);
 

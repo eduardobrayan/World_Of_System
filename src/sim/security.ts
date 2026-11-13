@@ -56,7 +56,8 @@ export function initSecurity(world: World, c: Country) {
     politica: 2,
     administrativa: -Math.log10(Math.max(500, pc) / 5000) * 6,
     judicial: (50 - c.pol.pressFreedom) * 0.15,
-    policial: n.cartels * 0.3 - 6,
+    // Los cárteles corrompen a la policía, pero sin dejarla en cero (México arranca ≈ 20 de integridad)
+    policial: n.cartels * 0.1 - 2,
     empresarial: 0,
     electoral: reg.competitive ? -10 : 12,
   };

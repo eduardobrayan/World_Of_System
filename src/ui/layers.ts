@@ -117,13 +117,16 @@ export const LAYERS: MapLayer[] = [
   },
   {
     id: 'corrupcion', name: 'Corrupción',
-    color: (c) => rampColor(ORANGE, (c.pol.corruption - 10) / 80),
+    color: (c, x) => rampColor(ORANGE, (perceived(x, c, 'corruption', c.pol.corruption) - 10) / 80),
     legend: () => rampLegend('Corrupción (media de seis tipos)', ORANGE, 'Baja (10)', 'Extrema (90)'),
   },
   {
     id: 'narco', name: 'Narcotráfico',
-    color: (c) => rampColor(ORANGE, (c.narco.cartels + c.narco.transit * 0.5 + c.narco.production * 0.5) / 150),
-    legend: () => rampLegend('Narcotráfico (cárteles, rutas y cultivos)', ORANGE, 'Marginal', 'Narcoestado', 'Los países consumidores financian el negocio aunque aparezcan oscuros.'),
+    color: (c, x) => {
+      const idx = perceived(x, c, 'cartels', c.narco.cartels) + c.narco.transit * 0.5 + c.narco.production * 0.5;
+      return rampColor(ORANGE, Math.sqrt(Math.max(0, idx - 10) / 130));
+    },
+    legend: () => rampLegend('Narcotráfico (cárteles, rutas y cultivos)', ORANGE, 'Marginal', 'Narcoestado', 'Escala de raíz cuadrada. Los países consumidores financian el negocio aunque aparezcan oscuros.'),
   },
   {
     id: 'brotes', name: 'Brotes',
@@ -132,7 +135,7 @@ export const LAYERS: MapLayer[] = [
       for (const o of x.world.global.outbreaks ?? []) if (o.detected || o.creator === x.player?.id) inf += o.infected[c.id] ?? 0;
       return inf > 0.0005 ? rampColor(ORANGE, 0.15 + Math.sqrt(inf / 0.4) * 0.85) : '#2a2f36';
     },
-    legend: () => rampLegend('Población, cosechas o ganado afectados por epidemias y plagas', ORANGE, 'Ninguno', '40 % o más'),
+    legend: () => rampLegend('Población, cosechas o ganado afectados por epidemias y plagas', ORANGE, 'Leve', '40 % o más', 'Gris: sin brotes conocidos. Solo se ven los brotes detectados y los que hayas liberado tú.'),
   },
   {
     id: 'regimen', name: 'Régimen',

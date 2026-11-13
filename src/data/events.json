@@ -2634,7 +2634,8 @@
   "tone": "bad",
   "scope": "country",
   "cooldown": 36,
-  "text": "Una investigadora de tu programa biológico secreto amenaza con contarlo todo a la prensa extranjera.",
+  "text": "Una investigadora del programa biológico secreto amenaza con contarlo todo a la prensa extranjera.",
+  "secret": true,
   "condition": "bio.program > 15 && bio.exposed == 0",
   "weight": "0.6",
   "options": [
