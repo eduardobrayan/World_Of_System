@@ -1,0 +1,20 @@
+{
+"democracia_parlamentaria": {"name":"Democracia parlamentaria","parliament":true,"elections":true,"competitive":true,"electionInterval":48,"coupFactor":0.12,"apBonus":0,"stabilityBase":6,"repressionCost":3,"pressCap":100,"cbIndependent":true,"parliamentBonus":0,
+  "influence":{"workers":1.0,"business":1.0,"military":0.3,"youth":0.8,"religious":0.6,"minorities":0.7},"legitimacy":75},
+"democracia_presidencial": {"name":"Democracia presidencialista","parliament":true,"elections":true,"competitive":true,"electionInterval":48,"coupFactor":0.15,"apBonus":0.5,"stabilityBase":5,"repressionCost":3,"pressCap":100,"cbIndependent":true,"parliamentBonus":5,
+  "influence":{"workers":1.0,"business":1.1,"military":0.4,"youth":0.8,"religious":0.7,"minorities":0.7},"legitimacy":72},
+"democracia_imperfecta": {"name":"Democracia imperfecta","parliament":true,"elections":true,"competitive":true,"electionInterval":60,"coupFactor":0.3,"apBonus":0.5,"stabilityBase":2,"repressionCost":2,"pressCap":85,"cbIndependent":true,"parliamentBonus":5,
+  "influence":{"workers":1.0,"business":1.1,"military":0.6,"youth":0.7,"religious":0.8,"minorities":0.5},"legitimacy":62},
+"hibrido": {"name":"Régimen híbrido","parliament":true,"elections":true,"competitive":true,"electionInterval":60,"coupFactor":0.6,"apBonus":1,"stabilityBase":2,"repressionCost":1.5,"pressCap":60,"cbIndependent":false,"parliamentBonus":20,
+  "influence":{"workers":0.8,"business":1.1,"military":1.0,"youth":0.5,"religious":0.9,"minorities":0.4},"legitimacy":52},
+"autoritario": {"name":"Autoritarismo","parliament":false,"elections":false,"competitive":false,"electionInterval":0,"coupFactor":1.0,"apBonus":1.5,"stabilityBase":4,"repressionCost":0.8,"pressCap":30,"cbIndependent":false,"parliamentBonus":40,
+  "influence":{"workers":0.5,"business":1.1,"military":1.6,"youth":0.4,"religious":0.7,"minorities":0.2},"legitimacy":45},
+"partido_unico": {"name":"Estado de partido único","parliament":false,"elections":false,"competitive":false,"electionInterval":0,"coupFactor":0.4,"apBonus":2,"stabilityBase":8,"repressionCost":0.6,"pressCap":15,"cbIndependent":false,"parliamentBonus":50,
+  "influence":{"workers":0.7,"business":0.9,"military":1.3,"youth":0.4,"religious":0.3,"minorities":0.2},"legitimacy":55},
+"teocracia": {"name":"Teocracia","parliament":true,"elections":false,"competitive":false,"electionInterval":0,"coupFactor":0.5,"apBonus":1.5,"stabilityBase":3,"repressionCost":0.8,"pressCap":20,"cbIndependent":false,"parliamentBonus":35,
+  "influence":{"workers":0.6,"business":0.7,"military":1.3,"youth":0.4,"religious":1.8,"minorities":0.2},"legitimacy":45},
+"monarquia_absoluta": {"name":"Monarquía absoluta","parliament":false,"elections":false,"competitive":false,"electionInterval":0,"coupFactor":0.35,"apBonus":1.5,"stabilityBase":10,"repressionCost":0.8,"pressCap":25,"cbIndependent":false,"parliamentBonus":50,
+  "influence":{"workers":0.4,"business":1.3,"military":1.2,"youth":0.4,"religious":1.3,"minorities":0.2},"legitimacy":65},
+"junta_militar": {"name":"Junta militar","parliament":false,"elections":false,"competitive":false,"electionInterval":0,"coupFactor":1.5,"apBonus":1.5,"stabilityBase":0,"repressionCost":0.5,"pressCap":20,"cbIndependent":false,"parliamentBonus":50,
+  "influence":{"workers":0.4,"business":1.0,"military":2.2,"youth":0.3,"religious":0.7,"minorities":0.2},"legitimacy":30}
+}

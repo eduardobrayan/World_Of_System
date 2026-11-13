@@ -1,0 +1,7 @@
+[
+ {"id":"oil","name":"Petróleo","unit":"Mb/d","price":66,"priceLabel":"$/barril","valueFactor":0.365,"elasticity":0.55,"supplyResponse":0.04,"demandResponse":0.06,"strategic":true,"energy":true},
+ {"id":"gas","name":"Gas natural","unit":"bcm/año","price":9,"priceLabel":"$/MMBtu","valueFactor":0.0353,"elasticity":0.65,"supplyResponse":0.04,"demandResponse":0.07,"strategic":true,"energy":true},
+ {"id":"minerals","name":"Minerales críticos","unit":"índice","price":100,"priceLabel":"índice","valueFactor":0.05,"elasticity":0.5,"supplyResponse":0.05,"demandResponse":0.05,"strategic":true,"energy":false},
+ {"id":"food","name":"Alimentos","unit":"índice","price":100,"priceLabel":"índice","valueFactor":0.02,"elasticity":0.8,"supplyResponse":0.06,"demandResponse":0.03,"strategic":false,"energy":false},
+ {"id":"chips","name":"Semiconductores","unit":"índice","price":100,"priceLabel":"índice","valueFactor":0.06,"elasticity":0.6,"supplyResponse":0.04,"demandResponse":0.05,"strategic":true,"energy":false}
+]

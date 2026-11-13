@@ -1,0 +1,16 @@
+[
+ {"id":"infantry","name":"Infantería","domain":"land","power":1.0,"cost":0.5,"upkeep":0.3,"build":6,"personnel":3.5,"icon":"🪖","desc":"Brigadas de infantería ligera. Baratas y numerosas; ideales para defender."},
+ {"id":"mechanized","name":"Mecanizada","domain":"land","power":1.7,"cost":1.4,"upkeep":0.5,"build":9,"personnel":3.0,"icon":"🚙","desc":"Brigadas con vehículos blindados de transporte."},
+ {"id":"tanks","name":"Carros de combate","domain":"land","power":2.3,"cost":1.8,"upkeep":0.6,"build":12,"personnel":1.0,"icon":"🛡","desc":"Batallones acorazados: decisivos en ofensiva y en llanura."},
+ {"id":"artillery","name":"Artillería","domain":"land","power":1.8,"cost":1.0,"upkeep":0.4,"build":9,"personnel":0.8,"icon":"💥","desc":"Batallones de artillería y cohetes."},
+ {"id":"recon","name":"Reconocimiento","domain":"land","power":0.6,"cost":0.5,"upkeep":0.2,"build":6,"personnel":0.5,"icon":"🔭","desc":"Unidades de reconocimiento y drones tácticos; mejoran la eficacia de las demás."},
+ {"id":"fighters","name":"Cazas","domain":"air","power":3.0,"cost":2.5,"upkeep":0.7,"build":18,"personnel":0.4,"icon":"✈","desc":"Escuadrones de combate (~20 aviones). Dan superioridad aérea."},
+ {"id":"transport","name":"Aviones de transporte","domain":"air","power":0.4,"cost":1.5,"upkeep":0.3,"build":15,"personnel":0.3,"icon":"🛫","desc":"Escuadrones de transporte: mejoran la logística y la proyección."},
+ {"id":"helicopters","name":"Helicópteros","domain":"air","power":1.2,"cost":1.0,"upkeep":0.3,"build":12,"personnel":0.3,"icon":"🚁","desc":"Escuadrones de ataque y transporte táctico."},
+ {"id":"awacs","name":"Vigilancia aérea","domain":"air","power":1.5,"cost":1.5,"upkeep":0.3,"build":18,"personnel":0.1,"icon":"📡","desc":"Aviones de alerta temprana y vigilancia; multiplican la eficacia aérea."},
+ {"id":"frigates","name":"Fragatas","domain":"sea","power":2.0,"cost":1.0,"upkeep":0.15,"build":30,"personnel":0.2,"icon":"⛴","desc":"Escoltas y patrulleros de altura."},
+ {"id":"destroyers","name":"Destructores","domain":"sea","power":3.5,"cost":2.0,"upkeep":0.25,"build":36,"personnel":0.3,"icon":"🚢","desc":"Buques de combate de superficie con defensa antiaérea y misiles."},
+ {"id":"submarines","name":"Submarinos","domain":"sea","power":3.0,"cost":2.0,"upkeep":0.2,"build":42,"personnel":0.1,"icon":"🐋","desc":"Submarinos de ataque y estratégicos."},
+ {"id":"carriers","name":"Portaaviones","domain":"sea","power":12.0,"cost":12.0,"upkeep":1.2,"build":84,"personnel":5.0,"icon":"🛳","desc":"Grupos de portaaviones: proyección de poder global."},
+ {"id":"logistic","name":"Buques logísticos","domain":"sea","power":0.6,"cost":0.6,"upkeep":0.1,"build":24,"personnel":0.2,"icon":"⚓","desc":"Buques de apoyo y anfibios: necesarios para operaciones lejanas."}
+]

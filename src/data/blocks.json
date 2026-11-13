@@ -1,0 +1,2860 @@
+[
+ {
+  "id": "B_EUO",
+  "name": "Europa Occidental (otros)",
+  "short": "Eur. Occ.",
+  "color": "#7f9fc0",
+  "flag": {
+   "stripes": [
+    "#003399"
+   ],
+   "dir": "h",
+   "emblem": "#ffcc00"
+  },
+  "capital": "Bruselas",
+  "area": "germano",
+  "regime": "democracia_parlamentaria",
+  "ideology": "liberal",
+  "personality": "bloque_regional",
+  "label": [
+   9,
+   50
+  ],
+  "eco": {
+   "gdp": 4290,
+   "growth": 1.4,
+   "inflation": 2.0,
+   "unemployment": 5.5,
+   "debt": 60,
+   "deficit": 1.5,
+   "reserves": 900,
+   "rate": 1.5,
+   "revenue": 42,
+   "exports": 70,
+   "imports": 64,
+   "investment": 23,
+   "euro": true
+  },
+  "res": {
+   "oil": [
+    0.1,
+    1.6
+   ],
+   "gas": [
+    1,
+    45
+   ],
+   "minerals": [
+    0.3,
+    1.5
+   ],
+   "food": [
+    9,
+    8
+   ],
+   "chips": [
+    0.3,
+    1.5
+   ]
+  },
+  "soc": {
+   "pop": 58.5,
+   "birth": 9.0,
+   "death": 9.8,
+   "migration": 5,
+   "medianAge": 43,
+   "education": 91,
+   "health": 91,
+   "gini": 28,
+   "corruption": 20,
+   "pressFreedom": 88
+  },
+  "approval": 48,
+  "stability": 76,
+  "milScale": 3.0,
+  "mil": {
+   "tech": 80,
+   "morale": 55,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   50,
+   60
+  ],
+  "techLevel": 86,
+  "renewables": 60,
+  "terrain": "mixto",
+  "hazards": {
+   "earthquake": 0,
+   "storm": 1,
+   "flood": 1,
+   "drought": 0
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Portugal",
+    "n": "Portugal",
+    "c": "Lisboa",
+    "p": 10.4,
+    "coast": 1,
+    "t": "mixto",
+    "s": "turismo"
+   },
+   {
+    "geo": "Ireland",
+    "n": "Irlanda",
+    "c": "Dublín",
+    "p": 5.4,
+    "coast": 1,
+    "t": "llanura",
+    "s": "tecnologia"
+   },
+   {
+    "geo": "Belgium",
+    "n": "Bélgica",
+    "c": "Bruselas",
+    "p": 11.8,
+    "coast": 1,
+    "t": "llanura",
+    "s": "servicios",
+    "cap": 1
+   },
+   {
+    "geo": "Luxembourg",
+    "n": "Luxemburgo",
+    "c": "Luxemburgo",
+    "p": 0.68,
+    "coast": 0,
+    "t": "mixto",
+    "s": "servicios"
+   },
+   {
+    "geo": "Switzerland",
+    "n": "Suiza",
+    "c": "Berna",
+    "p": 9.0,
+    "coast": 0,
+    "t": "montaña",
+    "s": "servicios"
+   },
+   {
+    "geo": "Austria",
+    "n": "Austria",
+    "c": "Viena",
+    "p": 9.2,
+    "coast": 0,
+    "t": "montaña",
+    "s": "industria"
+   },
+   {
+    "geo": "Denmark",
+    "n": "Dinamarca",
+    "c": "Copenhague",
+    "p": 6.0,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Finland",
+    "n": "Finlandia",
+    "c": "Helsinki",
+    "p": 5.6,
+    "coast": 1,
+    "t": "bosque",
+    "s": "tecnologia"
+   },
+   {
+    "geo": "Iceland",
+    "n": "Islandia",
+    "c": "Reikiavik",
+    "p": 0.4,
+    "coast": 1,
+    "t": "tundra",
+    "s": "energia"
+   },
+   {
+    "geo": "Greenland",
+    "n": "Groenlandia",
+    "c": "Nuuk",
+    "p": 0.06,
+    "coast": 1,
+    "t": "tundra",
+    "s": "mineria"
+   }
+  ]
+ },
+ {
+  "id": "B_EUC",
+  "name": "Europa Central y Báltico",
+  "short": "Eur. Central",
+  "color": "#a58fc2",
+  "flag": {
+   "stripes": [
+    "#7b5ea7",
+    "#ffffff"
+   ],
+   "dir": "h"
+  },
+  "capital": "Praga",
+  "area": "eslavo",
+  "regime": "democracia_imperfecta",
+  "ideology": "conservador",
+  "personality": "bloque_regional",
+  "label": [
+   22,
+   47.5
+  ],
+  "eco": {
+   "gdp": 1660,
+   "growth": 2.5,
+   "inflation": 4.0,
+   "unemployment": 4.5,
+   "debt": 50,
+   "deficit": 4.0,
+   "reserves": 300,
+   "rate": 4.5,
+   "revenue": 38,
+   "exports": 70,
+   "imports": 68,
+   "investment": 23,
+   "euro": true
+  },
+  "res": {
+   "oil": [
+    0.1,
+    1.1
+   ],
+   "gas": [
+    12,
+    50
+   ],
+   "minerals": [
+    0.5,
+    1.0
+   ],
+   "food": [
+    14,
+    8
+   ],
+   "chips": [
+    0.1,
+    1.0
+   ]
+  },
+  "soc": {
+   "pop": 65.7,
+   "birth": 8.5,
+   "death": 12.5,
+   "migration": -0.5,
+   "medianAge": 43,
+   "education": 84,
+   "health": 79,
+   "gini": 30,
+   "corruption": 48,
+   "pressFreedom": 70
+  },
+  "approval": 42,
+  "stability": 62,
+  "milScale": 3.5,
+  "mil": {
+   "tech": 65,
+   "morale": 55,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   45,
+   55
+  ],
+  "techLevel": 70,
+  "renewables": 40,
+  "terrain": "llanura",
+  "hazards": {
+   "earthquake": 1,
+   "storm": 0,
+   "flood": 1,
+   "drought": 1
+  },
+  "rivals": [
+   "RUS"
+  ],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Czechia",
+    "n": "Chequia",
+    "c": "Praga",
+    "p": 10.9,
+    "coast": 0,
+    "t": "mixto",
+    "s": "industria",
+    "cap": 1
+   },
+   {
+    "geo": "Slovakia",
+    "n": "Eslovaquia",
+    "c": "Bratislava",
+    "p": 5.4,
+    "coast": 0,
+    "t": "montaña",
+    "s": "industria"
+   },
+   {
+    "geo": "Hungary",
+    "n": "Hungría",
+    "c": "Budapest",
+    "p": 9.5,
+    "coast": 0,
+    "t": "llanura",
+    "s": "industria"
+   },
+   {
+    "geo": "Romania",
+    "n": "Rumanía",
+    "c": "Bucarest",
+    "p": 19.0,
+    "coast": 1,
+    "t": "mixto",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Bulgaria",
+    "n": "Bulgaria",
+    "c": "Sofía",
+    "p": 6.4,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Lithuania",
+    "n": "Lituania",
+    "c": "Vilna",
+    "p": 2.9,
+    "coast": 1,
+    "t": "llanura",
+    "s": "servicios"
+   },
+   {
+    "geo": "Latvia",
+    "n": "Letonia",
+    "c": "Riga",
+    "p": 1.85,
+    "coast": 1,
+    "t": "bosque",
+    "s": "servicios"
+   },
+   {
+    "geo": "Estonia",
+    "n": "Estonia",
+    "c": "Tallin",
+    "p": 1.37,
+    "coast": 1,
+    "t": "bosque",
+    "s": "tecnologia"
+   },
+   {
+    "geo": "Slovenia",
+    "n": "Eslovenia",
+    "c": "Liubliana",
+    "p": 2.1,
+    "coast": 1,
+    "t": "montaña",
+    "s": "industria"
+   },
+   {
+    "geo": "Croatia",
+    "n": "Croacia",
+    "c": "Zagreb",
+    "p": 3.85,
+    "coast": 1,
+    "t": "mixto",
+    "s": "turismo"
+   },
+   {
+    "geo": "Moldova",
+    "n": "Moldavia",
+    "c": "Chisináu",
+    "p": 2.4,
+    "coast": 0,
+    "t": "llanura",
+    "s": "agricultura"
+   }
+  ]
+ },
+ {
+  "id": "B_BAL",
+  "name": "Balcanes y Grecia",
+  "short": "Balcanes",
+  "color": "#8fb1d9",
+  "flag": {
+   "stripes": [
+    "#0d5eaf",
+    "#ffffff",
+    "#0d5eaf"
+   ],
+   "dir": "h"
+  },
+  "capital": "Atenas",
+  "area": "eslavo",
+  "regime": "democracia_imperfecta",
+  "ideology": "conservador",
+  "personality": "bloque_regional",
+  "label": [
+   21,
+   41.5
+  ],
+  "eco": {
+   "gdp": 490,
+   "growth": 2.3,
+   "inflation": 3.0,
+   "unemployment": 9.5,
+   "debt": 110,
+   "deficit": 1.5,
+   "reserves": 70,
+   "rate": 2.5,
+   "revenue": 42,
+   "exports": 40,
+   "imports": 50,
+   "investment": 18,
+   "euro": true
+  },
+  "res": {
+   "oil": [
+    0.02,
+    0.45
+   ],
+   "gas": [
+    0.5,
+    8
+   ],
+   "minerals": [
+    0.3,
+    0.2
+   ],
+   "food": [
+    5,
+    4
+   ],
+   "chips": [
+    0,
+    0.2
+   ]
+  },
+  "soc": {
+   "pop": 28.3,
+   "birth": 8.0,
+   "death": 12.0,
+   "migration": -1,
+   "medianAge": 43,
+   "education": 80,
+   "health": 82,
+   "gini": 33,
+   "corruption": 55,
+   "pressFreedom": 55
+  },
+  "approval": 40,
+  "stability": 58,
+  "milScale": 2.5,
+  "mil": {
+   "tech": 60,
+   "morale": 55,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   40,
+   50
+  ],
+  "techLevel": 60,
+  "renewables": 35,
+  "terrain": "montaña",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 0,
+   "flood": 1,
+   "drought": 1
+  },
+  "rivals": [
+   "TUR"
+  ],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Greece",
+    "n": "Grecia",
+    "c": "Atenas",
+    "p": 10.3,
+    "coast": 1,
+    "t": "montaña",
+    "s": "turismo",
+    "cap": 1
+   },
+   {
+    "geo": "Serbia",
+    "n": "Serbia",
+    "c": "Belgrado",
+    "p": 6.6,
+    "coast": 0,
+    "t": "llanura",
+    "s": "industria"
+   },
+   {
+    "geo": "Bosnia and Herz.",
+    "n": "Bosnia y Herzegovina",
+    "c": "Sarajevo",
+    "p": 3.2,
+    "coast": 0,
+    "t": "montaña",
+    "s": "industria"
+   },
+   {
+    "geo": "Montenegro",
+    "n": "Montenegro",
+    "c": "Podgorica",
+    "p": 0.62,
+    "coast": 1,
+    "t": "montaña",
+    "s": "turismo"
+   },
+   {
+    "geo": "Kosovo",
+    "n": "Kosovo",
+    "c": "Pristina",
+    "p": 1.6,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Macedonia",
+    "n": "Macedonia del Norte",
+    "c": "Skopie",
+    "p": 1.8,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Albania",
+    "n": "Albania",
+    "c": "Tirana",
+    "p": 2.75,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Cyprus",
+    "n": "Chipre",
+    "c": "Nicosia",
+    "p": 1.0,
+    "coast": 1,
+    "t": "mixto",
+    "s": "turismo"
+   },
+   {
+    "geo": "N. Cyprus",
+    "n": "Chipre del Norte",
+    "c": "Nicosia Norte",
+    "p": 0.4,
+    "coast": 1,
+    "t": "mixto",
+    "s": "turismo"
+   }
+  ]
+ },
+ {
+  "id": "B_CAU",
+  "name": "Cáucaso",
+  "short": "Cáucaso",
+  "color": "#c2905a",
+  "flag": {
+   "stripes": [
+    "#d90012",
+    "#0033a0",
+    "#f2a800"
+   ],
+   "dir": "h"
+  },
+  "capital": "Bakú",
+  "area": "turco",
+  "regime": "hibrido",
+  "ideology": "nacionalismo_autoritario",
+  "personality": "bloque_regional",
+  "label": [
+   45,
+   41
+  ],
+  "eco": {
+   "gdp": 140,
+   "growth": 4.5,
+   "inflation": 4.5,
+   "unemployment": 11,
+   "debt": 30,
+   "deficit": 2.0,
+   "reserves": 35,
+   "rate": 8,
+   "revenue": 27,
+   "exports": 40,
+   "imports": 40,
+   "investment": 22
+  },
+  "res": {
+   "oil": [
+    0.6,
+    0.2
+   ],
+   "gas": [
+    37,
+    15
+   ],
+   "minerals": [
+    0.3,
+    0.05
+   ],
+   "food": [
+    1.5,
+    2
+   ],
+   "chips": [
+    0,
+    0.05
+   ]
+  },
+  "soc": {
+   "pop": 16.9,
+   "birth": 12.5,
+   "death": 8.0,
+   "migration": -2,
+   "medianAge": 34,
+   "education": 78,
+   "health": 72,
+   "gini": 33,
+   "corruption": 55,
+   "pressFreedom": 35
+  },
+  "approval": 45,
+  "stability": 50,
+  "milScale": 2.0,
+  "mil": {
+   "tech": 45,
+   "morale": 55,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   35,
+   45
+  ],
+  "techLevel": 45,
+  "renewables": 20,
+  "terrain": "montaña",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 0,
+   "flood": 1,
+   "drought": 1
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Azerbaijan",
+    "n": "Azerbaiyán",
+    "c": "Bakú",
+    "p": 10.2,
+    "coast": 1,
+    "t": "mixto",
+    "s": "energia",
+    "cap": 1
+   },
+   {
+    "geo": "Georgia",
+    "n": "Georgia",
+    "c": "Tiflis",
+    "p": 3.7,
+    "coast": 1,
+    "t": "montaña",
+    "s": "servicios"
+   },
+   {
+    "geo": "Armenia",
+    "n": "Armenia",
+    "c": "Ereván",
+    "p": 3.0,
+    "coast": 0,
+    "t": "montaña",
+    "s": "mineria"
+   }
+  ]
+ },
+ {
+  "id": "B_ASC",
+  "name": "Asia Central y Afganistán",
+  "short": "Asia Central",
+  "color": "#c9b26a",
+  "flag": {
+   "stripes": [
+    "#1eb53a",
+    "#ffffff",
+    "#0099b5"
+   ],
+   "dir": "h"
+  },
+  "capital": "Taskent",
+  "area": "turco",
+  "regime": "autoritario",
+  "ideology": "nacionalismo_autoritario",
+  "personality": "autoritario_pragmatico",
+  "label": [
+   66,
+   40
+  ],
+  "eco": {
+   "gdp": 275,
+   "growth": 5.0,
+   "inflation": 9,
+   "unemployment": 9,
+   "debt": 35,
+   "deficit": 3.0,
+   "reserves": 70,
+   "rate": 12,
+   "revenue": 22,
+   "exports": 30,
+   "imports": 38,
+   "investment": 28
+  },
+  "res": {
+   "oil": [
+    0.15,
+    0.3
+   ],
+   "gas": [
+    130,
+    90
+   ],
+   "minerals": [
+    1.5,
+    0.3
+   ],
+   "food": [
+    6,
+    8
+   ],
+   "chips": [
+    0,
+    0.05
+   ]
+  },
+  "soc": {
+   "pop": 108.8,
+   "birth": 24.0,
+   "death": 5.5,
+   "migration": -2,
+   "medianAge": 24,
+   "education": 62,
+   "health": 64,
+   "gini": 33,
+   "corruption": 72,
+   "pressFreedom": 15
+  },
+  "approval": 50,
+  "stability": 50,
+  "milScale": 3.0,
+  "mil": {
+   "tech": 35,
+   "morale": 50,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   35,
+   55
+  ],
+  "techLevel": 35,
+  "renewables": 25,
+  "terrain": "montaña",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 0,
+   "flood": 1,
+   "drought": 2
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Uzbekistan",
+    "n": "Uzbekistán",
+    "c": "Taskent",
+    "p": 37,
+    "coast": 0,
+    "t": "desierto",
+    "s": "agricultura",
+    "cap": 1
+   },
+   {
+    "geo": "Turkmenistan",
+    "n": "Turkmenistán",
+    "c": "Asjabad",
+    "p": 7.5,
+    "coast": 1,
+    "t": "desierto",
+    "s": "energia"
+   },
+   {
+    "geo": "Kyrgyzstan",
+    "n": "Kirguistán",
+    "c": "Biskek",
+    "p": 7.2,
+    "coast": 0,
+    "t": "montaña",
+    "s": "mineria"
+   },
+   {
+    "geo": "Tajikistan",
+    "n": "Tayikistán",
+    "c": "Dusambé",
+    "p": 10.6,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Afghanistan",
+    "n": "Afganistán",
+    "c": "Kabul",
+    "p": 43,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Mongolia",
+    "n": "Mongolia",
+    "c": "Ulán Bator",
+    "p": 3.5,
+    "coast": 0,
+    "t": "llanura",
+    "s": "mineria"
+   }
+  ]
+ },
+ {
+  "id": "B_LEV",
+  "name": "Levante",
+  "short": "Levante",
+  "color": "#a67b5b",
+  "flag": {
+   "stripes": [
+    "#000000",
+    "#ffffff",
+    "#007a3d"
+   ],
+   "dir": "h",
+   "canton": "#ce1126"
+  },
+  "capital": "Damasco",
+  "area": "arabe",
+  "regime": "hibrido",
+  "ideology": "islamismo",
+  "personality": "estado_fragil",
+  "label": [
+   37,
+   33
+  ],
+  "eco": {
+   "gdp": 118,
+   "growth": 1.0,
+   "inflation": 15,
+   "unemployment": 18,
+   "debt": 120,
+   "deficit": 5.0,
+   "reserves": 25,
+   "rate": 10,
+   "revenue": 18,
+   "exports": 20,
+   "imports": 45,
+   "investment": 14
+  },
+  "res": {
+   "oil": [
+    0.1,
+    0.35
+   ],
+   "gas": [
+    3,
+    8
+   ],
+   "minerals": [
+    0.4,
+    0.05
+   ],
+   "food": [
+    2,
+    5
+   ],
+   "chips": [
+    0,
+    0.05
+   ]
+  },
+  "soc": {
+   "pop": 47.9,
+   "birth": 20.0,
+   "death": 5.0,
+   "migration": -3,
+   "medianAge": 24,
+   "education": 60,
+   "health": 65,
+   "gini": 36,
+   "corruption": 78,
+   "pressFreedom": 25
+  },
+  "approval": 35,
+  "stability": 30,
+  "milScale": 2.0,
+  "mil": {
+   "tech": 35,
+   "morale": 45,
+   "nukes": 0,
+   "doctrine": "asimetrica"
+  },
+  "intel": [
+   30,
+   35
+  ],
+  "techLevel": 30,
+  "renewables": 10,
+  "terrain": "desierto",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 0,
+   "flood": 0,
+   "drought": 2
+  },
+  "rivals": [
+   "ISR"
+  ],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Syria",
+    "n": "Siria",
+    "c": "Damasco",
+    "p": 25,
+    "coast": 1,
+    "t": "desierto",
+    "s": "agricultura",
+    "cap": 1
+   },
+   {
+    "geo": "Lebanon",
+    "n": "Líbano",
+    "c": "Beirut",
+    "p": 5.8,
+    "coast": 1,
+    "t": "montaña",
+    "s": "servicios"
+   },
+   {
+    "geo": "Jordan",
+    "n": "Jordania",
+    "c": "Amán",
+    "p": 11.6,
+    "coast": 1,
+    "t": "desierto",
+    "s": "servicios"
+   },
+   {
+    "geo": "Palestine",
+    "n": "Palestina",
+    "c": "Ramala",
+    "p": 5.5,
+    "coast": 1,
+    "t": "urbano",
+    "s": "servicios"
+   }
+  ]
+ },
+ {
+  "id": "B_GOL",
+  "name": "Golfo y sur de Arabia",
+  "short": "Golfo",
+  "color": "#7cb38a",
+  "flag": {
+   "stripes": [
+    "#8d1b3d",
+    "#ffffff"
+   ],
+   "dir": "v"
+  },
+  "capital": "Doha",
+  "area": "arabe",
+  "regime": "monarquia_absoluta",
+  "ideology": "monarquia_tradicional",
+  "personality": "petromonarquia",
+  "label": [
+   52,
+   20
+  ],
+  "eco": {
+   "gdp": 510,
+   "growth": 2.8,
+   "inflation": 2.5,
+   "unemployment": 6,
+   "debt": 35,
+   "deficit": -1.0,
+   "reserves": 200,
+   "rate": 4.5,
+   "revenue": 35,
+   "exports": 55,
+   "imports": 40,
+   "investment": 22
+  },
+  "res": {
+   "oil": [
+    5.0,
+    1.1
+   ],
+   "gas": [
+    225,
+    75
+   ],
+   "minerals": [
+    0.1,
+    0.1
+   ],
+   "food": [
+    0.5,
+    3
+   ],
+   "chips": [
+    0,
+    0.2
+   ]
+  },
+  "soc": {
+   "pop": 54.4,
+   "birth": 20.0,
+   "death": 4.0,
+   "migration": 3,
+   "medianAge": 24,
+   "education": 65,
+   "health": 70,
+   "gini": 38,
+   "corruption": 55,
+   "pressFreedom": 20
+  },
+  "approval": 55,
+  "stability": 55,
+  "milScale": 2.0,
+  "mil": {
+   "tech": 60,
+   "morale": 50,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   40,
+   50
+  ],
+  "techLevel": 55,
+  "renewables": 5,
+  "terrain": "desierto",
+  "hazards": {
+   "earthquake": 0,
+   "storm": 1,
+   "flood": 0,
+   "drought": 2
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Qatar",
+    "n": "Catar",
+    "c": "Doha",
+    "p": 3.1,
+    "coast": 1,
+    "t": "desierto",
+    "s": "energia",
+    "cap": 1
+   },
+   {
+    "geo": "Kuwait",
+    "n": "Kuwait",
+    "c": "Kuwait",
+    "p": 5.0,
+    "coast": 1,
+    "t": "desierto",
+    "s": "energia"
+   },
+   {
+    "geo": "Oman",
+    "n": "Omán",
+    "c": "Mascate",
+    "p": 5.3,
+    "coast": 1,
+    "t": "desierto",
+    "s": "energia"
+   },
+   {
+    "geo": "Yemen",
+    "n": "Yemen",
+    "c": "Saná",
+    "p": 41,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   }
+  ]
+ },
+ {
+  "id": "B_MAG",
+  "name": "Magreb y Libia",
+  "short": "Magreb",
+  "color": "#d1b06a",
+  "flag": {
+   "stripes": [
+    "#c1272d"
+   ],
+   "dir": "h",
+   "emblem": "#006233"
+  },
+  "capital": "Rabat",
+  "area": "arabe",
+  "regime": "hibrido",
+  "ideology": "monarquia_tradicional",
+  "personality": "bloque_regional",
+  "label": [
+   0,
+   30
+  ],
+  "eco": {
+   "gdp": 285,
+   "growth": 3.2,
+   "inflation": 5,
+   "unemployment": 12,
+   "debt": 70,
+   "deficit": 4.5,
+   "reserves": 120,
+   "rate": 4,
+   "revenue": 26,
+   "exports": 35,
+   "imports": 45,
+   "investment": 28
+  },
+  "res": {
+   "oil": [
+    1.4,
+    0.6
+   ],
+   "gas": [
+    14,
+    20
+   ],
+   "minerals": [
+    2.0,
+    0.2
+   ],
+   "food": [
+    6,
+    10
+   ],
+   "chips": [
+    0,
+    0.1
+   ]
+  },
+  "soc": {
+   "pop": 63.9,
+   "birth": 17.0,
+   "death": 5.5,
+   "migration": -1.5,
+   "medianAge": 30,
+   "education": 60,
+   "health": 72,
+   "gini": 38,
+   "corruption": 62,
+   "pressFreedom": 30
+  },
+  "approval": 45,
+  "stability": 48,
+  "milScale": 2.5,
+  "mil": {
+   "tech": 45,
+   "morale": 50,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   40,
+   50
+  ],
+  "techLevel": 42,
+  "renewables": 20,
+  "terrain": "desierto",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 0,
+   "flood": 1,
+   "drought": 2
+  },
+  "rivals": [
+   "DZA"
+  ],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Morocco",
+    "n": "Marruecos",
+    "c": "Rabat",
+    "p": 38.4,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura",
+    "cap": 1
+   },
+   {
+    "geo": "W. Sahara",
+    "n": "Sáhara Occidental",
+    "c": "El Aaiún",
+    "p": 0.6,
+    "coast": 1,
+    "t": "desierto",
+    "s": "mineria"
+   },
+   {
+    "geo": "Tunisia",
+    "n": "Túnez",
+    "c": "Túnez",
+    "p": 12.3,
+    "coast": 1,
+    "t": "mixto",
+    "s": "turismo"
+   },
+   {
+    "geo": "Libya",
+    "n": "Libia",
+    "c": "Trípoli",
+    "p": 7.4,
+    "coast": 1,
+    "t": "desierto",
+    "s": "energia"
+   },
+   {
+    "geo": "Mauritania",
+    "n": "Mauritania",
+    "c": "Nuakchot",
+    "p": 5.2,
+    "coast": 1,
+    "t": "desierto",
+    "s": "mineria"
+   }
+  ]
+ },
+ {
+  "id": "B_AFO",
+  "name": "África Occidental",
+  "short": "Áfr. Occ.",
+  "color": "#b9c26a",
+  "flag": {
+   "stripes": [
+    "#14b53a",
+    "#fcd116",
+    "#ce1126"
+   ],
+   "dir": "v"
+  },
+  "capital": "Acra",
+  "area": "africano",
+  "regime": "hibrido",
+  "ideology": "nacionalismo_autoritario",
+  "personality": "bloque_regional",
+  "label": [
+   -4,
+   13
+  ],
+  "eco": {
+   "gdp": 368,
+   "growth": 5.2,
+   "inflation": 6,
+   "unemployment": 6,
+   "debt": 55,
+   "deficit": 4.5,
+   "reserves": 50,
+   "rate": 6,
+   "revenue": 16,
+   "exports": 30,
+   "imports": 35,
+   "investment": 24
+  },
+  "res": {
+   "oil": [
+    0.3,
+    0.4
+   ],
+   "gas": [
+    3,
+    4
+   ],
+   "minerals": [
+    2.0,
+    0.1
+   ],
+   "food": [
+    14,
+    16
+   ],
+   "chips": [
+    0,
+    0.05
+   ]
+  },
+  "soc": {
+   "pop": 222,
+   "birth": 35.0,
+   "death": 8.5,
+   "migration": -1,
+   "medianAge": 18,
+   "education": 40,
+   "health": 52,
+   "gini": 38,
+   "corruption": 68,
+   "pressFreedom": 40
+  },
+  "approval": 40,
+  "stability": 38,
+  "milScale": 3.0,
+  "mil": {
+   "tech": 28,
+   "morale": 45,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   25,
+   30
+  ],
+  "techLevel": 25,
+  "renewables": 30,
+  "terrain": "selva",
+  "hazards": {
+   "earthquake": 0,
+   "storm": 0,
+   "flood": 2,
+   "drought": 3
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Ghana",
+    "n": "Ghana",
+    "c": "Acra",
+    "p": 35,
+    "coast": 1,
+    "t": "selva",
+    "s": "mineria",
+    "cap": 1
+   },
+   {
+    "geo": "Côte d'Ivoire",
+    "n": "Costa de Marfil",
+    "c": "Abiyán",
+    "p": 32,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Senegal",
+    "n": "Senegal",
+    "c": "Dakar",
+    "p": 18.9,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Mali",
+    "n": "Malí",
+    "c": "Bamako",
+    "p": 25,
+    "coast": 0,
+    "t": "desierto",
+    "s": "mineria"
+   },
+   {
+    "geo": "Niger",
+    "n": "Níger",
+    "c": "Niamey",
+    "p": 28,
+    "coast": 0,
+    "t": "desierto",
+    "s": "mineria"
+   },
+   {
+    "geo": "Burkina Faso",
+    "n": "Burkina Faso",
+    "c": "Uagadugú",
+    "p": 24,
+    "coast": 0,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Guinea",
+    "n": "Guinea",
+    "c": "Conakri",
+    "p": 15,
+    "coast": 1,
+    "t": "selva",
+    "s": "mineria"
+   },
+   {
+    "geo": "Sierra Leone",
+    "n": "Sierra Leona",
+    "c": "Freetown",
+    "p": 9,
+    "coast": 1,
+    "t": "selva",
+    "s": "mineria"
+   },
+   {
+    "geo": "Liberia",
+    "n": "Liberia",
+    "c": "Monrovia",
+    "p": 5.6,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Togo",
+    "n": "Togo",
+    "c": "Lomé",
+    "p": 9.5,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Benin",
+    "n": "Benín",
+    "c": "Porto Novo",
+    "p": 14.8,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Gambia",
+    "n": "Gambia",
+    "c": "Banjul",
+    "p": 2.9,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Guinea-Bissau",
+    "n": "Guinea-Bisáu",
+    "c": "Bisáu",
+    "p": 2.2,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   }
+  ]
+ },
+ {
+  "id": "B_AFC",
+  "name": "África Central",
+  "short": "Áfr. Central",
+  "color": "#8aa85a",
+  "flag": {
+   "stripes": [
+    "#007fff",
+    "#f7d618",
+    "#ce1021"
+   ],
+   "dir": "h"
+  },
+  "capital": "Kinsasa",
+  "area": "africano",
+  "regime": "autoritario",
+  "ideology": "nacionalismo_autoritario",
+  "personality": "estado_fragil",
+  "label": [
+   20,
+   0
+  ],
+  "eco": {
+   "gdp": 203,
+   "growth": 4.0,
+   "inflation": 8,
+   "unemployment": 10,
+   "debt": 55,
+   "deficit": 3.0,
+   "reserves": 15,
+   "rate": 10,
+   "revenue": 14,
+   "exports": 40,
+   "imports": 35,
+   "investment": 20
+  },
+  "res": {
+   "oil": [
+    0.9,
+    0.15
+   ],
+   "gas": [
+    2,
+    1
+   ],
+   "minerals": [
+    9,
+    0.1
+   ],
+   "food": [
+    8,
+    11
+   ],
+   "chips": [
+    0,
+    0.02
+   ]
+  },
+  "soc": {
+   "pop": 181.5,
+   "birth": 38.0,
+   "death": 9.5,
+   "migration": -0.5,
+   "medianAge": 17,
+   "education": 40,
+   "health": 45,
+   "gini": 42,
+   "corruption": 80,
+   "pressFreedom": 30
+  },
+  "approval": 35,
+  "stability": 30,
+  "milScale": 2.5,
+  "mil": {
+   "tech": 25,
+   "morale": 40,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   20,
+   30
+  ],
+  "techLevel": 20,
+  "renewables": 60,
+  "terrain": "selva",
+  "hazards": {
+   "earthquake": 0,
+   "storm": 0,
+   "flood": 2,
+   "drought": 1
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Dem. Rep. Congo",
+    "n": "R. D. del Congo",
+    "c": "Kinsasa",
+    "p": 115,
+    "coast": 1,
+    "t": "selva",
+    "s": "mineria",
+    "cap": 1
+   },
+   {
+    "geo": "Cameroon",
+    "n": "Camerún",
+    "c": "Yaundé",
+    "p": 30,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Chad",
+    "n": "Chad",
+    "c": "Yamena",
+    "p": 20,
+    "coast": 0,
+    "t": "desierto",
+    "s": "energia"
+   },
+   {
+    "geo": "Central African Rep.",
+    "n": "R. Centroafricana",
+    "c": "Bangui",
+    "p": 5.5,
+    "coast": 0,
+    "t": "selva",
+    "s": "mineria"
+   },
+   {
+    "geo": "Gabon",
+    "n": "Gabón",
+    "c": "Libreville",
+    "p": 2.6,
+    "coast": 1,
+    "t": "selva",
+    "s": "energia"
+   },
+   {
+    "geo": "Congo",
+    "n": "Congo",
+    "c": "Brazzaville",
+    "p": 6.5,
+    "coast": 1,
+    "t": "selva",
+    "s": "energia"
+   },
+   {
+    "geo": "Eq. Guinea",
+    "n": "Guinea Ecuatorial",
+    "c": "Malabo",
+    "p": 1.9,
+    "coast": 1,
+    "t": "selva",
+    "s": "energia"
+   }
+  ]
+ },
+ {
+  "id": "B_AFE",
+  "name": "África Oriental y Cuerno",
+  "short": "Áfr. Oriental",
+  "color": "#c49a4f",
+  "flag": {
+   "stripes": [
+    "#000000",
+    "#bb0000",
+    "#006600"
+   ],
+   "dir": "h",
+   "emblem": "#ffffff"
+  },
+  "capital": "Nairobi",
+  "area": "africano",
+  "regime": "autoritario",
+  "ideology": "nacionalismo_autoritario",
+  "personality": "estado_fragil",
+  "label": [
+   34,
+   4
+  ],
+  "eco": {
+   "gdp": 364,
+   "growth": 4.0,
+   "inflation": 25,
+   "unemployment": 10,
+   "debt": 65,
+   "deficit": 5.0,
+   "reserves": 30,
+   "rate": 12,
+   "revenue": 13,
+   "exports": 15,
+   "imports": 28,
+   "investment": 20
+  },
+  "res": {
+   "oil": [
+    0.2,
+    0.4
+   ],
+   "gas": [
+    1,
+    1
+   ],
+   "minerals": [
+    1.0,
+    0.1
+   ],
+   "food": [
+    14,
+    20
+   ],
+   "chips": [
+    0,
+    0.05
+   ]
+  },
+  "soc": {
+   "pop": 294,
+   "birth": 34.0,
+   "death": 7.5,
+   "migration": -1.5,
+   "medianAge": 18,
+   "education": 42,
+   "health": 52,
+   "gini": 40,
+   "corruption": 75,
+   "pressFreedom": 30
+  },
+  "approval": 35,
+  "stability": 28,
+  "milScale": 3.5,
+  "mil": {
+   "tech": 28,
+   "morale": 40,
+   "nukes": 0,
+   "doctrine": "masa"
+  },
+  "intel": [
+   25,
+   35
+  ],
+  "techLevel": 25,
+  "renewables": 70,
+  "terrain": "mixto",
+  "hazards": {
+   "earthquake": 1,
+   "storm": 0,
+   "flood": 2,
+   "drought": 3
+  },
+  "rivals": [
+   "ETH"
+  ],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Kenya",
+    "n": "Kenia",
+    "c": "Nairobi",
+    "p": 57,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura",
+    "cap": 1
+   },
+   {
+    "geo": "Tanzania",
+    "n": "Tanzania",
+    "c": "Dodoma",
+    "p": 70,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Uganda",
+    "n": "Uganda",
+    "c": "Kampala",
+    "p": 51,
+    "coast": 0,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Sudan",
+    "n": "Sudán",
+    "c": "Jartum",
+    "p": 51,
+    "coast": 1,
+    "t": "desierto",
+    "s": "agricultura"
+   },
+   {
+    "geo": "S. Sudan",
+    "n": "Sudán del Sur",
+    "c": "Yuba",
+    "p": 12,
+    "coast": 0,
+    "t": "llanura",
+    "s": "energia"
+   },
+   {
+    "geo": "Eritrea",
+    "n": "Eritrea",
+    "c": "Asmara",
+    "p": 3.7,
+    "coast": 1,
+    "t": "desierto",
+    "s": "mineria"
+   },
+   {
+    "geo": "Djibouti",
+    "n": "Yibuti",
+    "c": "Yibuti",
+    "p": 1.2,
+    "coast": 1,
+    "t": "desierto",
+    "s": "servicios"
+   },
+   {
+    "geo": "Somalia",
+    "n": "Somalia",
+    "c": "Mogadiscio",
+    "p": 19.5,
+    "coast": 1,
+    "t": "desierto",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Somaliland",
+    "n": "Somalilandia",
+    "c": "Hargeisa",
+    "p": 4.5,
+    "coast": 1,
+    "t": "desierto",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Rwanda",
+    "n": "Ruanda",
+    "c": "Kigali",
+    "p": 14.5,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Burundi",
+    "n": "Burundi",
+    "c": "Gitega",
+    "p": 14,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   }
+  ]
+ },
+ {
+  "id": "B_AFS",
+  "name": "África Austral",
+  "short": "Áfr. Austral",
+  "color": "#9cba73",
+  "flag": {
+   "stripes": [
+    "#cc092f",
+    "#000000"
+   ],
+   "dir": "h",
+   "emblem": "#ffcb00"
+  },
+  "capital": "Luanda",
+  "area": "africano",
+  "regime": "hibrido",
+  "ideology": "socialdemocracia",
+  "personality": "bloque_regional",
+  "label": [
+   24,
+   -17
+  ],
+  "eco": {
+   "gdp": 257,
+   "growth": 3.0,
+   "inflation": 12,
+   "unemployment": 15,
+   "debt": 70,
+   "deficit": 4.0,
+   "reserves": 30,
+   "rate": 12,
+   "revenue": 20,
+   "exports": 35,
+   "imports": 38,
+   "investment": 20
+  },
+  "res": {
+   "oil": [
+    1.15,
+    0.3
+   ],
+   "gas": [
+    3,
+    3
+   ],
+   "minerals": [
+    3.5,
+    0.1
+   ],
+   "food": [
+    9,
+    12
+   ],
+   "chips": [
+    0,
+    0.02
+   ]
+  },
+  "soc": {
+   "pop": 177,
+   "birth": 33.0,
+   "death": 8.0,
+   "migration": -0.5,
+   "medianAge": 18,
+   "education": 45,
+   "health": 52,
+   "gini": 50,
+   "corruption": 65,
+   "pressFreedom": 45
+  },
+  "approval": 40,
+  "stability": 45,
+  "milScale": 2.5,
+  "mil": {
+   "tech": 28,
+   "morale": 42,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   20,
+   30
+  ],
+  "techLevel": 25,
+  "renewables": 60,
+  "terrain": "llanura",
+  "hazards": {
+   "earthquake": 0,
+   "storm": 1,
+   "flood": 1,
+   "drought": 3
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Angola",
+    "n": "Angola",
+    "c": "Luanda",
+    "p": 39,
+    "coast": 1,
+    "t": "llanura",
+    "s": "energia",
+    "cap": 1
+   },
+   {
+    "geo": "Zambia",
+    "n": "Zambia",
+    "c": "Lusaka",
+    "p": 21.9,
+    "coast": 0,
+    "t": "llanura",
+    "s": "mineria"
+   },
+   {
+    "geo": "Malawi",
+    "n": "Malaui",
+    "c": "Lilongüe",
+    "p": 22,
+    "coast": 0,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Mozambique",
+    "n": "Mozambique",
+    "c": "Maputo",
+    "p": 35,
+    "coast": 1,
+    "t": "llanura",
+    "s": "energia"
+   },
+   {
+    "geo": "Zimbabwe",
+    "n": "Zimbabue",
+    "c": "Harare",
+    "p": 17,
+    "coast": 0,
+    "t": "llanura",
+    "s": "mineria"
+   },
+   {
+    "geo": "Botswana",
+    "n": "Botsuana",
+    "c": "Gaborone",
+    "p": 2.6,
+    "coast": 0,
+    "t": "desierto",
+    "s": "mineria"
+   },
+   {
+    "geo": "Namibia",
+    "n": "Namibia",
+    "c": "Windhoek",
+    "p": 3.1,
+    "coast": 1,
+    "t": "desierto",
+    "s": "mineria"
+   },
+   {
+    "geo": "Lesotho",
+    "n": "Lesoto",
+    "c": "Maseru",
+    "p": 2.4,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "eSwatini",
+    "n": "Esuatini",
+    "c": "Mbabane",
+    "p": 1.2,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Madagascar",
+    "n": "Madagascar",
+    "c": "Antananarivo",
+    "p": 33,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   }
+  ]
+ },
+ {
+  "id": "B_ASS",
+  "name": "Sur de Asia (otros)",
+  "short": "Sur de Asia",
+  "color": "#7ab07a",
+  "flag": {
+   "stripes": [
+    "#006a4e"
+   ],
+   "dir": "h",
+   "emblem": "#f42a41"
+  },
+  "capital": "Daca",
+  "area": "indio",
+  "regime": "hibrido",
+  "ideology": "conservador",
+  "personality": "bloque_regional",
+  "label": [
+   89,
+   24
+  ],
+  "eco": {
+   "gdp": 618,
+   "growth": 4.5,
+   "inflation": 7,
+   "unemployment": 5,
+   "debt": 45,
+   "deficit": 4.5,
+   "reserves": 45,
+   "rate": 8,
+   "revenue": 10,
+   "exports": 15,
+   "imports": 22,
+   "investment": 28
+  },
+  "res": {
+   "oil": [
+    0.01,
+    0.3
+   ],
+   "gas": [
+    22,
+    30
+   ],
+   "minerals": [
+    0.1,
+    0.1
+   ],
+   "food": [
+    22,
+    24
+   ],
+   "chips": [
+    0,
+    0.1
+   ]
+  },
+  "soc": {
+   "pop": 229,
+   "birth": 18.0,
+   "death": 5.8,
+   "migration": -2,
+   "medianAge": 27,
+   "education": 55,
+   "health": 65,
+   "gini": 33,
+   "corruption": 72,
+   "pressFreedom": 35
+  },
+  "approval": 40,
+  "stability": 42,
+  "milScale": 3.0,
+  "mil": {
+   "tech": 35,
+   "morale": 50,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   30,
+   35
+  ],
+  "techLevel": 35,
+  "renewables": 15,
+  "terrain": "llanura",
+  "hazards": {
+   "earthquake": 1,
+   "storm": 3,
+   "flood": 3,
+   "drought": 1
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Bangladesh",
+    "n": "Bangladés",
+    "c": "Daca",
+    "p": 176,
+    "coast": 1,
+    "t": "llanura",
+    "s": "industria",
+    "cap": 1
+   },
+   {
+    "geo": "Nepal",
+    "n": "Nepal",
+    "c": "Katmandú",
+    "p": 30,
+    "coast": 0,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Bhutan",
+    "n": "Bután",
+    "c": "Timbu",
+    "p": 0.8,
+    "coast": 0,
+    "t": "montaña",
+    "s": "energia"
+   },
+   {
+    "geo": "Sri Lanka",
+    "n": "Sri Lanka",
+    "c": "Colombo",
+    "p": 22,
+    "coast": 1,
+    "t": "selva",
+    "s": "turismo"
+   }
+  ]
+ },
+ {
+  "id": "B_SEA",
+  "name": "Sudeste Asiático (otros)",
+  "short": "Sudeste As.",
+  "color": "#d6a35a",
+  "flag": {
+   "stripes": [
+    "#a51931",
+    "#f4f5f8",
+    "#2d2a4a",
+    "#f4f5f8",
+    "#a51931"
+   ],
+   "dir": "h"
+  },
+  "capital": "Bangkok",
+  "area": "sudeste",
+  "regime": "hibrido",
+  "ideology": "desarrollismo",
+  "personality": "no_alineado_pragmatico",
+  "label": [
+   102,
+   14
+  ],
+  "eco": {
+   "gdp": 1183,
+   "growth": 3.5,
+   "inflation": 1.5,
+   "unemployment": 2.5,
+   "debt": 60,
+   "deficit": 3.5,
+   "reserves": 450,
+   "rate": 2.5,
+   "revenue": 18,
+   "exports": 65,
+   "imports": 60,
+   "investment": 24
+  },
+  "res": {
+   "oil": [
+    0.75,
+    2.5
+   ],
+   "gas": [
+    120,
+    120
+   ],
+   "minerals": [
+    1.5,
+    0.5
+   ],
+   "food": [
+    22,
+    16
+   ],
+   "chips": [
+    3,
+    8
+   ]
+  },
+  "soc": {
+   "pop": 189.5,
+   "birth": 12.0,
+   "death": 7.5,
+   "migration": -0.5,
+   "medianAge": 34,
+   "education": 66,
+   "health": 75,
+   "gini": 37,
+   "corruption": 62,
+   "pressFreedom": 30
+  },
+  "approval": 45,
+  "stability": 50,
+  "milScale": 4.0,
+  "mil": {
+   "tech": 50,
+   "morale": 50,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   40,
+   45
+  ],
+  "techLevel": 55,
+  "renewables": 20,
+  "terrain": "selva",
+  "hazards": {
+   "earthquake": 1,
+   "storm": 2,
+   "flood": 2,
+   "drought": 1
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Thailand",
+    "n": "Tailandia",
+    "c": "Bangkok",
+    "p": 71.5,
+    "coast": 1,
+    "t": "llanura",
+    "s": "industria",
+    "cap": 1
+   },
+   {
+    "geo": "Malaysia",
+    "n": "Malasia",
+    "c": "Kuala Lumpur",
+    "p": 35.5,
+    "coast": 1,
+    "t": "selva",
+    "s": "tecnologia"
+   },
+   {
+    "geo": "Myanmar",
+    "n": "Myanmar",
+    "c": "Naipyidó",
+    "p": 55,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Cambodia",
+    "n": "Camboya",
+    "c": "Nom Pen",
+    "p": 17.8,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Laos",
+    "n": "Laos",
+    "c": "Vientián",
+    "p": 7.8,
+    "coast": 0,
+    "t": "montaña",
+    "s": "energia"
+   },
+   {
+    "geo": "Brunei",
+    "n": "Brunéi",
+    "c": "Bandar Seri Begawan",
+    "p": 0.46,
+    "coast": 1,
+    "t": "selva",
+    "s": "energia"
+   },
+   {
+    "geo": "Timor-Leste",
+    "n": "Timor Oriental",
+    "c": "Dili",
+    "p": 1.4,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   }
+  ]
+ },
+ {
+  "id": "B_OCE",
+  "name": "Oceanía (otros)",
+  "short": "Oceanía",
+  "color": "#6fb3b3",
+  "flag": {
+   "stripes": [
+    "#00247d"
+   ],
+   "dir": "h",
+   "canton": "#cc142b",
+   "emblem": "#ffffff"
+  },
+  "capital": "Wellington",
+  "area": "anglo",
+  "regime": "democracia_parlamentaria",
+  "ideology": "socialdemocracia",
+  "personality": "bloque_regional",
+  "label": [
+   160,
+   -25
+  ],
+  "eco": {
+   "gdp": 301,
+   "growth": 1.8,
+   "inflation": 2.8,
+   "unemployment": 4.8,
+   "debt": 50,
+   "deficit": 3.0,
+   "reserves": 25,
+   "rate": 2.5,
+   "revenue": 33,
+   "exports": 25,
+   "imports": 28,
+   "investment": 22
+  },
+  "res": {
+   "oil": [
+    0.03,
+    0.2
+   ],
+   "gas": [
+    5,
+    5
+   ],
+   "minerals": [
+    0.8,
+    0.05
+   ],
+   "food": [
+    5,
+    1.5
+   ],
+   "chips": [
+    0,
+    0.1
+   ]
+  },
+  "soc": {
+   "pop": 18,
+   "birth": 17.0,
+   "death": 6.5,
+   "migration": 1,
+   "medianAge": 28,
+   "education": 75,
+   "health": 76,
+   "gini": 35,
+   "corruption": 45,
+   "pressFreedom": 70
+  },
+  "approval": 45,
+  "stability": 65,
+  "milScale": 0.8,
+  "mil": {
+   "tech": 65,
+   "morale": 50,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   40,
+   45
+  ],
+  "techLevel": 60,
+  "renewables": 75,
+  "terrain": "mixto",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 2,
+   "flood": 1,
+   "drought": 0
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "New Zealand",
+    "n": "Nueva Zelanda",
+    "c": "Wellington",
+    "p": 5.3,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura",
+    "cap": 1
+   },
+   {
+    "geo": "Papua New Guinea",
+    "n": "Papúa Nueva Guinea",
+    "c": "Port Moresby",
+    "p": 10.6,
+    "coast": 1,
+    "t": "selva",
+    "s": "mineria"
+   },
+   {
+    "geo": "Fiji",
+    "n": "Fiyi",
+    "c": "Suva",
+    "p": 0.93,
+    "coast": 1,
+    "t": "selva",
+    "s": "turismo"
+   },
+   {
+    "geo": "Solomon Is.",
+    "n": "Islas Salomón",
+    "c": "Honiara",
+    "p": 0.8,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Vanuatu",
+    "n": "Vanuatu",
+    "c": "Port Vila",
+    "p": 0.33,
+    "coast": 1,
+    "t": "selva",
+    "s": "turismo"
+   }
+  ]
+ },
+ {
+  "id": "B_CAM",
+  "name": "Centroamérica y Caribe",
+  "short": "Centroam.",
+  "color": "#d18a7a",
+  "flag": {
+   "stripes": [
+    "#0067c6",
+    "#ffffff",
+    "#0067c6"
+   ],
+   "dir": "h"
+  },
+  "capital": "Ciudad de Panamá",
+  "area": "hispano",
+  "regime": "democracia_imperfecta",
+  "ideology": "conservador",
+  "personality": "bloque_regional",
+  "label": [
+   -82,
+   15
+  ],
+  "eco": {
+   "gdp": 649,
+   "growth": 3.0,
+   "inflation": 4,
+   "unemployment": 6.5,
+   "debt": 55,
+   "deficit": 3.0,
+   "reserves": 90,
+   "rate": 6,
+   "revenue": 18,
+   "exports": 30,
+   "imports": 40,
+   "investment": 21
+  },
+  "res": {
+   "oil": [
+    0.1,
+    0.9
+   ],
+   "gas": [
+    28,
+    25
+   ],
+   "minerals": [
+    0.3,
+    0.1
+   ],
+   "food": [
+    6,
+    9
+   ],
+   "chips": [
+    0,
+    0.3
+   ]
+  },
+  "soc": {
+   "pop": 92.4,
+   "birth": 17.0,
+   "death": 6.5,
+   "migration": -3,
+   "medianAge": 27,
+   "education": 60,
+   "health": 70,
+   "gini": 46,
+   "corruption": 68,
+   "pressFreedom": 45
+  },
+  "approval": 45,
+  "stability": 45,
+  "milScale": 1.5,
+  "mil": {
+   "tech": 30,
+   "morale": 45,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   25,
+   35
+  ],
+  "techLevel": 35,
+  "renewables": 40,
+  "terrain": "selva",
+  "hazards": {
+   "earthquake": 2,
+   "storm": 3,
+   "flood": 2,
+   "drought": 1
+  },
+  "rivals": [],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Panama",
+    "n": "Panamá",
+    "c": "Ciudad de Panamá",
+    "p": 4.6,
+    "coast": 1,
+    "t": "selva",
+    "s": "servicios",
+    "cap": 1
+   },
+   {
+    "geo": "Guatemala",
+    "n": "Guatemala",
+    "c": "Ciudad de Guatemala",
+    "p": 18.7,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Honduras",
+    "n": "Honduras",
+    "c": "Tegucigalpa",
+    "p": 11,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "El Salvador",
+    "n": "El Salvador",
+    "c": "San Salvador",
+    "p": 6.4,
+    "coast": 1,
+    "t": "montaña",
+    "s": "servicios"
+   },
+   {
+    "geo": "Nicaragua",
+    "n": "Nicaragua",
+    "c": "Managua",
+    "p": 7.1,
+    "coast": 1,
+    "t": "selva",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Costa Rica",
+    "n": "Costa Rica",
+    "c": "San José",
+    "p": 5.2,
+    "coast": 1,
+    "t": "selva",
+    "s": "turismo"
+   },
+   {
+    "geo": "Belize",
+    "n": "Belice",
+    "c": "Belmopán",
+    "p": 0.42,
+    "coast": 1,
+    "t": "selva",
+    "s": "turismo"
+   },
+   {
+    "geo": "Cuba",
+    "n": "Cuba",
+    "c": "La Habana",
+    "p": 10.9,
+    "coast": 1,
+    "t": "llanura",
+    "s": "turismo"
+   },
+   {
+    "geo": "Haiti",
+    "n": "Haití",
+    "c": "Puerto Príncipe",
+    "p": 11.9,
+    "coast": 1,
+    "t": "montaña",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Dominican Rep.",
+    "n": "R. Dominicana",
+    "c": "Santo Domingo",
+    "p": 11.5,
+    "coast": 1,
+    "t": "montaña",
+    "s": "turismo"
+   },
+   {
+    "geo": "Jamaica",
+    "n": "Jamaica",
+    "c": "Kingston",
+    "p": 2.8,
+    "coast": 1,
+    "t": "montaña",
+    "s": "turismo"
+   },
+   {
+    "geo": "Bahamas",
+    "n": "Bahamas",
+    "c": "Nasáu",
+    "p": 0.4,
+    "coast": 1,
+    "t": "llanura",
+    "s": "turismo"
+   },
+   {
+    "geo": "Trinidad and Tobago",
+    "n": "Trinidad y Tobago",
+    "c": "Puerto España",
+    "p": 1.5,
+    "coast": 1,
+    "t": "selva",
+    "s": "energia"
+   }
+  ]
+ },
+ {
+  "id": "B_SAM",
+  "name": "Andes y Cono Sur (otros)",
+  "short": "Andes",
+  "color": "#b8a0d6",
+  "flag": {
+   "stripes": [
+    "#d91023",
+    "#ffffff",
+    "#d91023"
+   ],
+   "dir": "v"
+  },
+  "capital": "Lima",
+  "area": "hispano",
+  "regime": "democracia_imperfecta",
+  "ideology": "conservador",
+  "personality": "bloque_regional",
+  "label": [
+   -70,
+   -12
+  ],
+  "eco": {
+   "gdp": 635,
+   "growth": 2.8,
+   "inflation": 3.0,
+   "unemployment": 6.5,
+   "debt": 40,
+   "deficit": 2.5,
+   "reserves": 130,
+   "rate": 5,
+   "revenue": 22,
+   "exports": 28,
+   "imports": 26,
+   "investment": 21
+  },
+  "res": {
+   "oil": [
+    1.2,
+    0.6
+   ],
+   "gas": [
+    26,
+    20
+   ],
+   "minerals": [
+    5,
+    0.2
+   ],
+   "food": [
+    10,
+    8
+   ],
+   "chips": [
+    0,
+    0.2
+   ]
+  },
+  "soc": {
+   "pop": 77.4,
+   "birth": 16.0,
+   "death": 6.0,
+   "migration": 0.5,
+   "medianAge": 29,
+   "education": 70,
+   "health": 74,
+   "gini": 42,
+   "corruption": 65,
+   "pressFreedom": 50
+  },
+  "approval": 35,
+  "stability": 42,
+  "milScale": 2.0,
+  "mil": {
+   "tech": 40,
+   "morale": 45,
+   "nukes": 0,
+   "doctrine": "defensa_territorial"
+  },
+  "intel": [
+   30,
+   35
+  ],
+  "techLevel": 42,
+  "renewables": 55,
+  "terrain": "montaña",
+  "hazards": {
+   "earthquake": 3,
+   "storm": 0,
+   "flood": 2,
+   "drought": 1
+  },
+  "rivals": [
+   "VEN"
+  ],
+  "claims": [],
+  "sphere": [],
+  "members": [
+   {
+    "geo": "Peru",
+    "n": "Perú",
+    "c": "Lima",
+    "p": 34.5,
+    "coast": 1,
+    "t": "montaña",
+    "s": "mineria",
+    "cap": 1
+   },
+   {
+    "geo": "Ecuador",
+    "n": "Ecuador",
+    "c": "Quito",
+    "p": 18.4,
+    "coast": 1,
+    "t": "montaña",
+    "s": "energia"
+   },
+   {
+    "geo": "Bolivia",
+    "n": "Bolivia",
+    "c": "La Paz",
+    "p": 12.6,
+    "coast": 0,
+    "t": "montaña",
+    "s": "mineria"
+   },
+   {
+    "geo": "Paraguay",
+    "n": "Paraguay",
+    "c": "Asunción",
+    "p": 7,
+    "coast": 0,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Uruguay",
+    "n": "Uruguay",
+    "c": "Montevideo",
+    "p": 3.4,
+    "coast": 1,
+    "t": "llanura",
+    "s": "agricultura"
+   },
+   {
+    "geo": "Guyana",
+    "n": "Guyana",
+    "c": "Georgetown",
+    "p": 0.83,
+    "coast": 1,
+    "t": "selva",
+    "s": "energia"
+   },
+   {
+    "geo": "Suriname",
+    "n": "Surinam",
+    "c": "Paramaribo",
+    "p": 0.64,
+    "coast": 1,
+    "t": "selva",
+    "s": "mineria"
+   }
+  ]
+ }
+]

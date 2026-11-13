@@ -1,0 +1,15 @@
+[
+ {"id":"ONU","name":"Naciones Unidas","short":"ONU","type":"universal","members":"*","veto":["USA","CHN","RUS","GBR","FRA"],"council":["USA","CHN","RUS","GBR","FRA","B_EUO","B_SAM","B_AFO","B_SEA","PAK"],"tradeBonus":0,"mutualDefense":false,"color":"#5b92e5"},
+ {"id":"OTAN","name":"Organización del Tratado del Atlántico Norte","short":"OTAN","type":"military","members":["USA","CAN","GBR","FRA","DEU","ITA","ESP","NLD","POL","SWE","NOR","TUR","B_EUO","B_EUC","B_BAL"],"veto":[],"council":[],"tradeBonus":0.05,"mutualDefense":true,"color":"#1f4e8c"},
+ {"id":"UE","name":"Unión Europea","short":"UE","type":"economic","members":["FRA","DEU","ITA","ESP","NLD","POL","SWE","B_EUO","B_EUC","B_BAL"],"veto":[],"council":[],"tradeBonus":0.6,"mutualDefense":false,"color":"#003399"},
+ {"id":"BRICS","name":"BRICS+","short":"BRICS","type":"political","members":["BRA","RUS","IND","CHN","ZAF","EGY","ETH","IRN","ARE","IDN"],"veto":[],"council":[],"tradeBonus":0.08,"mutualDefense":false,"color":"#c0392b"},
+ {"id":"OCS","name":"Organización de Cooperación de Shanghái","short":"OCS","type":"political","members":["CHN","RUS","IND","PAK","IRN","KAZ","B_ASC","BLR"],"veto":[],"council":[],"tradeBonus":0.05,"mutualDefense":false,"color":"#8e44ad"},
+ {"id":"OTSC","name":"Organización del Tratado de Seguridad Colectiva","short":"OTSC","type":"military","members":["RUS","BLR","KAZ","B_ASC"],"veto":[],"council":[],"tradeBonus":0.05,"mutualDefense":true,"color":"#7b241c"},
+ {"id":"ASEAN","name":"Asociación de Naciones del Sudeste Asiático","short":"ASEAN","type":"economic","members":["IDN","VNM","PHL","B_SEA"],"veto":[],"council":[],"tradeBonus":0.3,"mutualDefense":false,"color":"#16a085"},
+ {"id":"UA","name":"Unión Africana","short":"UA","type":"political","members":["EGY","NGA","ETH","ZAF","DZA","B_MAG","B_AFO","B_AFC","B_AFE","B_AFS"],"veto":[],"council":[],"tradeBonus":0.1,"mutualDefense":false,"color":"#27ae60"},
+ {"id":"OPEP","name":"OPEP+","short":"OPEP+","type":"economic","members":["SAU","IRQ","IRN","ARE","VEN","NGA","DZA","RUS","KAZ","MEX","B_GOL","B_MAG","B_AFC"],"veto":[],"council":[],"tradeBonus":0.0,"mutualDefense":false,"color":"#b7950b","cartel":"oil"},
+ {"id":"G7","name":"Grupo de los Siete","short":"G7","type":"political","members":["USA","CAN","GBR","FRA","DEU","ITA","JPN"],"veto":[],"council":[],"tradeBonus":0.05,"mutualDefense":false,"color":"#2c3e50"},
+ {"id":"LA","name":"Liga Árabe","short":"Liga Árabe","type":"political","members":["SAU","EGY","IRQ","ARE","DZA","B_LEV","B_GOL","B_MAG"],"veto":[],"council":[],"tradeBonus":0.05,"mutualDefense":false,"color":"#1e8449"},
+ {"id":"MERCOSUR","name":"Mercado Común del Sur","short":"Mercosur","type":"economic","members":["BRA","ARG","B_SAM"],"veto":[],"council":[],"tradeBonus":0.4,"mutualDefense":false,"color":"#2471a3"},
+ {"id":"TMEC","name":"Tratado México–EE. UU.–Canadá","short":"T-MEC","type":"economic","members":["USA","MEX","CAN"],"veto":[],"council":[],"tradeBonus":0.5,"mutualDefense":false,"color":"#5d6d7e"}
+]

@@ -1,0 +1,48 @@
+{
+"workers":{"name":"Trabajadores","icon":"👷","popWeight":0.40,"desc":"Asalariados, sindicatos y clases populares.",
+ "factors":[
+  {"label":"Desempleo","expr":"clamp((7 - unemployment) * 2.2, -30, 8)"},
+  {"label":"Inflación","expr":"clamp((3 - inflation) * 1.3, -30, 4)"},
+  {"label":"Crecimiento","expr":"clamp(growth * 1.4, -12, 8)"},
+  {"label":"Gasto social y pensiones","expr":"(budget.social + budget.pensions) * 1.1"},
+  {"label":"IVA / impuestos al consumo","expr":"-taxes.consumption * 0.45"},
+  {"label":"Impuesto sobre la renta","expr":"-taxes.income * 0.2"},
+  {"label":"Desigualdad","expr":"-(soc.gini - 35) * 0.3"},
+  {"label":"Huelgas en curso","expr":"soc.strikes * 0.05"}]},
+"business":{"name":"Empresarios","icon":"💼","popWeight":0.05,"desc":"Grandes empresas, pymes, inversores y finanzas.",
+ "factors":[
+  {"label":"Impuesto de sociedades","expr":"-taxes.corporate * 0.8"},
+  {"label":"Crecimiento","expr":"clamp(growth * 2.2, -15, 12)"},
+  {"label":"Estabilidad","expr":"(pol.stability - 55) * 0.3"},
+  {"label":"Inflación alta","expr":"-clamp(inflation - 5, 0, 60) * 0.5"},
+  {"label":"Deuda pública","expr":"-clamp(debt - 90, 0, 200) * 0.08"},
+  {"label":"Acceso al comercio","expr":"(tradeAccess - 1) * 45"},
+  {"label":"Sanciones sufridas","expr":"-sanctioned * 4"},
+  {"label":"Protestas","expr":"-soc.protest * 0.12"}]},
+"military":{"name":"Militares","icon":"🎖","popWeight":0.03,"desc":"Fuerzas armadas, veteranos y complejo de defensa.",
+ "factors":[
+  {"label":"Presupuesto de defensa","expr":"log(budget.defense / 2) * 15"},
+  {"label":"Marcha de la guerra","expr":"atWar * clamp(warScore * 0.2, -20, 15)"},
+  {"label":"Moral de las tropas","expr":"(mil.morale - 60) * 0.3"},
+  {"label":"Cansancio de guerra","expr":"-pol.warWeariness * 0.15"},
+  {"label":"Preparación","expr":"(mil.readiness - 70) * 0.15"}]},
+"youth":{"name":"Jóvenes","icon":"🎒","popWeight":0.22,"desc":"Estudiantes y jóvenes trabajadores; sensibles al empleo, la educación y las libertades.",
+ "factors":[
+  {"label":"Desempleo juvenil","expr":"clamp((7 - unemployment) * 2.6, -35, 8)"},
+  {"label":"Gasto en educación","expr":"budget.education * 3"},
+  {"label":"Libertad de prensa","expr":"(pol.pressFreedom - 60) * 0.2"},
+  {"label":"Transición energética","expr":"(tech.renewables - 40) * 0.1"},
+  {"label":"Represión","expr":"-pol.repression * 0.35"},
+  {"label":"Vivienda e inflación","expr":"clamp((3 - inflation) * 0.8, -20, 3)"}]},
+"religious":{"name":"Religiosos","icon":"🕊","popWeight":0.15,"desc":"Comunidades religiosas y sectores tradicionalistas.",
+ "factors":[
+  {"label":"Gasto social","expr":"budget.social * 1.0"},
+  {"label":"Estabilidad y orden","expr":"(pol.stability - 55) * 0.2"},
+  {"label":"Inflación","expr":"clamp((3 - inflation) * 0.6, -15, 3)"}]},
+"minorities":{"name":"Minorías","icon":"🤝","popWeight":0.15,"desc":"Minorías étnicas, religiosas, inmigrantes y colectivos discriminados.",
+ "factors":[
+  {"label":"Represión","expr":"-pol.repression * 0.45"},
+  {"label":"Desigualdad","expr":"-(soc.gini - 35) * 0.4"},
+  {"label":"Libertad de prensa","expr":"(pol.pressFreedom - 60) * 0.15"},
+  {"label":"Desempleo","expr":"clamp((7 - unemployment) * 1.5, -20, 6)"}]}
+}

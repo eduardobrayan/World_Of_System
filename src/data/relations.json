@@ -1,0 +1,72 @@
+{
+"_doc":"Relaciones iniciales explícitas (opinión de A hacia B, se aplica en ambos sentidos salvo 'oneway'), tratados, sanciones y guerras activas en enero de 2026.",
+"pairs":[
+ ["USA","CAN",55],["USA","MEX",25],["USA","GBR",75],["USA","FRA",50],["USA","DEU",50],["USA","JPN",75],["USA","KOR",70],["USA","AUS",75],
+ ["USA","ISR",80],["USA","TWN",65],["USA","PHL",60],["USA","SAU",45],["USA","ARE",50],["USA","POL",70],["USA","UKR",35],["USA","IND",35],
+ ["USA","CHN",-45],["USA","RUS",-40],["USA","IRN",-80],["USA","PRK",-80],["USA","VEN",-75],["USA","BRA",0],["USA","ZAF",-15],["USA","ARG",55],
+ ["USA","COL",-20],["USA","EGY",30],["USA","TUR",15],["USA","PAK",10],["USA","VNM",20],["USA","IDN",15],["USA","NGA",-10],["USA","B_EUO",40],
+ ["CHN","RUS",65],["CHN","PRK",45],["CHN","PAK",70],["CHN","IRN",40],["CHN","TWN",-75],["CHN","JPN",-45],["CHN","IND",-25],["CHN","PHL",-45],
+ ["CHN","VNM",-10],["CHN","KOR",5],["CHN","AUS",-15],["CHN","BRA",40],["CHN","ZAF",40],["CHN","SAU",35],["CHN","KAZ",45],["CHN","B_SEA",25],
+ ["CHN","B_AFC",35],["CHN","ETH",40],["CHN","EGY",30],["CHN","GBR",-15],["CHN","DEU",10],["CHN","FRA",5],["CHN","ARE",35],["CHN","VEN",30],
+ ["RUS","UKR",-90],["RUS","POL",-70],["RUS","GBR",-70],["RUS","FRA",-55],["RUS","DEU",-55],["RUS","SWE",-60],["RUS","NOR",-45],["RUS","B_EUO",-50],
+ ["RUS","B_EUC",-50],["RUS","BLR",80],["RUS","KAZ",40],["RUS","PRK",55],["RUS","IRN",50],["RUS","IND",45],["RUS","TUR",15],["RUS","JPN",-40],
+ ["RUS","ITA",-35],["RUS","ESP",-35],["RUS","NLD",-50],["RUS","CAN",-50],["RUS","VEN",40],["RUS","B_ASC",40],["RUS","B_CAU",10],["RUS","SAU",25],
+ ["UKR","POL",55],["UKR","GBR",70],["UKR","DEU",60],["UKR","FRA",60],["UKR","BLR",-60],["UKR","B_EUO",55],["UKR","B_EUC",40],["UKR","SWE",60],
+ ["ISR","IRN",-95],["ISR","B_LEV",-60],["ISR","EGY",10],["ISR","ARE",30],["ISR","SAU",-5],["ISR","TUR",-50],["ISR","IRQ",-50],["ISR","ZAF",-50],
+ ["IRN","SAU",-30],["IRN","ARE",-15],["IRN","IRQ",45],["IRN","B_LEV",15],["IRN","GBR",-55],["IRN","FRA",-45],["IRN","DEU",-40],["IRN","PAK",15],
+ ["IND","PAK",-85],["IND","JPN",45],["IND","FRA",50],["IND","ARE",50],["IND","SAU",35],["IND","B_ASS",30],["IND","AUS",40],["IND","GBR",30],
+ ["PRK","KOR",-85],["PRK","JPN",-80],["KOR","JPN",35],["JPN","AUS",60],["JPN","PHL",50],["JPN","TWN",55],["JPN","GBR",50],
+ ["SAU","ARE",65],["SAU","EGY",55],["SAU","B_GOL",45],["SAU","PAK",55],["ARE","EGY",55],["EGY","ETH",-50],["ETH","B_AFE",-35],
+ ["DZA","B_MAG",-40],["DZA","FRA",-20],["VEN","COL",-30],["VEN","B_SAM",-40],["VEN","BRA",-5],["ARG","GBR",-20],["ARG","BRA",15],
+ ["TUR","B_BAL",-15],["TUR","B_CAU",35],["TUR","B_LEV",10],["TUR","PAK",40],
+ ["FRA","DEU",65],["FRA","GBR",55],["FRA","ITA",55],["FRA","ESP",60],["DEU","POL",45],["DEU","NLD",65],["GBR","AUS",65],["GBR","CAN",65],
+ ["PHL","VNM",30],["VNM","B_SEA",25],["IDN","AUS",35],["AUS","B_OCE",55],["MEX","B_CAM",35],["BRA","B_SAM",35],["COL","B_SAM",30],
+ ["NGA","B_AFO",25],["ZAF","B_AFS",40],["KAZ","B_ASC",40],["PAK","B_ASC",10],["BLR","POL",-55]
+],
+"treaties":[
+ {"type":"alliance","parties":["USA","JPN"],"name":"Tratado de Seguridad EE. UU.–Japón"},
+ {"type":"alliance","parties":["USA","KOR"],"name":"Tratado de Defensa Mutua EE. UU.–Corea"},
+ {"type":"alliance","parties":["USA","AUS"],"name":"ANZUS / AUKUS"},
+ {"type":"alliance","parties":["GBR","AUS"],"name":"AUKUS"},
+ {"type":"alliance","parties":["USA","PHL"],"name":"Tratado de Defensa Mutua EE. UU.–Filipinas"},
+ {"type":"defense","parties":["USA","TWN"],"name":"Ley de Relaciones con Taiwán (garantía ambigua)"},
+ {"type":"defense","parties":["USA","ISR"],"name":"Memorando de cooperación de seguridad EE. UU.–Israel"},
+ {"type":"alliance","parties":["CHN","PRK"],"name":"Tratado de amistad sino-norcoreano"},
+ {"type":"alliance","parties":["RUS","PRK"],"name":"Asociación estratégica integral Rusia–Corea del Norte"},
+ {"type":"alliance","parties":["RUS","BLR"],"name":"Estado de la Unión"},
+ {"type":"defense","parties":["SAU","PAK"],"name":"Acuerdo de defensa mutua saudí-pakistaní"},
+ {"type":"cooperation","parties":["CHN","RUS"],"name":"Asociación sin límites"},
+ {"type":"cooperation","parties":["CHN","PAK"],"name":"Corredor económico China–Pakistán"},
+ {"type":"cooperation","parties":["RUS","IRN"],"name":"Asociación estratégica Rusia–Irán"},
+ {"type":"trade","parties":["JPN","AUS"],"name":"CPTPP"},
+ {"type":"trade","parties":["KOR","USA"],"name":"KORUS"},
+ {"type":"trade","parties":["GBR","JPN"],"name":"Acuerdo comercial Reino Unido–Japón"},
+ {"type":"trade","parties":["CHN","B_SEA"],"name":"RCEP (China–ASEAN)"},
+ {"type":"trade","parties":["CHN","AUS"],"name":"ChAFTA"},
+ {"type":"trade","parties":["JPN","B_SEA"],"name":"RCEP (Japón–ASEAN)"},
+ {"type":"energy","parties":["RUS","CHN"],"name":"Gasoducto Fuerza de Siberia"},
+ {"type":"energy","parties":["B_GOL","DEU"],"name":"Suministro de GNL"}
+],
+"aid":[
+ {"from":"DEU","to":"UKR","amount":9},{"from":"GBR","to":"UKR","amount":5},{"from":"B_EUO","to":"UKR","amount":6},{"from":"FRA","to":"UKR","amount":3},
+ {"from":"NLD","to":"UKR","amount":3},{"from":"SWE","to":"UKR","amount":2},{"from":"NOR","to":"UKR","amount":3},{"from":"POL","to":"UKR","amount":1.5},
+ {"from":"CAN","to":"UKR","amount":2},{"from":"JPN","to":"UKR","amount":3},{"from":"USA","to":"UKR","amount":4},{"from":"ITA","to":"UKR","amount":1.5},
+ {"from":"ESP","to":"UKR","amount":1},{"from":"USA","to":"ISR","amount":3.8},{"from":"USA","to":"EGY","amount":1.4}
+],
+"sanctions":[
+ {"by":"USA","target":"RUS","level":3},{"by":"GBR","target":"RUS","level":3},{"by":"FRA","target":"RUS","level":2},{"by":"DEU","target":"RUS","level":2},
+ {"by":"ITA","target":"RUS","level":2},{"by":"ESP","target":"RUS","level":2},{"by":"NLD","target":"RUS","level":2},{"by":"POL","target":"RUS","level":3},
+ {"by":"SWE","target":"RUS","level":3},{"by":"NOR","target":"RUS","level":2},{"by":"CAN","target":"RUS","level":3},{"by":"JPN","target":"RUS","level":2},
+ {"by":"AUS","target":"RUS","level":2},{"by":"B_EUO","target":"RUS","level":2},{"by":"B_EUC","target":"RUS","level":2},{"by":"UKR","target":"RUS","level":3},
+ {"by":"USA","target":"IRN","level":3},{"by":"GBR","target":"IRN","level":2},{"by":"FRA","target":"IRN","level":2},{"by":"DEU","target":"IRN","level":2},
+ {"by":"USA","target":"PRK","level":3},{"by":"JPN","target":"PRK","level":3},{"by":"KOR","target":"PRK","level":3},{"by":"GBR","target":"PRK","level":2},
+ {"by":"USA","target":"VEN","level":3},{"by":"USA","target":"BLR","level":2},{"by":"POL","target":"BLR","level":2},{"by":"B_EUC","target":"BLR","level":2},
+ {"by":"USA","target":"CHN","level":1},{"by":"CHN","target":"USA","level":1},{"by":"RUS","target":"USA","level":1},{"by":"RUS","target":"GBR","level":1}
+],
+"wars":[
+ {"name":"Guerra ruso-ucraniana","attackers":["RUS"],"defenders":["UKR"],"start":-46,"goal":"territory","occupied":["UKR:Donbás","UKR:Crimea","UKR:Zaporiyia y Jersón"],"control":19,"exhaustionA":38,"exhaustionD":52}
+],
+"tariffs":[
+ {"by":"USA","target":"CHN","value":30},{"by":"CHN","target":"USA","value":10},{"by":"USA","target":"IND","value":25},{"by":"USA","target":"BRA","value":20}
+]
+}
