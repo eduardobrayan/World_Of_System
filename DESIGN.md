@@ -1,7 +1,7 @@
 # World of System — Documento de diseño
 
-Simulador de estrategia geopolítica 2D para navegador, de un jugador, por turnos (1 turno = 1 mes,
-inicio en enero de 2026). El jugador dirige un país real; el resto lo gobierna una IA interna basada
+Simulador de estrategia geopolítica 2D para navegador, de un jugador, en tiempo real sobre una simulación
+mensual (1 paso de simulación = 1 mes, inicio en enero de 2026). El jugador dirige un país real; el resto lo gobierna una IA interna basada
 en utilidad. La prioridad es la **profundidad de la simulación** y las **consecuencias en cadena**.
 
 ---
@@ -383,3 +383,22 @@ calibrar, así que la partida empieza estable con la ideología elegida.
 10. **Previsiones**: la previsión de presupuesto/impuestos simula 12 meses con y sin el cambio
     (sin eventos ni IA) para mostrar el efecto aislado; las previsiones de reacciones usan la misma
     función de evaluación de la IA sin ruido.
+
+### Tiempo real sobre una simulación mensual (F8)
+
+- **Decisión:** la simulación sigue siendo un paso mensual puro y determinista (`advanceTurn`); el tiempo real es
+  una capa de interfaz. El reloj corre solo desde el inicio (6 s por mes a 1×, 2,6 s a 2×, 1 s a 3×), se ven los
+  días y una barra de progreso del mes. Pausa con la barra espaciadora; teclas 1/2/3 para la velocidad; «⏭ Próximo
+  mes» es un atajo secundario. Cualquier ventana abierta (acción, evento, tutorial) detiene el reloj.
+- **Acciones:** se aplican al instante al confirmarlas (cambian el estado ya); los efectos de flujo (crecimiento,
+  inflación…) se notan en el siguiente cálculo mensual.
+- **Eventos:** solo los marcados `critical` en `events.json` (desastres, crisis financieras, golpes, atentados,
+  pandemia…) abren su ventana y detienen el tiempo. Los demás van a la bandeja; si en un mes no hay respuesta,
+  decide el gabinete con la utilidad de la IA **sin ruido** (`cabinetChoice`, determinista).
+- **Animación continua:** las noticias del mes entran en directo en el teletipo a lo largo del mes siguiente, las
+  cifras de la barra superior interpolan del valor anterior al nuevo, los frentes se desplazan suavemente según el
+  control territorial con columnas de tropas en marcha, y los brotes conocidos laten sobre el mapa. Se respeta
+  `prefers-reduced-motion`.
+- **Distribución:** `npm run build` genera un único HTML autocontenido (vite-plugin-singlefile) que funciona con
+  doble clic desde `file://`; se copia a `jugar/WorldOfSystem.html`.
+

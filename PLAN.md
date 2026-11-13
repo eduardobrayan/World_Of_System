@@ -115,3 +115,23 @@ indexar alianzas, barreras comerciales y relaciones por turno.
 **Verificación F7:** 34 tests en verde (11 nuevos); 200 turnos estables con dos semillas (crecimiento ~2,5 %,
 corrupción media 52 → 45 por reformas graduales, cárteles 24 → 21, sin NaN, ~72 ms/turno). Se corrigió una pandemia
 natural que podía volverse endémica para siempre.
+
+## F8 — Pulido, versión jugable con doble clic y tiempo real ✅
+- [x] Científico arrepentido: desmantelar destruye también las cepas; el evento es secreto (no sale en noticias de la IA)
+- [x] Cargo genérico con nombres de líder aleatorios (no «Presidenta Eduardo»)
+- [x] Integridad policial inicial más plausible en países con cárteles (México 8 → 19), media ponderada intacta
+- [x] Capa Narcotráfico con escala de raíz; leyendas de Corrupción y Brotes corregidas; ruido de inteligencia en
+      corrupción, cárteles, criminalidad, presión y violencia de países extranjeros (paneles, tabla y capas)
+- [x] Gráficas sin historial: una línea discreta en vez de un lienzo vacío; ejes sin etiquetas repetidas
+- [x] Resumen final con presión social, corrupción, cárteles, criminalidad y brotes provocados
+- [x] Previsión a 12 meses sin azar en brotes (sin mutaciones ni atribuciones) y sin noticias
+- [x] modSum con caché por array de modificadores (idéntico bit a bit): ~69 → ~59 ms/mes
+- [x] Nombres legibles y colores correctos de los efectos nuevos (cárteles, corrupción por tipos, policía…) en las previsiones
+- [x] Limpieza de imports y `void` sobrantes; tabla de focos del narco sin desbordar
+- [x] Build en un único HTML autocontenido (sin aviso de bundle) y copia jugable `jugar/WorldOfSystem.html`
+- [x] Tiempo real: reloj continuo con días, pausa con espacio, 1/2/3, «Próximo mes» secundario, eventos no críticos
+      a la bandeja con decisión del gabinete al mes, noticias en directo, cifras animadas, frentes y brotes animados
+
+**Verificación F8:** 38 tests en verde (4 nuevos); 200 meses estables; build sin avisos; recorrido con Playwright
+desde `file://` (escritorio y móvil) sin errores de consola; el reloj avanza solo sin interacción.
+

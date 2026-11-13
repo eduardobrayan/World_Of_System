@@ -3,7 +3,7 @@ import { createWorld } from '../src/sim/init';
 import { advanceTurn } from '../src/sim/turn';
 import { modSum } from '../src/sim/vars';
 import { addModifier } from '../src/sim/effects';
-import { EVENT_BY_ID, triggerEvent } from '../src/sim/events';
+import { EVENT_BY_ID, autoResolveExpired, triggerEvent } from '../src/sim/events';
 import { rngOf } from '../src/sim/util';
 import type { Country } from '../src/sim/types';
 
@@ -51,5 +51,17 @@ describe('F8: pulido', () => {
     const m = w.countries.MEX;
     expect(m.police.integrity).toBeGreaterThan(12);
     expect(m.police.integrity).toBeLessThan(35);
+  });
+
+  it('tiempo real: los asuntos no críticos caducan al mes y decide el gabinete; los críticos esperan', () => {
+    const w = createWorld({ seed: 'rt', player: 'ESP' });
+    const c = w.countries.ESP;
+    triggerEvent(w, c, EVENT_BY_ID.record_turismo, rngOf(w));
+    triggerEvent(w, c, EVENT_BY_ID.terremoto, rngOf(w));
+    expect(w.pendingEvents).toHaveLength(2);
+    const done = autoResolveExpired(w);
+    expect(done.map((d) => d.title)).toHaveLength(1);
+    expect(w.pendingEvents.map((p) => p.id)).toEqual(['terremoto']);
+    expect(EVENT_BY_ID.terremoto.critical).toBe(true);
   });
 });
