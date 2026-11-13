@@ -5,12 +5,30 @@ import type { Resolver } from './expr';
 import { ideologyOf, regimeOf } from './data';
 import { gdppc } from './util';
 
-export function modSum(c: Country, key: string): number {
-  let s = 0;
-  for (const m of c.mods) {
-    const v = m.mods[key];
-    if (typeof v === 'number') s += v;
+/**
+ * Sumas de modificadores por clave, cacheadas por array de `c.mods`. Los modificadores solo se
+ * añaden con push (cambia la longitud) o se sustituyen creando un array nuevo, y sus valores no se
+ * mutan, así que (referencia, longitud) basta para invalidar. Se suman en el mismo orden que antes:
+ * el resultado es idéntico bit a bit (determinismo).
+ */
+const MOD_CACHE = new WeakMap<Country['mods'], { len: number; sums: Map<string, number> }>();
+
+function modSums(mods: Country['mods']): Map<string, number> {
+  const hit = MOD_CACHE.get(mods);
+  if (hit && hit.len === mods.length) return hit.sums;
+  const sums = new Map<string, number>();
+  for (const m of mods) {
+    for (const k in m.mods) {
+      const v = m.mods[k];
+      if (typeof v === 'number') sums.set(k, (sums.get(k) ?? 0) + v);
+    }
   }
+  MOD_CACHE.set(mods, { len: mods.length, sums });
+  return sums;
+}
+
+export function modSum(c: Country, key: string): number {
+  let s = modSums(c.mods).get(key) ?? 0;
   for (const sh of c.shocks) if (sh.key === key) s += sh.value;
   return s;
 }

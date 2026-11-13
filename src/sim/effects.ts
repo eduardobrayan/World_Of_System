@@ -97,7 +97,7 @@ export function makeModifier(world: World, c: Country, def: ModifierDef, source:
 export function addModifier(world: World, c: Country, def: ModifierDef, source: string, target?: Country) {
   const m = makeModifier(world, c, def, source, target);
   const i = c.mods.findIndex((x) => x.id === m.id);
-  if (i >= 0) c.mods[i] = m;
+  if (i >= 0) c.mods = c.mods.map((x, j) => (j === i ? m : x)); // array nuevo: invalida la caché de modSum
   else c.mods.push(m);
 }
 
