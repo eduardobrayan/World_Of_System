@@ -69,8 +69,8 @@ export function renderSecurity(app: App): HTMLElement[] {
     .sort((a, b2) => b2.v - a.v).slice(0, 8).map((e) => e.x);
   const cell = (x: typeof c, k: 'cartels' | 'transit' | 'production') => h('td', { class: 'n' }, `${approxMark(w, c, x)}${pv(x, k).toFixed(0)}`);
   out.push(section('Rutas y focos mundiales',
-    h('table', { class: 'tbl' }, h('thead', null, h('tr', null, h('th', null, 'País'), h('th', { class: 'n' }, 'Cárteles'), h('th', { class: 'n' }, 'Tránsito'), h('th', { class: 'n' }, 'Producción'))),
-      h('tbody', null, hot.map((x) => h('tr', { class: 'click', onclick: () => app.onSelect(x.id) }, h('td', null, flagEl(x, 16, 11), ' ', x.short),
+    h('table', { class: 'tbl' }, h('thead', null, h('tr', null, h('th', null, 'País'), h('th', { class: 'n' }, 'Cárteles'), h('th', { class: 'n' }, 'Tránsito'), h('th', { class: 'n', title: 'Producción' }, 'Prod.'))),
+      h('tbody', null, hot.map((x) => h('tr', { class: 'click', onclick: () => app.onSelect(x.id) }, h('td', { style: 'white-space:nowrap' }, flagEl(x, 16, 11), ' ', x.short),
         cell(x, 'cartels'), cell(x, 'transit'), cell(x, 'production')))))));
   return out;
 }

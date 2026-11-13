@@ -1,6 +1,7 @@
 # World of System
 
-Simulador de estrategia geopolítica 2D para navegador, de un jugador y por turnos (1 turno = 1 mes, desde enero de 2026).
+Simulador de estrategia geopolítica 2D para navegador, de un jugador y en tiempo real desde enero de 2026: el reloj
+corre solo (pausa con la barra espaciadora, velocidades 1/2/3) y el mundo se recalcula cada mes de juego.
 Diriges un país real; el resto del mundo lo gobierna una IA con personalidad, memoria y motivos explicables.
 
 Además de economía, política, diplomacia, guerra e inteligencia, puedes gobernar con tu propio partido (o con
@@ -10,20 +11,27 @@ programa biológico secreto.
 
 ## Cómo jugar
 
-```bash
-npm install
-npm run dev        # abre http://localhost:5173
-```
+Hay dos formas:
 
-```bash
-npm run build      # versión estática en dist/ (se puede abrir desde cualquier servidor web)
-```
+1. **Sin instalar nada (doble clic):** descarga el repositorio y abre `jugar/WorldOfSystem.html` con doble clic.
+   Es un único archivo HTML con todo dentro (código, estilos y mapa), funciona sin conexión y sin servidor.
+   Las partidas se guardan en el navegador.
+2. **Modo desarrollo:** con Node.js instalado,
+
+   ```bash
+   npm install
+   npm run dev        # abre http://localhost:5173
+   ```
+
+`npm run build` genera `dist/index.html` (también autocontenido, se abre con doble clic) y actualiza la copia jugable
+`jugar/WorldOfSystem.html`. Abrir el `index.html` de la raíz directamente no funciona: es la plantilla de desarrollo
+y necesita `npm run dev`.
 
 ## Desarrollo
 
 ```bash
 npm test                     # tests de la simulación (Vitest)
-npm run simulate -- 200      # 200 turnos sin jugador con métricas de salud del mundo
+npm run simulate -- 200      # 200 meses sin jugador con métricas de salud del mundo
 npm run geo                  # regenera el mapa desde Natural Earth 110m (paquete world-atlas)
 ```
 

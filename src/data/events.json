@@ -289,6 +289,7 @@
  },
  {
   "id": "crisis_deuda",
+  "critical": true,
   "title": "Crisis de deuda soberana",
   "category": "economia",
   "tone": "bad",
@@ -411,6 +412,7 @@
  },
  {
   "id": "crisis_cambiaria",
+  "critical": true,
   "title": "Ataque contra la moneda",
   "category": "economia",
   "tone": "bad",
@@ -506,6 +508,7 @@
  },
  {
   "id": "terremoto",
+  "critical": true,
   "title": "Terremoto devastador",
   "category": "desastre",
   "tone": "bad",
@@ -595,6 +598,7 @@
  },
  {
   "id": "inundaciones",
+  "critical": true,
   "title": "Inundaciones catastróficas",
   "category": "desastre",
   "tone": "bad",
@@ -657,6 +661,7 @@
  },
  {
   "id": "huracan",
+  "critical": true,
   "title": "Huracán",
   "category": "desastre",
   "tone": "bad",
@@ -1076,6 +1081,7 @@
  },
  {
   "id": "tension_fronteriza",
+  "critical": true,
   "title": "Incidente fronterizo",
   "category": "diplomacia",
   "tone": "bad",
@@ -1394,6 +1400,7 @@
  },
  {
   "id": "crisis_bancaria",
+  "critical": true,
   "title": "Crisis bancaria",
   "category": "economia",
   "tone": "bad",
@@ -1461,6 +1468,7 @@
  },
  {
   "id": "rumores_golpe",
+  "critical": true,
   "title": "Ruido de sables",
   "category": "politica",
   "tone": "bad",
@@ -1554,6 +1562,7 @@
  },
  {
   "id": "atentado",
+  "critical": true,
   "title": "Atentado terrorista",
   "category": "seguridad",
   "tone": "bad",
@@ -1609,6 +1618,7 @@
  },
  {
   "id": "movimiento_independentista",
+  "critical": true,
   "title": "Desafío independentista",
   "category": "politica",
   "tone": "bad",
@@ -2150,6 +2160,7 @@
  },
  {
   "id": "pandemia",
+  "critical": true,
   "title": "Pandemia en el país",
   "category": "salud",
   "tone": "bad",
@@ -2629,6 +2640,7 @@
  },
  {
   "id": "cientifico_arrepentido",
+  "critical": true,
   "title": "Un científico arrepentido",
   "category": "inteligencia",
   "tone": "bad",

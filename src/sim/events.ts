@@ -16,6 +16,8 @@ export interface EventDefX extends EventDef {
   options: (EventOption & { debtCut?: number; replaceMinister?: boolean })[];
   /** Evento sobre algo secreto: no aparece en las noticias cuando lo resuelve la IA. */
   secret?: boolean;
+  /** Asunto crítico: en tiempo real detiene el reloj hasta que el jugador decida. */
+  critical?: boolean;
 }
 
 export const EVENTS: EventDefX[] = eventsJson as unknown as EventDefX[];
@@ -115,6 +117,39 @@ export function resolveEvent(world: World, uidStr: string, optionIdx: number): s
   news(world, `${String(pe.vars.title ?? def.title)}: ${opt.text.toLowerCase()}.`, 'evento', [c.id], 1);
   timeline(world, `${String(pe.vars.title ?? def.title)} → ${opt.text}`, 'evento');
   return opt.text;
+}
+
+/** Opción que elegiría el gabinete (utilidad de la IA sin ruido: determinista). */
+export function cabinetChoice(world: World, pe: PendingEvent): number {
+  const def = EVENT_BY_ID[pe.id];
+  const c = world.countries[pe.country];
+  if (!def || !c) return 0;
+  const target = pe.vars.target ? world.countries[String(pe.vars.target)] : undefined;
+  const r = resolver(world, c, target);
+  let best = 0, bestU = -Infinity;
+  def.options.forEach((o, i) => {
+    if (o.requires && !evalExpr(o.requires, r)) return;
+    const u = evalExpr(o.ai ?? 0, r);
+    if (u > bestU) { bestU = u; best = i; }
+  });
+  return best;
+}
+
+/**
+ * Asuntos no críticos que llevan un mes sin respuesta: decide el gabinete. Devuelve los títulos y
+ * las opciones elegidas (para avisar al jugador).
+ */
+export function autoResolveExpired(world: World): { title: string; option: string }[] {
+  const pid = world.player?.country;
+  const out: { title: string; option: string }[] = [];
+  for (const pe of [...world.pendingEvents]) {
+    if (pe.country !== pid || EVENT_BY_ID[pe.id]?.critical || pe.turn > world.turn) continue;
+    const idx = cabinetChoice(world, pe);
+    const title = String(pe.vars.title ?? EVENT_BY_ID[pe.id]?.title ?? 'Asunto');
+    const option = resolveEvent(world, pe.uid, idx);
+    if (option) out.push({ title, option });
+  }
+  return out;
 }
 
 export function eventWeight(world: World, c: Country, def: EventDefX, target: Country | null): number {

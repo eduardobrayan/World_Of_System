@@ -48,15 +48,53 @@ export class MapView {
     this.ctx = canvas.getContext('2d')!;
     this.bind();
     new ResizeObserver(() => { this.fitIfNeeded(); this.invalidate(); }).observe(canvas);
+    // Animación continua (frentes, tropas en marcha, brotes): ~30 fps mientras haya algo que mover
     const loop = () => {
-      this.pulse = (this.pulse + 1) % 600;
-      if (this.dirty || (this.host.world.wars.length && this.pulse % 4 === 0 && this.host.layer === 'conflictos')) this.render();
+      this.pulse = (this.pulse + 1) % 3600;
+      if (this.dirty || (this.pulse % 2 === 0 && this.animating())) this.render();
       this.raf = requestAnimationFrame(loop);
     };
     this.raf = requestAnimationFrame(loop);
   }
 
   destroy() { cancelAnimationFrame(this.raf); }
+
+  private reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** Posición animada de cada frente (fracción del trayecto defensor → atacante), interpolada entre meses. */
+  private frontPos: Record<string, number> = {};
+
+  private animating(): boolean {
+    if (this.reducedMotion || this.host.view === 'local') return false;
+    const W = this.host.world;
+    return W.wars.length > 0 || this.visibleOutbreaks().length > 0;
+  }
+
+  private visibleOutbreaks() {
+    const W = this.host.world, pid = this.host.player?.id;
+    const out: { infected: Record<string, number>; human: boolean }[] = [];
+    for (const o of W.global.outbreaks ?? []) if (o.detected || o.creator === pid) out.push({ infected: o.infected, human: o.kind === 'humano' });
+    if (W.global.pandemic) out.push({ infected: W.global.pandemic.infected, human: true });
+    return out;
+  }
+
+  /** Anillos que laten sobre los países con brotes conocidos (más grandes cuanto más afectados). */
+  private drawOutbreakPulses() {
+    const ctx = this.ctx, s = this.v.s;
+    const t = this.pulse / 60;
+    for (const o of this.visibleOutbreaks()) {
+      for (const [id, inf] of Object.entries(o.infected)) {
+        if (inf < 0.003 || !this.host.world.countries[id]?.alive) continue;
+        const [x, y] = labelPoint(id);
+        const ph = (t * 0.8 + (id.charCodeAt(0) % 7) / 7) % 1;
+        const base = (4 + Math.sqrt(inf / 0.4) * 14) / s;
+        ctx.beginPath();
+        ctx.arc(x, y, base * (0.6 + ph * 1.2), 0, Math.PI * 2);
+        ctx.strokeStyle = o.human ? `rgba(240,165,124,${0.75 * (1 - ph)})` : `rgba(181,214,96,${0.75 * (1 - ph)})`;
+        ctx.lineWidth = 2 / s;
+        ctx.stroke();
+      }
+    }
+  }
   invalidate() { this.dirty = true; }
 
   private size() { return { w: this.canvas.clientWidth || 800, h: this.canvas.clientHeight || 500 }; }
@@ -312,6 +350,7 @@ export class MapView {
     if (this.host.player) outline(this.host.player.id, '#f0efec', 1.6);
     if (this.host.selected) outline(this.host.selected, '#5598e7', 2.6, 8);
     if (this.host.layer === 'conflictos' || world.wars.length) this.drawFronts();
+    if (!this.reducedMotion) this.drawOutbreakPulses();
     this.drawLabels(dpr);
   }
 
@@ -356,7 +395,13 @@ export class MapView {
     for (const war of W.wars) {
       for (const fr of war.fronts) {
         const a = labelPoint(fr.a), d = labelPoint(fr.d);
-        const mx = d[0] + (a[0] - d[0]) * 0.35, my = d[1] + (a[1] - d[1]) * 0.35;
+        // La línea del frente avanza hacia el defensor cuanto más territorio controla el atacante (y se desliza suavemente entre meses)
+        const key = `${war.id}:${fr.a}:${fr.d}`;
+        const target = Math.max(0.08, Math.min(0.85, 0.42 - fr.control / 260));
+        const cur = this.frontPos[key] ?? target;
+        const f = this.reducedMotion ? target : cur + (target - cur) * 0.04;
+        this.frontPos[key] = f;
+        const mx = d[0] + (a[0] - d[0]) * f, my = d[1] + (a[1] - d[1]) * f;
         const r = (5 + Math.sin(t * Math.PI) * 1.5) / s;
         ctx.beginPath();
         ctx.arc(mx, my, r * 1.8, 0, Math.PI * 2);
@@ -370,10 +415,23 @@ export class MapView {
         ctx.strokeStyle = '#1a1a19';
         ctx.stroke();
         ctx.setLineDash([4 / s, 3 / s]);
+        ctx.lineDashOffset = war.ceasefire > 0 ? 0 : (-t * 6) / s; // la línea de suministro «marcha» hacia el frente
         ctx.strokeStyle = war.ceasefire > 0 ? 'rgba(180,180,170,0.6)' : 'rgba(230,103,103,0.75)';
         ctx.lineWidth = 1.4 / s;
         ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(mx, my); ctx.stroke();
         ctx.setLineDash([]);
+        ctx.lineDashOffset = 0;
+        if (war.ceasefire <= 0) {
+          // Columnas de tropas: el atacante avanza hacia el frente y el defensor envía refuerzos
+          for (let i = 0; i < 3; i++) {
+            const k = (t * 0.35 + i / 3) % 1;
+            ctx.fillStyle = '#f0a57c';
+            ctx.fillRect(a[0] + (mx - a[0]) * k - 1.6 / s, a[1] + (my - a[1]) * k - 1.6 / s, 3.2 / s, 3.2 / s);
+            const k2 = (t * 0.25 + i / 3 + 0.17) % 1;
+            ctx.fillStyle = '#86b6ef';
+            ctx.fillRect(d[0] + (mx - d[0]) * k2 - 1.6 / s, d[1] + (my - d[1]) * k2 - 1.6 / s, 3.2 / s, 3.2 / s);
+          }
+        }
       }
     }
   }

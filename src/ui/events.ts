@@ -1,5 +1,5 @@
 /** Ventana de eventos: el jugador elige entre varias opciones con consecuencias distintas. */
-import { EVENT_BY_ID, resolveEvent } from '../sim/events';
+import { EVENT_BY_ID, cabinetChoice, resolveEvent } from '../sim/events';
 import { describeBundle } from '../sim/actions';
 import { evalExpr } from '../sim/expr';
 import { resolver } from '../sim/vars';
@@ -24,8 +24,9 @@ export function openPendingEvent(app: App, uidStr: string) {
   if (!def || !c) return;
   const target = pe.vars.target ? w.countries[String(pe.vars.target)] : undefined;
   const r = resolver(w, c, target);
+  // Mientras la ventana está abierta el reloj se detiene (app.modalOpen); los asuntos no críticos se pueden cerrar y dejar en la bandeja
   app.modalOpen++;
-  app.speed = 0;
+  const critical = !!def.critical;
   let close = () => undefined as void;
   const text = fillTemplate(def.text, w, c, { source: def.id, target, vars: pe.vars });
   const body = h('div', null,
@@ -34,12 +35,13 @@ export function openPendingEvent(app: App, uidStr: string) {
     def.options.map((o, i) => {
       const allowed = !o.requires || !!evalExpr(o.requires, r);
       return h('button', { class: 'option', disabled: !allowed, onclick: () => {
+        if (!w.pendingEvents.some((p) => p.uid === pe.uid)) { close(); app.refresh(); return; }
         const t = resolveEvent(w, pe.uid, i);
         toast(`Decisión: ${t}`, 'info');
         close();
         flushNewsToasts(app);
         app.refresh();
-        const next = w.pendingEvents.find((p) => p.country === w.player?.country);
+        const next = w.pendingEvents.find((p) => p.country === w.player?.country && EVENT_BY_ID[p.id]?.critical);
         if (next) setTimeout(() => openPendingEvent(app, next.uid), 150);
       } },
       h('div', null, h('b', null, o.text)),
@@ -47,8 +49,12 @@ export function openPendingEvent(app: App, uidStr: string) {
       h('div', { class: 'fx' }, effectLines(describeBundle(w, c, o, target))));
     }));
   close = modal({
-    title: String(pe.vars.title ?? def.title), kicker: CAT[def.category] ?? def.category, body, closable: false,
+    title: String(pe.vars.title ?? def.title), kicker: `${critical ? '⚠ Asunto crítico · ' : ''}${CAT[def.category] ?? def.category}`, body, closable: !critical,
     onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); },
-    footer: h('span', { class: 'small muted' }, 'Debes decidir antes de avanzar el turno.'),
+    footer: critical
+      ? h('span', { class: 'small muted' }, 'Asunto crítico: el tiempo está detenido hasta que decidas.')
+      : h('div', { class: 'row between', style: 'width:100%;gap:10px' },
+        h('span', { class: 'small muted' }, `Si no respondes antes de fin de mes, tu gabinete elegirá «${def.options[cabinetChoice(w, pe)]?.text ?? ''}».`),
+        h('button', { class: 'btn', onclick: () => close() }, 'Más tarde')),
   });
 }

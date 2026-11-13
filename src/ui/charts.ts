@@ -61,9 +61,10 @@ export function lineChart(opts: ChartOpts): HTMLElement {
     let lo = Infinity, hi = -Infinity;
     for (const s of series) for (const v of s.values) if (Number.isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
     if (opts.zeroLine) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
-    const pad = (hi - lo) * 0.08 || 1;
+    // Series casi planas: margen mínimo proporcional para no repetir etiquetas («74 74 74»)
+    const pad = Math.max((hi - lo) * 0.08, Math.max(Math.abs(hi), Math.abs(lo)) * 0.02) || 1;
     lo -= pad; hi += pad;
-    const ticks = niceTicks(lo, hi);
+    const ticks = niceTicks(lo, hi).filter((t, i, a) => i === 0 || fmt(t) !== fmt(a[i - 1]));
     ctx.font = '11px system-ui';
     const labelW = Math.max(...ticks.map((t) => ctx.measureText(fmt(t)).width)) + 8;
     const L = labelW, R = 8, T = 6, B = 18;

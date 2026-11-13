@@ -63,7 +63,7 @@ export function showStart(container: HTMLElement, onStart: (opts: NewGameOptions
     const c: Country | null = chosen ? preview.countries[chosen] : null;
     mount(side,
       h('h1', null, '🌐 World of System'),
-      h('div', { class: 'tagline' }, 'Simulador geopolítico por turnos. Dirige un país desde enero de 2026: economía, política, diplomacia, guerra e inteligencia, con consecuencias en cadena.'),
+      h('div', { class: 'tagline' }, 'Simulador geopolítico en tiempo real. Dirige un país desde enero de 2026: economía, política, diplomacia, guerra e inteligencia, con consecuencias en cadena.'),
       h('div', { class: 'field' }, h('span', null, 'País (clic en el mapa o en la lista)'),
         h('div', { class: 'country-list' }, DATA.countries.slice().sort((a, b) => a.name.localeCompare(b.name, 'es')).map((rc) =>
           h('button', { class: rc.id === chosen ? 'on' : '', onclick: () => host.onSelect(rc.id) }, flagEl(preview.countries[rc.id], 18, 12), rc.name)))),

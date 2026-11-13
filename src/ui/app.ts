@@ -12,8 +12,10 @@ import { flagEl } from './flags';
 import { perceived, approxMark } from './perceive';
 import { fmtMoney } from '../sim/util';
 import { hookAfterTurn, hookBeforeTurn } from './hooks';
+import { liveTick } from './live';
 
-export const SPEEDS = [0, 3200, 1400, 500];
+/** Duración real (ms) de un mes de juego en cada velocidad (0 = pausa). */
+export const SPEEDS = [0, 6000, 2600, 1000];
 
 export class App implements MapHost {
   world: World;
@@ -24,7 +26,8 @@ export class App implements MapHost {
   view: 'world' | 'local' = 'world';
   localId: Id | null = null;
   tab = 'resumen';
-  speed = 0;
+  speed = 1; // el tiempo corre solo desde el inicio
+  lastSpeed = 1; // para reanudar con la barra espaciadora
   dayProgress = 0;
   busy = false;
   modalOpen = 0;
@@ -45,10 +48,26 @@ export class App implements MapHost {
   constructor(world: World, private container: HTMLElement, public onExit: () => void, public onLoad: (w: World) => void = () => undefined) {
     this.world = world;
     this.selected = world.player?.country ?? null;
+    if (world.gameOver) this.speed = 0;
+    this.ui.newsLast = world.news[world.news.length - 1] ?? null; // marca para los avisos de noticias
     this.build();
     this.refresh();
     this.loop();
+    window.addEventListener('keydown', this.onKey);
   }
+
+  /** Atajos: barra espaciadora = pausa/reanudar; 1, 2, 3 = velocidades. */
+  private onKey = (e: KeyboardEvent) => {
+    const t = e.target as HTMLElement | null;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || this.modalOpen || document.querySelector('.modal-back')) return;
+    if (e.code === 'Space' || e.key === ' ') {
+      e.preventDefault();
+      this.setSpeed(this.speed ? 0 : this.lastSpeed || 1);
+    } else if (e.key === '1' || e.key === '2' || e.key === '3') {
+      this.setSpeed(Number(e.key));
+    }
+  };
 
   get player(): Country | null {
     return this.world.player ? this.world.countries[this.world.player.country] : null;
@@ -205,9 +224,14 @@ export class App implements MapHost {
 
   // ---------- Tiempo ----------
   setSpeed(s: number) {
+    if (s) this.lastSpeed = s;
     this.speed = s;
-    this.dayProgress = 0;
     this.refresh();
+  }
+
+  /** Día del mes en curso (1–30) según el avance del reloj. */
+  get day(): number {
+    return Math.min(30, 1 + Math.floor(this.dayProgress * 30));
   }
 
   private loop() {
@@ -216,14 +240,14 @@ export class App implements MapHost {
       const dt = now - last;
       last = now;
       if (this.speed > 0 && !this.busy && !this.modalOpen && !this.world.gameOver) {
-        this.dayProgress += dt / SPEEDS[this.speed];
+        this.dayProgress += Math.min(dt, 250) / SPEEDS[this.speed];
         const dayEl = this.topEl.querySelector('.day');
-        if (dayEl) dayEl.textContent = `día ${Math.min(30, 1 + Math.floor(this.dayProgress * 30))}`;
-        if (this.dayProgress >= 1) {
-          this.dayProgress = 0;
-          this.endTurn();
-        }
+        if (dayEl) dayEl.textContent = `día ${this.day}`;
+        const bar = this.topEl.querySelector<HTMLElement>('.month-bar i');
+        if (bar) bar.style.width = `${Math.min(100, this.dayProgress * 100)}%`;
+        if (this.dayProgress >= 1) this.endTurn();
       }
+      liveTick(this, now);
       this.timer = requestAnimationFrame(tick);
     };
     this.timer = requestAnimationFrame(tick);
@@ -232,7 +256,8 @@ export class App implements MapHost {
   /** Avanza un mes. Si hay eventos pendientes del jugador, se resuelven antes. */
   endTurn() {
     if (this.busy || this.world.gameOver) return;
-    if (!hookBeforeTurn(this)) { this.speed = 0; this.refresh(); return; }
+    if (!hookBeforeTurn(this)) { this.refresh(); return; } // asunto crítico abierto: el reloj espera
+    this.dayProgress = 0;
     this.busy = true;
     try {
       advanceTurn(this.world);
@@ -247,6 +272,7 @@ export class App implements MapHost {
   }
 
   destroy() {
+    window.removeEventListener('keydown', this.onKey);
     cancelAnimationFrame(this.timer);
     this.map.destroy();
   }

@@ -2,6 +2,8 @@
 import type { App } from './app';
 import { toast } from './dom';
 import { afterTurnExtras, beforeTurnExtras } from './turnflow';
+import { newsSince } from './live';
+import type { NewsItem } from '../sim/types';
 
 export function hookBeforeTurn(app: App): boolean {
   return beforeTurnExtras(app);
@@ -11,12 +13,12 @@ export function hookBeforeTurn(app: App): boolean {
 export function flushNewsToasts(app: App) {
   const w = app.world;
   const pid = w.player?.country;
-  const seen = (app.ui.newsSeen as number | undefined) ?? w.news.length;
-  for (let i = Math.min(seen, w.news.length); i < w.news.length; i++) {
-    const n = w.news[i];
+  const last = app.ui.newsLast as NewsItem | undefined;
+  const fresh = last === undefined ? [] : newsSince(w.news, last);
+  for (const n of fresh) {
     if (n.importance >= 2 && pid && n.countries.includes(pid)) toast(n.text, n.type === 'derrota' || n.type === 'crisis' ? 'bad' : 'info');
   }
-  app.ui.newsSeen = w.news.length;
+  app.ui.newsLast = w.news[w.news.length - 1] ?? null;
 }
 
 export function hookAfterTurn(app: App) {

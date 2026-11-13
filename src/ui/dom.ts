@@ -48,7 +48,8 @@ export function toast(text: string, kind: 'info' | 'good' | 'bad' = 'info', ms =
 }
 
 export function modal(opts: { title: string; kicker?: string; body: Child; footer?: Child; wide?: boolean; onClose?: () => void; closable?: boolean }): () => void {
-  const close = () => { back.remove(); opts.onClose?.(); };
+  let closed = false;
+  const close = () => { if (closed) return; closed = true; back.remove(); opts.onClose?.(); };
   const back = h('div', { class: 'modal-back', onclick: (e: Event) => { if (e.target === back && opts.closable !== false) close(); } },
     h('div', { class: `modal ${opts.wide ? 'wide' : ''}`, role: 'dialog', 'aria-modal': 'true' },
       h('header', null, opts.kicker ? h('div', { class: 'kicker' }, opts.kicker) : null, h('h2', null, opts.title)),
