@@ -1,0 +1,13 @@
+[
+ {"id":"caza","name":"Caza de combate","unit":"fighters","icon":"✈","cost":6,"months":36,"bonus":0.08,"minTech":55,"desc":"Avión de superioridad aérea y ataque."},
+ {"id":"dron","name":"Dron de combate","unit":"recon","icon":"🛸","cost":1.2,"months":14,"bonus":0.25,"minTech":40,"desc":"Drones de ataque y vigilancia baratos y numerosos."},
+ {"id":"carro","name":"Carro de combate","unit":"tanks","icon":"🛡","cost":3,"months":24,"bonus":0.08,"minTech":45,"desc":"Blindado principal para la guerra terrestre."},
+ {"id":"blindado","name":"Vehículo de combate de infantería","unit":"mechanized","icon":"🚙","cost":2,"months":18,"bonus":0.07,"minTech":40,"desc":"Transporte acorazado y apoyo de fuego."},
+ {"id":"artilleria","name":"Artillería de cohetes de precisión","unit":"artillery","icon":"🚀","cost":2.5,"months":20,"bonus":0.1,"minTech":45,"desc":"Lanzacohetes guiados de largo alcance."},
+ {"id":"fusil","name":"Equipo de infantería avanzado","unit":"infantry","icon":"🪖","cost":1,"months":12,"bonus":0.06,"minTech":30,"desc":"Armas ligeras, visión nocturna, comunicaciones y blindaje personal."},
+ {"id":"helicoptero","name":"Helicóptero de ataque","unit":"helicopters","icon":"🚁","cost":2.5,"months":24,"bonus":0.09,"minTech":50,"desc":"Apoyo aéreo cercano y antitanque."},
+ {"id":"fragata","name":"Fragata multipropósito","unit":"frigates","icon":"⛴","cost":4,"months":36,"bonus":0.08,"minTech":50,"desc":"Escolta antisubmarina y antiaérea."},
+ {"id":"submarino","name":"Submarino de ataque","unit":"submarines","icon":"🐋","cost":6,"months":48,"bonus":0.1,"minTech":60,"desc":"Submarino silencioso de propulsión avanzada."},
+ {"id":"destructor","name":"Destructor de misiles","unit":"destroyers","icon":"🚢","cost":7,"months":48,"bonus":0.08,"minTech":60,"desc":"Defensa antiaérea de área y ataque a tierra."},
+ {"id":"radar","name":"Avión de alerta temprana","unit":"awacs","icon":"📡","cost":4,"months":30,"bonus":0.15,"minTech":60,"desc":"Vigilancia aérea que multiplica la eficacia de los cazas."}
+]

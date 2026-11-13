@@ -326,7 +326,7 @@ function diplomaticCandidates(world: World, c: Country, out: Candidate[]) {
 function domesticCandidates(world: World, c: Country, out: Candidate[]) {
   const r = resolver(world, c);
   for (const def of ACTIONS) {
-    if (!def.ai?.utility || !['ley', 'economia', 'social', 'gobierno'].includes(def.category)) continue;
+    if (!def.ai?.utility || !['ley', 'economia', 'social', 'gobierno', 'seguridad'].includes(def.category)) continue;
     if (def.params?.law && c.pol.flags[def.id]) continue;
     const u = evalExpr(def.ai.utility, r);
     if (u < 0.3) continue;
@@ -369,7 +369,7 @@ export function aiDecide(world: World, c: Country, rng: Rng) {
 
 // ---------- Reacciones a incidentes ----------
 
-const AGGRESSIVE = new Set(['sancion', 'amenaza', 'aranceles', 'ruptura', 'insulto', 'espionaje', 'guerra', 'bloqueo', 'maniobras']);
+const AGGRESSIVE = new Set(['sancion', 'amenaza', 'aranceles', 'ruptura', 'insulto', 'espionaje', 'guerra', 'bloqueo', 'maniobras', 'biologico', 'armas_bio']);
 
 /** Puntuación de amenaza de un actor según sus incidentes agresivos recientes. */
 export function aggressionScore(world: World, actor: Id): number {

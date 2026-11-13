@@ -116,6 +116,25 @@ export const LAYERS: MapLayer[] = [
     legend: () => divLegend('Estabilidad política', 'Crítica (10)', '50', 'Sólida (90)'),
   },
   {
+    id: 'corrupcion', name: 'Corrupción',
+    color: (c) => rampColor(ORANGE, (c.pol.corruption - 10) / 80),
+    legend: () => rampLegend('Corrupción (media de seis tipos)', ORANGE, 'Baja (10)', 'Extrema (90)'),
+  },
+  {
+    id: 'narco', name: 'Narcotráfico',
+    color: (c) => rampColor(ORANGE, (c.narco.cartels + c.narco.transit * 0.5 + c.narco.production * 0.5) / 150),
+    legend: () => rampLegend('Narcotráfico (cárteles, rutas y cultivos)', ORANGE, 'Marginal', 'Narcoestado', 'Los países consumidores financian el negocio aunque aparezcan oscuros.'),
+  },
+  {
+    id: 'brotes', name: 'Brotes',
+    color: (c, x) => {
+      let inf = x.world.global.pandemic?.infected[c.id] ?? 0;
+      for (const o of x.world.global.outbreaks ?? []) if (o.detected || o.creator === x.player?.id) inf += o.infected[c.id] ?? 0;
+      return inf > 0.0005 ? rampColor(ORANGE, 0.15 + Math.sqrt(inf / 0.4) * 0.85) : '#2a2f36';
+    },
+    legend: () => rampLegend('Población, cosechas o ganado afectados por epidemias y plagas', ORANGE, 'Ninguno', '40 % o más'),
+  },
+  {
     id: 'regimen', name: 'Régimen',
     color: (c) => [SERIES[0], SERIES[1], SERIES[2], SERIES[3]][REGIME_GROUP[c.pol.regime] ?? 3],
     legend: () => swatches('Tipo de régimen', REGIME_LABELS.map((l, i) => [SERIES[i], l] as [string, string])),

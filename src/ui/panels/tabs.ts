@@ -12,6 +12,8 @@ import { renderMilitar } from './militar';
 import { renderIntel } from './intel';
 import { renderTech } from './tech';
 import { renderObjectives } from './objectives';
+import { renderSecurity } from './security';
+import { renderArmament } from './armament';
 
 export interface TabDef { id: string; icon: string; name: string; short?: string; render: (app: App) => HTMLElement[]; visible?: (app: App) => boolean }
 
@@ -23,7 +25,9 @@ export const TABS: TabDef[] = [
   { id: 'gobierno', icon: '🏛', name: 'Gobierno', render: renderGovernment, visible: hasPlayer },
   { id: 'sociedad', icon: '👥', name: 'Sociedad', render: renderSociety, visible: hasPlayer },
   { id: 'diplomacia', icon: '🤝', name: 'Diplomacia', short: 'Diplom.', render: renderDiplomacy, visible: hasPlayer },
+  { id: 'seguridad', icon: '🚓', name: 'Seguridad', short: 'Segur.', render: renderSecurity, visible: hasPlayer },
   { id: 'militar', icon: '🎖', name: 'Defensa', render: renderMilitar, visible: hasPlayer },
+  { id: 'armamento', icon: '🛠', name: 'Armamento', short: 'Armas', render: renderArmament, visible: hasPlayer },
   { id: 'inteligencia', icon: '🕵', name: 'Inteligencia', short: 'Intelig.', render: renderIntel, visible: hasPlayer },
   { id: 'tecnologia', icon: '🔬', name: 'Tecnología', short: 'Tecnol.', render: renderTech, visible: hasPlayer },
   { id: 'territorio', icon: '🗺', name: 'Territorio', short: 'Territ.', render: renderTerritory, visible: hasPlayer },

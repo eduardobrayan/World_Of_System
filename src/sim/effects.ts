@@ -21,6 +21,9 @@ const RANGES: Record<string, [number, number]> = {
   'pol.warWeariness': [0, 100], 'mil.morale': [0, 100], 'mil.readiness': [0, 100], 'mil.tech': [0, 100],
   'mil.logistics': [0, 100], 'intel.level': [0, 100], 'intel.counter': [0, 100], 'tech.level': [0, 100],
   'tech.renewables': [0, 100], 'reputation': [0, 100],
+  'police.training': [0, 100], 'police.militarization': [0, 100], 'bio.defense': [0, 100], 'bio.lab': [0, 100],
+  'narco.cartels': [0, 100], 'narco.production': [0, 100], 'narco.transit': [0, 100], 'narco.consumption': [0, 100], 'narco.violence': [0, 100],
+  'corr.politica': [0, 100], 'corr.administrativa': [0, 100], 'corr.judicial': [0, 100], 'corr.policial': [0, 100], 'corr.empresarial': [0, 100], 'corr.electoral': [0, 100],
 };
 
 export function fillTemplate(text: string, world: World, c: Country, ctx?: EffectCtx): string {

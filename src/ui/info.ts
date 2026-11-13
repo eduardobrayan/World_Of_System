@@ -3,6 +3,7 @@ import type { Contribution, Country, Snapshot, World } from '../sim/types';
 import { DATA } from '../sim/data';
 import { gdppc, fmtMoney } from '../sim/util';
 import { modParts, sanctionLevelOn } from '../sim/vars';
+import { corruptionBreakdown } from '../sim/security';
 
 export interface Indicator {
   key: string;
@@ -42,7 +43,14 @@ export const IND: Record<string, Indicator> = {
     explain: (c) => Object.entries(c.groups).map(([g, s]) => ({ label: `${DATA.groups[g as keyof typeof DATA.groups].icon} ${DATA.groups[g as keyof typeof DATA.groups].name}`, value: s.support })) },
   stability: { key: 'stability', name: 'Estabilidad', desc: 'Solidez del régimen. Por debajo de 30 se disparan los riesgos de golpe y revolución.', get: (c) => c.pol.stability, fmt: num(0), explain: ex('stability'), better: 'up', hist: 'stability', noisy: true },
   legitimacy: { key: 'legitimacy', name: 'Legitimidad', desc: 'Aceptación del sistema político (no solo del Gobierno). Sube con elecciones limpias y confianza institucional.', get: (c) => c.pol.legitimacy, fmt: num(0), better: 'up', explain: mods('legitimacy') },
-  corruption: { key: 'corruption', name: 'Corrupción', desc: 'Percepción de corrupción (0 = ninguna). Reduce la recaudación, la confianza y el crecimiento potencial.', get: (c) => c.pol.corruption, fmt: num(0), better: 'down', explain: mods('corruption') },
+  corruption: { key: 'corruption', name: 'Corrupción', desc: 'Media ponderada de seis tipos de corrupción (política, administrativa, judicial, policial, empresarial y electoral). Reduce la recaudación, la confianza y el crecimiento potencial.', get: (c) => c.pol.corruption, fmt: num(0), better: 'down', hist: 'corruption',
+    explain: (c) => corruptionBreakdown(c).map((x) => ({ label: `${x.icon} ${x.name}`, value: x.value })) },
+  pressure: { key: 'pressure', name: 'Presión social', desc: 'Malestar por necesidades civiles peor cubiertas que de costumbre (alimentación, vivienda, energía, sanidad, empleo…). Alimenta protestas, emigración e insatisfacción.', get: (c) => c.soc.pressure, fmt: num(0), better: 'down', hist: 'pressure', explain: ex('pressure') },
+  crime: { key: 'crime', name: 'Criminalidad', desc: 'Índice de delincuencia (0–100): violencia del narco, paro, desigualdad y eficacia policial.', get: (c) => c.police.crime, fmt: num(0), better: 'down', hist: 'crime', explain: mods('crime') },
+  cartels: { key: 'cartels', name: 'Poder de los cárteles', desc: 'Fuerza del crimen organizado (0–100). Corrompe a policías, jueces y políticos y genera violencia.', get: (c) => c.narco.cartels, fmt: num(0), better: 'down', hist: 'cartels', explain: mods('narco.cartels') },
+  narcoViolence: { key: 'narcoViolence', name: 'Violencia del narco', desc: 'Homicidios y enfrentamientos ligados al narcotráfico. Se dispara durante las ofensivas y guerras entre cárteles.', get: (c) => c.narco.violence, fmt: num(0), better: 'down', explain: mods('narco.violence') },
+  policeSize: { key: 'policeSize', name: 'Policías por 100.000 hab.', desc: 'Tamaño de los cuerpos policiales; depende del presupuesto de seguridad interior.', get: (c) => c.police.size, fmt: num(0), better: 'up' },
+  policeEff: { key: 'policeEff', name: 'Eficacia policial', desc: 'Tamaño × formación × integridad, respecto al nivel de 2026 (100).', get: (c) => c.police.effectiveness * 100, fmt: num(0), better: 'up' },
   pressFreedom: { key: 'pressFreedom', name: 'Libertad de prensa', desc: 'Pluralismo informativo. Limitada por el régimen y las políticas de medios.', get: (c) => c.pol.pressFreedom, fmt: num(0), better: 'up', explain: mods('pressFreedom') },
   protest: { key: 'protest', name: 'Protestas', desc: 'Intensidad de las movilizaciones (0–100). Frenan la economía, bajan la estabilidad y, extremas, pueden acabar en revolución.', get: (c) => c.soc.protest, fmt: num(0), explain: ex('protest'), better: 'down', hist: 'protest', noisy: true },
   strikes: { key: 'strikes', name: 'Huelgas', desc: 'Conflictividad laboral (0–100), impulsada por el descontento de los trabajadores y la inflación.', get: (c) => c.soc.strikes, fmt: num(0), better: 'down' },

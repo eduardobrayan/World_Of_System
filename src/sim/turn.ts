@@ -21,6 +21,10 @@ import { updateRelations, updateTreaties, resolveResolutions, autoResolutions } 
 import { expireProposals } from './diplohandlers';
 import { updateWars } from './war';
 import { updateIntel } from './intel';
+import { updateSecurity, updateNarcoWorld } from './security';
+import { updateNeeds } from './needs';
+import { updateBio } from './bio';
+import { updateWeapons } from './weapons';
 
 export function advanceTurn(world: World) {
   if (world.gameOver) return;
@@ -42,18 +46,23 @@ export function advanceTurn(world: World) {
   expireProposals(world);
   applyAidFlows(world);
   updateTradeAccess(world);
+  updateBio(world);
   updateMarket(world);
   updateWars(world);
   if (world.gameOver) return;
   updateIntel(world);
   updatePandemic(world);
+  updateNarcoWorld(world);
 
   for (const id of ids) {
     const c = world.countries[id];
     if (world.player?.country !== id) fiscalAutopilot(world, c);
     updateRegions(world, c);
+    updateWeapons(world, c);
     updateMilitary(world, c);
+    updateSecurity(world, c);
     updateEconomy(world, c);
+    updateNeeds(world, c);
     updateSociety(world, c);
     updatePolitics(world, c);
     updateTech(world, c);

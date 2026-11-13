@@ -61,7 +61,9 @@ export function updatePandemic(world: World) {
       const cj = world.countries[j];
       if (!cj?.alive) continue;
       const resist = clamp(1 + modSum(cj, 'pandemicResist') * -1 + modSum(cj, 'pandemicSpread'), 0.2, 2);
-      next[j] = clamp((next[j] ?? 0) + inf * 0.12 * pd.severity * resist, 0, 0.6);
+      // Con vacunas y medidas de contención, el contagio entre países se frena
+      const contained = pd.months > 18 ? 0.2 : pd.months > 12 ? 0.5 : 1;
+      next[j] = clamp((next[j] ?? 0) + inf * 0.12 * pd.severity * resist * contained, 0, 0.6);
     }
   }
   let maxInf = 0;
@@ -80,7 +82,7 @@ export function updatePandemic(world: World) {
     addShock(c, 'protest', 'Pandemia', inf * 15);
   }
   pd.infected = next;
-  if (maxInf < 0.003 && pd.months > 6) {
+  if ((maxInf < 0.003 && pd.months > 6) || pd.months > 60) {
     news(world, `🦠 La OMS da por terminada la pandemia de ${pd.name}.`, 'salud', [], 3);
     g.pandemic = null;
   }

@@ -3,7 +3,7 @@ import type { Commodity, Country, Dict, Id, World } from './types';
 import { COMMODITIES } from './types';
 import { COMMODITY_BY_ID, DATA } from './data';
 import { clamp, haversine } from './util';
-import { neighborsLand, neighborsSea, sanctionLevelOn } from './vars';
+import { modSum, neighborsLand, neighborsSea, sanctionLevelOn } from './vars';
 
 const INCOME_ELASTICITY: Record<Commodity, number> = { oil: 0.45, gas: 0.55, minerals: 0.9, food: 0.35, chips: 1.2 };
 const CAPACITY_TREND: Record<Commodity, number> = { oil: 0.2, gas: 0.9, minerals: 2.6, food: 1.3, chips: 3.8 };
@@ -216,7 +216,7 @@ export function updateMarket(world: World) {
       const growthM = (r.capacityGrowth / 100 + def.supplyResponse * priceSignal + techProdBonus(c, k)) / 12;
       const occupied = c.regions.length ? c.regions.filter((x) => x.owner === c.id && x.controller !== c.id).reduce((a, x) => a + x.popShare, 0) : 0;
       r.prod = clamp(r.prod * (1 + growthM), r.baseProd * 0.15, Math.max(r.baseProd * 3, r.baseProd + 0.5));
-      const effProd = r.prod * (1 - occupied * 0.7) * (1 + c.mods.reduce((a, md) => a + (md.mods[`prod.${k}`] ?? 0), 0));
+      const effProd = r.prod * (1 - occupied * 0.7) * (1 + Math.max(-0.9, modSum(c, `prod.${k}`)));
       // Demanda: renta, precio y transición energética
       const inc = Math.pow(c.eco.gdp / Math.max(1, c.base.gdp), INCOME_ELASTICITY[k]);
       const popF = k === 'food' ? Math.pow(c.soc.pop / Math.max(0.01, c.base.pop), 0.8) / Math.pow(c.eco.gdp / Math.max(1, c.base.gdp), 0.1) : 1;

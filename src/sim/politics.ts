@@ -93,9 +93,7 @@ export function updatePolitics(world: World, c: Country) {
   c.explain.stability = st.parts;
   pol.calibStab *= 0.998;
 
-  const interior = (pol.ministers.find((m) => m.ministry === 'interior')?.competence ?? 50) - 50;
-  const corrT = c.base.corruption + modSum(c, 'corruption') + regionalSum(c, 'corruption') - interior * 0.04;
-  pol.corruption = clamp(approach(pol.corruption, corrT, 1 / 36), 0, 100);
+  // La corrupción general es la media de sus tipos (ver security.ts)
   const pressT = Math.min(reg.pressCap, c.base.pressFreedom + modSum(c, 'pressFreedom'));
   pol.pressFreedom = clamp(approach(pol.pressFreedom, pressT, 1 / 12), 0, 100);
 

@@ -2230,5 +2230,457 @@
     "ai": "ideo.econ + pers.aggression - 0.5"
    }
   ]
+ },
+ {
+  "id": "masacre_carteles",
+  "title": "Masacre del narco",
+  "category": "seguridad",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 18,
+  "text": "Un enfrentamiento entre cárteles deja decenas de muertos en una ciudad de {country}. Los vídeos de los cuerpos colgados de un puente recorren el mundo.",
+  "condition": "narco.violence > 30",
+  "weight": "(narco.violence - 25) * 0.04",
+  "options": [
+   {
+    "text": "Enviar al ejército a la zona",
+    "hint": "La violencia baja a medio plazo; los militares ganan peso.",
+    "modifiers": [
+     {
+      "id": "ev_ejercito_calles",
+      "name": "Ejército en las calles",
+      "duration": 12,
+      "mods": {
+       "narco.cartels": -5,
+       "narco.violence": 6,
+       "pressFreedom": -2
+      }
+     }
+    ],
+    "groups": {
+     "military": 4,
+     "youth": -2
+    },
+    "ai": "ideo.auth + 0.5"
+   },
+   {
+    "text": "Unidad especial de investigación",
+    "hint": "Más lenta pero sin militarizar.",
+    "effects": [
+     {
+      "path": "budget.security",
+      "add": 0.05
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_unidad_especial",
+      "name": "Unidad especial contra el narco",
+      "duration": 24,
+      "mods": {
+       "narco.cartels": -4,
+       "police.training": 4
+      }
+     }
+    ],
+    "ai": "regime.competitive"
+   },
+   {
+    "text": "Minimizarlo ante la prensa",
+    "hint": "No cuesta nada… salvo la confianza.",
+    "modifiers": [
+     {
+      "id": "ev_minimizar",
+      "name": "Gobierno que mira hacia otro lado",
+      "duration": 12,
+      "mods": {
+       "trust": -4,
+       "group.all": -2
+      }
+     }
+    ],
+    "ai": "0.2"
+   }
+  ]
+ },
+ {
+  "id": "captura_capo",
+  "title": "Cae un gran capo",
+  "category": "seguridad",
+  "tone": "good",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "La policía de {country} detiene al líder del cártel más poderoso tras años de persecución.",
+  "condition": "narco.cartels > 30",
+  "weight": "(narco.cartels - 25) * 0.025 + (police.training - 50) * 0.01",
+  "options": [
+   {
+    "text": "Extraditarlo a EE. UU.",
+    "hint": "Golpe duro a su red; algunos lo verán como sumisión.",
+    "modifiers": [
+     {
+      "id": "ev_extradicion",
+      "name": "Extradición de un capo",
+      "duration": 24,
+      "mods": {
+       "narco.cartels": -8,
+       "narco.violence": 5
+      }
+     }
+    ],
+    "groups": {
+     "military": 1
+    },
+    "ai": "1"
+   },
+   {
+    "text": "Juzgarlo en el país",
+    "hint": "Orgullo nacional, pero los jueces pueden ser comprados.",
+    "modifiers": [
+     {
+      "id": "ev_juicio_capo",
+      "name": "Macrojuicio al capo",
+      "duration": 24,
+      "mods": {
+       "narco.cartels": -6,
+       "corr.judicial": 3,
+       "legitimacy": 2
+      }
+     }
+    ],
+    "ai": "ideo.nat"
+   }
+  ]
+ },
+ {
+  "id": "alijo_record",
+  "title": "Alijo récord en el puerto",
+  "category": "seguridad",
+  "tone": "neutral",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Las aduanas de {country} interceptan toneladas de cocaína ocultas en contenedores de fruta. La ruta estaba protegida por funcionarios.",
+  "condition": "narco.transit > 40",
+  "weight": "(narco.transit - 35) * 0.02",
+  "options": [
+   {
+    "text": "Purgar las aduanas",
+    "hint": "Golpe a la corrupción administrativa.",
+    "modifiers": [
+     {
+      "id": "ev_purga_aduanas",
+      "name": "Purga en aduanas",
+      "duration": 36,
+      "mods": {
+       "corr.administrativa": -4,
+       "narco.transit": -6
+      }
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "Pedir ayuda internacional",
+    "hint": "Mejora la cooperación y la reputación.",
+    "effects": [
+     {
+      "path": "reputation",
+      "add": 2
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_ayuda_puertos",
+      "name": "Escáneres en los puertos",
+      "duration": 24,
+      "mods": {
+       "narco.transit": -4
+      }
+     }
+    ],
+    "ai": "regime.competitive"
+   }
+  ]
+ },
+ {
+  "id": "motin_policial",
+  "title": "Motín policial",
+  "category": "seguridad",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Agentes de varias ciudades de {country} se acuartelan exigiendo mejores sueldos. Los saqueos se multiplican en las calles sin vigilancia.",
+  "condition": "police.integrity < 45 || budget.security < 0.8",
+  "weight": "(45 - police.integrity) * 0.03 + 0.2",
+  "options": [
+   {
+    "text": "Subir los sueldos",
+    "hint": "Fin del motín y algo más de integridad.",
+    "effects": [
+     {
+      "path": "budget.security",
+      "add": 0.15
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_sueldos_policia",
+      "name": "Subida salarial policial",
+      "duration": -1,
+      "mods": {
+       "corr.policial": -3
+      }
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "Expulsar a los cabecillas",
+    "hint": "Autoridad, a costa de unas semanas de caos.",
+    "modifiers": [
+     {
+      "id": "ev_expulsion_agentes",
+      "name": "Expulsión de agentes amotinados",
+      "duration": 6,
+      "mods": {
+       "crime": 6,
+       "stability": -3,
+       "corr.policial": -5
+      }
+     }
+    ],
+    "ai": "ideo.auth"
+   },
+   {
+    "text": "Sacar al ejército a patrullar",
+    "hint": "Orden inmediato, malestar civil.",
+    "effects": [
+     {
+      "path": "pol.repression",
+      "add": 10
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_ejercito_patrulla",
+      "name": "Ejército patrullando",
+      "duration": 6,
+      "mods": {
+       "crime": -3,
+       "trust": -3
+      }
+     }
+    ],
+    "groups": {
+     "military": 3,
+     "youth": -3
+    },
+    "ai": "0.5"
+   }
+  ]
+ },
+ {
+  "id": "crisis_vivienda",
+  "title": "Crisis de la vivienda",
+  "category": "social",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 24,
+  "text": "Los alquileres en las grandes ciudades de {country} se disparan. Jóvenes y familias acampan frente al parlamento.",
+  "condition": "needs.vivienda < 55 && pressure > 8",
+  "weight": "(60 - needs.vivienda) * 0.03 + pressure * 0.02",
+  "options": [
+   {
+    "text": "Plan de vivienda pública",
+    "hint": "Caro, pero ataca el problema.",
+    "effects": [
+     {
+      "path": "budget.social",
+      "add": 0.3
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_plan_vivienda",
+      "name": "Plan de vivienda pública",
+      "duration": 48,
+      "mods": {
+       "need.vivienda": 8
+      }
+     }
+    ],
+    "groups": {
+     "youth": 5,
+     "workers": 3,
+     "business": -2
+    },
+    "ai": "-ideo.econ + 0.5"
+   },
+   {
+    "text": "Topar los alquileres",
+    "hint": "Alivio inmediato; menos oferta a medio plazo.",
+    "modifiers": [
+     {
+      "id": "ev_tope_alquiler",
+      "name": "Tope a los alquileres",
+      "duration": 36,
+      "mods": {
+       "need.vivienda": 5,
+       "investment": -0.3
+      }
+     }
+    ],
+    "groups": {
+     "youth": 4,
+     "business": -4
+    },
+    "ai": "-ideo.econ"
+   },
+   {
+    "text": "Liberalizar el suelo",
+    "hint": "Más construcción a largo plazo.",
+    "modifiers": [
+     {
+      "id": "ev_suelo",
+      "name": "Liberalización del suelo",
+      "duration": 48,
+      "mods": {
+       "need.vivienda": 3,
+       "growth": 0.1
+      }
+     }
+    ],
+    "groups": {
+     "business": 4,
+     "youth": -2
+    },
+    "ai": "ideo.econ"
+   }
+  ]
+ },
+ {
+  "id": "crisis_pensiones",
+  "title": "Jubilados en la calle",
+  "category": "social",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 36,
+  "text": "Miles de pensionistas de {country} protestan porque sus pensiones ya no llegan a fin de mes.",
+  "condition": "needs.pensiones < 50 && soc.medianAge > 34",
+  "weight": "(55 - needs.pensiones) * 0.03",
+  "options": [
+   {
+    "text": "Revalorizar las pensiones",
+    "hint": "Más gasto, jubilados tranquilos.",
+    "effects": [
+     {
+      "path": "budget.pensions",
+      "add": 0.4
+     }
+    ],
+    "groups": {
+     "workers": 3,
+     "religious": 2
+    },
+    "ai": "1 - ideo.econ"
+   },
+   {
+    "text": "Pacto de pensiones con la oposición",
+    "hint": "Reforma gradual, cuesta capital político.",
+    "effects": [
+     {
+      "path": "pol.ap",
+      "add": -2
+     },
+     {
+      "path": "budget.pensions",
+      "add": 0.2
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_pacto_pensiones",
+      "name": "Pacto de pensiones",
+      "duration": 24,
+      "mods": {
+       "stability": 2
+      }
+     }
+    ],
+    "ai": "regime.competitive"
+   },
+   {
+    "text": "No hay dinero",
+    "hint": "Disciplina fiscal, protestas.",
+    "modifiers": [
+     {
+      "id": "ev_pensiones_congeladas",
+      "name": "Pensiones congeladas",
+      "duration": 12,
+      "mods": {
+       "protest": 6,
+       "group.all": -2
+      }
+     }
+    ],
+    "ai": "ideo.econ"
+   }
+  ]
+ },
+ {
+  "id": "cientifico_arrepentido",
+  "title": "Un científico arrepentido",
+  "category": "inteligencia",
+  "tone": "bad",
+  "scope": "country",
+  "cooldown": 36,
+  "text": "Una investigadora de tu programa biológico secreto amenaza con contarlo todo a la prensa extranjera.",
+  "condition": "bio.program > 15 && bio.exposed == 0",
+  "weight": "0.6",
+  "options": [
+   {
+    "text": "Comprar su silencio",
+    "hint": "Caro, pero discreto.",
+    "effects": [
+     {
+      "type": "treasury",
+      "value": "-gdp * 0.0005"
+     }
+    ],
+    "ai": "1"
+   },
+   {
+    "text": "Que desaparezca",
+    "hint": "Brutal: si se sabe, será peor.",
+    "effects": [
+     {
+      "path": "pol.repression",
+      "add": 5
+     }
+    ],
+    "modifiers": [
+     {
+      "id": "ev_desaparicion",
+      "name": "Rumores de una desaparición",
+      "duration": 12,
+      "mods": {
+       "trust": -3
+      }
+     }
+    ],
+    "ai": "ideo.auth"
+   },
+   {
+    "text": "Desmantelar el programa",
+    "hint": "Se acabó el riesgo… y las armas.",
+    "effects": [
+     {
+      "path": "bio.program",
+      "set": 0
+     }
+    ],
+    "ai": "pers.riskAversion"
+   }
+  ]
  }
 ]

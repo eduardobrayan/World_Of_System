@@ -19,12 +19,16 @@ import { initTech } from './tech';
 import { snapshot } from './history';
 import { ensureHandlers } from './registry';
 import { baselineMetrics } from './goals';
+import { initSecurity } from './security';
+import { initNeeds } from './needs';
 
 export interface NewGameOptions {
   seed: string;
   player: Id | null;
   difficulty?: 'facil' | 'normal' | 'dificil';
   objective?: string;
+  /** Partido del jugador: el que gobierna, otro existente o uno nuevo creado por el jugador. */
+  party?: { mode: 'gov' } | { mode: 'existing'; name: string } | { mode: 'new'; name: string; ideology: string; color?: string; leader?: string };
 }
 
 const DEFAULT_TAXES = (pc: number): Record<TaxId, number> => pc > 30000
@@ -113,7 +117,7 @@ function buildCountry(raw: RawCountry, isBlock: boolean, rng: Rng): Country {
     soc: {
       pop: raw.soc.pop, birth: raw.soc.birth, death: raw.soc.death, migration: raw.soc.migration, medianAge: raw.soc.medianAge,
       education: raw.soc.education, health: raw.soc.health, gini: raw.soc.gini, urban: clamp(30 + Math.log10(pc / 1000) * 25, 15, 95),
-      satisfaction: 50, trust: 50, protest: 0, strikes: 0, calibEdu: 0, calibHealth: 0, calibGini: 0, refugees: 0,
+      satisfaction: 50, trust: 50, protest: 0, strikes: 0, calibEdu: 0, calibHealth: 0, calibGini: 0, refugees: 0, needs: {}, pressure: 0,
     },
     groups: Object.fromEntries(GROUPS.map((g) => [g, { support: raw.approval, calib: 0, radical: 20 }])) as Country['groups'],
     pol: {
@@ -126,7 +130,7 @@ function buildCountry(raw: RawCountry, isBlock: boolean, rng: Rng): Country {
     mil: {
       units, baseUnits: { ...units }, tech: raw.mil.tech, morale: raw.mil.morale, readiness: 70, logistics: 50, nukes: raw.mil.nukes,
       doctrine: raw.mil.doctrine, mobilization: 0, production: [], deployments: {}, power: 0, landPower: 0, airPower: 0, navalPower: 0,
-      upkeep: 0, procurement: 0, personnel: 0, nuclearPosture: 0, casualties: 0,
+      upkeep: 0, procurement: 0, personnel: 0, nuclearPosture: 0, casualties: 0, designs: [],
     },
     intel: { level: raw.intel[0], counter: raw.intel[1], networks: {}, ops: [] },
     tech: { level: raw.techLevel, done: [], current: null, progress: 0, points: 0, renewables: raw.renewables, stolen: 0 },
@@ -142,6 +146,10 @@ function buildCountry(raw: RawCountry, isBlock: boolean, rng: Rng): Country {
       targetDefense: 0, sphere: [...(raw.sphere ?? [])],
     },
     explain: {}, history: [], shocks: [], base: {}, alive: true, reputation: 60,
+    police: { size: 300, training: 50, militarization: 30, integrity: 50, crime: 30, effectiveness: 1 },
+    corr: { politica: 0, administrativa: 0, judicial: 0, policial: 0, empresarial: 0, electoral: 0 },
+    narco: { production: 0, transit: 0, cartels: 0, violence: 0, consumption: 0 },
+    bio: { program: 0, lab: 0, defense: 0, designs: [], exposed: -1 },
   };
 
   // Partidos
@@ -330,6 +338,8 @@ function calibrate(world: World, c: Country) {
   b.milRatio = 1 / 0.7;
   c.mil.logistics = clamp(25 + 15 * Math.log10(Math.max(500, pc) / 1000) + (c.mil.doctrine === 'expedicionaria' ? 20 : 0), 15, 90);
 
+  initSecurity(world, c);
+
   // Valores de referencia
   Object.assign(b, {
     gdp: e.gdp, pop: c.soc.pop, gdppc: pc, education: c.soc.education, health: c.soc.health, gini: c.soc.gini,
@@ -391,15 +401,16 @@ function calibrate(world: World, c: Country) {
     recomputeFx(c, r);
   }
   computePower(c);
+  initNeeds(world, c);
 }
 
 export function createWorld(opts: NewGameOptions): World {
   ensureHandlers();
   const world: World = {
-    version: 1, seed: opts.seed, rng: seedRng(opts.seed), turn: 0, countries: {}, order: [], rel: {}, trade: {},
+    version: 2, seed: opts.seed, rng: seedRng(opts.seed), turn: 0, countries: {}, order: [], rel: {}, trade: {},
     treaties: [], orgs: {}, resolutions: [], sanctions: [], tariffs: {}, wars: [],
     market: { price: {} as never, base: {} as never, supply: {} as never, demand: {} as never, history: {} as never, shock: {} as never, ema: {} as never, access: {} as never },
-    global: { tension: 45, temperature: 1.45, emissions: 0, pandemic: null, worldGrowth: 3.1, worldInflation: 3.5, worldRealRate: 1.0 },
+    global: { tension: 45, temperature: 1.45, emissions: 0, pandemic: null, worldGrowth: 3.1, worldInflation: 3.5, worldRealRate: 1.0, outbreaks: [] },
     scheduled: [], pendingEvents: [], chains: [], eventCooldowns: {}, incidents: [], proposals: [], news: [], aiLog: [], timeline: [],
     player: null, gameOver: null, uid: 0, worldHistory: [],
   };
@@ -412,6 +423,7 @@ export function createWorld(opts: NewGameOptions): World {
   for (const raw of DATA.countries) world.countries[raw.id] = buildCountry(raw, false, rng);
   for (const raw of DATA.blocks) world.countries[raw.id] = buildCountry(raw, true, rng);
   world.order = Object.keys(world.countries).sort();
+  if (opts.player && opts.party && opts.party.mode !== 'gov' && world.countries[opts.player]) applyPlayerParty(world.countries[opts.player], opts.party);
 
   for (const o of DATA.organizations) {
     world.orgs[o.id] = {
@@ -437,6 +449,7 @@ export function createWorld(opts: NewGameOptions): World {
     c.pol.ministers = MINISTRIES.map((m) => generateMinister(rng, c, m, rng.next() < 0.5 ? 'leal' : 'tecnocrata', 0));
     c.pol.leaderName = makeName(rng, c.area);
   }
+  if (opts.player && opts.party?.mode === 'new' && opts.party.leader?.trim() && world.countries[opts.player]) world.countries[opts.player].pol.leaderName = opts.party.leader.trim().slice(0, 40);
 
   initPolicies(world);
   initMarket(world);
@@ -466,4 +479,35 @@ export function createWorld(opts: NewGameOptions): World {
   world.rng = rng.state;
   for (const id of world.order) snapshot(world, world.countries[id], true);
   return world;
+}
+
+/**
+ * El jugador gobierna con otro partido existente o con uno nuevo: ese partido acaba de ganar
+ * y toma el gobierno y los escaños del anterior (que pasa a la oposición). Se aplica antes de
+ * calibrar, así que el punto de partida sigue siendo estable.
+ */
+export function applyPlayerParty(c: Country, party: NonNullable<NewGameOptions['party']>) {
+  if (party.mode === 'gov') return;
+  const gov = c.pol.parties.find((p) => p.gov);
+  const govSeats = gov?.seats ?? 50;
+  let mine = party.mode === 'existing' ? c.pol.parties.find((p) => p.name === party.name) : undefined;
+  if (party.mode === 'existing' && !mine) return;
+  if (party.mode === 'new') {
+    const ideology = DATA.ideologies[party.ideology] ? party.ideology : c.pol.ideology;
+    mine = { id: `${c.id}_p${c.pol.parties.length}`, name: party.name.trim().slice(0, 50) || 'Nuevo partido', ideology, seats: 0, gov: false, color: party.color, custom: true, founded: 0 };
+    // Un partido nuevo arrebata escaños a todos (sobre todo al gobierno saliente)
+    for (const p of c.pol.parties) p.seats *= p.gov ? 0.35 : 0.8;
+    const rest = c.pol.parties.reduce((a, p) => a + p.seats, 0);
+    mine.seats = Math.max(govSeats, 100 - rest);
+    c.pol.parties.push(mine);
+  } else if (mine && gov && mine !== gov) {
+    const s = mine.seats;
+    mine.seats = gov.seats;
+    gov.seats = s;
+  }
+  const tot = c.pol.parties.reduce((a, p) => a + p.seats, 0) || 1;
+  for (const p of c.pol.parties) { p.seats = Math.round((p.seats / tot) * 1000) / 10; p.gov = false; }
+  mine!.gov = true;
+  c.pol.govParty = mine!.name;
+  c.pol.ideology = mine!.ideology;
 }

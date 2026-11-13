@@ -3,6 +3,9 @@ import { registerGovHandlers } from './govhandlers';
 import { registerDiploHandlers } from './diplohandlers';
 import { registerMilHandlers } from './milhandlers';
 import { registerIntelHandlers } from './intel';
+import { registerBioHandlers } from './bio';
+import { registerWeaponHandlers } from './weapons';
+import { registerSecurityHandlers } from './sechandlers';
 
 let done = false;
 
@@ -13,4 +16,7 @@ export function ensureHandlers() {
   registerDiploHandlers();
   registerMilHandlers();
   registerIntelHandlers();
+  registerBioHandlers();
+  registerWeaponHandlers();
+  registerSecurityHandlers();
 }

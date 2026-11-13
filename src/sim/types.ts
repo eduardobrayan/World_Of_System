@@ -44,7 +44,7 @@ export interface Modifier {
   mods: Dict<number>;
 }
 
-export interface Party { id: string; name: string; ideology: string; seats: number; gov: boolean }
+export interface Party { id: string; name: string; ideology: string; seats: number; gov: boolean; color?: string; custom?: boolean; founded?: number }
 
 export interface Minister {
   ministry: Ministry;
@@ -140,6 +140,8 @@ export interface Society {
   calibHealth: number;
   calibGini: number;
   refugees: number; // millones acogidos recientes
+  needs: Dict<number>; // necesidades civiles cubiertas (0..100)
+  pressure: number; // presión social por necesidades no cubiertas
 }
 
 export interface GroupState {
@@ -197,6 +199,7 @@ export interface Military {
   upkeep: number; // miles de millones/año
   procurement: number; // fondos acumulados para reposición automática
   personnel: number; // miles de efectivos
+  designs: WeaponDesign[];
   nuclearPosture: number; // 0..4 nivel de alerta
   casualties: number; // miles acumulados
 }
@@ -313,6 +316,10 @@ export interface Snapshot {
   protest: number;
   reserves: number;
   currency: number;
+  pressure?: number;
+  crime?: number;
+  corruption?: number;
+  cartels?: number;
 }
 
 export interface Country {
@@ -345,7 +352,53 @@ export interface Country {
   alive: boolean;
   reputation: number; // 0..100 reputación global
   annexedBy?: Id;
+  police: Police;
+  corr: Record<CorruptionType, number>;
+  narco: Narco;
+  bio: Bio;
 }
+
+export const CORRUPTION_TYPES = ['politica', 'administrativa', 'judicial', 'policial', 'empresarial', 'electoral'] as const;
+export type CorruptionType = (typeof CORRUPTION_TYPES)[number];
+
+export interface Police {
+  size: number; // agentes por 100.000 habitantes
+  training: number; // 0..100
+  militarization: number; // 0..100
+  integrity: number; // 0..100 (100 − corrupción policial)
+  crime: number; // índice de criminalidad 0..100
+  effectiveness: number; // eficacia relativa (1 = nivel inicial)
+}
+export interface Narco { production: number; transit: number; cartels: number; violence: number; consumption: number }
+
+export interface WeaponDesign {
+  id: string; name: string; base: string; unit: UnitType;
+  power: number; armor: number; economy: number; // rasgos 1..5
+  quality: number; // bonificación de poder de ese tipo de unidad (0.1 = +10 %)
+  costMul: number; // multiplicador del coste unitario
+  remaining: number; total: number; cost: number; // coste total del programa (miles de millones)
+  done: boolean; supplier?: Id; started: number; embargo?: boolean;
+}
+
+export interface PathogenDesign {
+  id: string; name: string; kind: 'humano' | 'cultivos' | 'ganado';
+  transmission: number; lethality: number; stealth: number; resistance: number; // 1..5
+  ready: number; // turno en que estará listo
+  vaccine: boolean; // vacuna propia desarrollada en paralelo
+  cost: number;
+  used: number;
+}
+
+export interface Outbreak {
+  id: string; name: string; kind: 'humano' | 'cultivos' | 'ganado';
+  transmission: number; lethality: number; stealth: number; resistance: number; // 1..5 (puede mutar)
+  infected: Dict<number>; // país → fracción afectada (población, cosechas o cabaña)
+  months: number; origin: Id; creator: Id | null; attributed: boolean; detected: boolean;
+  vaccineFor: Id | null; // el creador tiene vacuna propia
+  deaths: number; // miles acumulados
+}
+
+export interface Bio { program: number; lab: number; defense: number; designs: PathogenDesign[]; exposed: number }
 
 export interface Relation { op: number; trust: number; base: number }
 
@@ -465,6 +518,9 @@ export interface GlobalState {
   worldGrowth0?: number;
   worldInflation: number;
   worldRealRate: number;
+  outbreaks: Outbreak[];
+  narcoDemand?: number; // demanda mundial de drogas (1 = 2026)
+  narcoBase?: number;
 }
 
 export interface MarketState {

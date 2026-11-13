@@ -20,6 +20,10 @@ export function snapshot(world: World, c: Country, force = false) {
     protest: round(c.soc.protest, 1),
     reserves: round(c.eco.reserves, 0),
     currency: round(c.eco.currency, 1),
+    pressure: round(c.soc.pressure, 1),
+    crime: round(c.police.crime, 1),
+    corruption: round(c.pol.corruption, 1),
+    cartels: round(c.narco.cartels, 1),
   });
   if (c.history.length > 1200) c.history.shift();
 }

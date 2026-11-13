@@ -1,5 +1,5 @@
 /** Fuerzas armadas: poder, mantenimiento, preparación, producción y movilización. */
-import type { Country, UnitType, World } from './types';
+import type { Country, UnitType, WeaponDesign, World } from './types';
 import { UNIT_TYPES } from './types';
 import { UNIT_BY_ID } from './data';
 import { addShock, modSum } from './vars';
@@ -33,7 +33,20 @@ export function rawUpkeep(c: Country): number {
 }
 
 export function unitCost(c: Country, k: UnitType): number {
-  return UNIT_BY_ID[k].cost * (c.base.milCostScale ?? 1) * (1 - ((c.pol.ministers.find((m) => m.ministry === 'defense')?.competence ?? 50) - 50) * 0.003);
+  return designCostMul(c, k) * UNIT_BY_ID[k].cost * (c.base.milCostScale ?? 1) * (1 - ((c.pol.ministers.find((m) => m.ministry === 'defense')?.competence ?? 50) - 50) * 0.003);
+}
+
+/** Bonificación activa para un tipo de unidad (la mejor de los programas terminados). */
+export function designBonus(c: Country, k: UnitType): number {
+  let best = 0;
+  for (const d of c.mil.designs ?? []) if (d.done && d.unit === k) best = Math.max(best, d.quality * (d.embargo ? 0.5 : 1));
+  return best;
+}
+
+export function designCostMul(c: Country, k: UnitType): number {
+  let best: WeaponDesign | null = null;
+  for (const d of c.mil.designs ?? []) if (d.done && d.unit === k && (!best || d.quality > best.quality)) best = d;
+  return best ? best.costMul : 1;
 }
 
 export function computePower(c: Country) {
@@ -45,7 +58,7 @@ export function computePower(c: Country) {
   let land = 0, air = 0, sea = 0, landUnits = 0;
   for (const k of UNIT_TYPES) {
     const u = UNIT_BY_ID[k];
-    const v = m.units[k] * u.power;
+    const v = m.units[k] * u.power * (1 + designBonus(c, k));
     if (u.domain === 'land') { land += v; landUnits += m.units[k]; }
     else if (u.domain === 'air') air += v;
     else sea += v;

@@ -283,6 +283,63 @@ de la oposición. Golpe: probabilidad mensual `riesgoGolpe`, éxito `0.35 + 0.01
 Revolución: análogo con protestas y estabilidad. Todo cambio de gobierno recalcula la relación estructural con cada país,
 ajusta la personalidad y suaviza los rencores de la memoria.
 
+### 4.11 Seguridad interior: policía, corrupción y narcotráfico (F7, `security.ts`)
+- **Policía**: tamaño (agentes/100.000 hab.) que sigue al presupuesto de seguridad interior
+  (`base · (seguridad/seguridad₀)^0.8`), formación, militarización e integridad (= 100 − corrupción policial).
+  `eficacia = √(tamaño/300) · (0.6 + formación/250) · (0.55 + integridad/220)`, normalizada a 1 en 2026.
+- **Criminalidad**: `crimen₀ · (1 − 0.7·(eficacia − 1)) + 0.4·Δviolencia + Δparo + 0.5·ΔGini (+4 en guerra)`.
+  Sus desviaciones restan satisfacción, crecimiento y empujan la emigración. La militarización reprime mejor
+  las protestas pero erosiona la confianza.
+- **Corrupción en seis tipos** (pesos): política 0.25, administrativa 0.20, judicial 0.15, policial 0.15,
+  empresarial 0.15, electoral 0.10. La corrupción general es su media ponderada. Cada tipo tiende a su valor
+  inicial + modificadores comunes (leyes, políticas, edificios, ministro del Interior) + modificadores propios
+  (`corr.<tipo>`) + impulsores (poder de los cárteles, prensa, gasto en administración, manipulación electoral).
+  Efectos específicos: administrativa → recaudación; empresarial y judicial → inversión; electoral → legitimidad;
+  policial → eficacia policial. Escándalos: probabilidad ∝ corrupción × libertad de prensa; al destaparse
+  la trama baja 3 puntos.
+- **Narcotráfico** (`narco.json` para los países relevantes; el resto se deriva de renta y corrupción):
+  producción, tránsito, cárteles, violencia y consumo. La demanda mundial se calcula con consumo × población ×
+  renta. Cárteles: `+0.4·Δcorrupción + 0.6·Δparo + 18·(demanda − 1) − 22·(eficacia − 1) + 0.2·Δcorrupción judicial`.
+  Violencia: `+0.8·Δcárteles + modificadores` (las ofensivas la disparan un año; al terminar, los cárteles se
+  fragmentan). Los cárteles corrompen policía, jueces y políticos (realimentación débil, ganancia < 0.1).
+
+### 4.12 Necesidades civiles y presión social (F7, `needs.ts`)
+Nueve necesidades con cobertura 0–100: alimentación, vivienda, energía, sanidad, educación, seguridad, empleo,
+agua y servicios, pensiones. Se calculan con renta, precios mundiales de alimentos y energía, dependencia de
+importaciones, inflación, tipos de interés, gasto público, refugiados, daños de guerra, epidemias y plagas.
+La población se acostumbra al nivel de 2026: `presión = Σ peso · (habitual − actual)` (los retrocesos cuentan
+×0.9, las mejoras restan ×0.3). La presión suma protestas (×0.55), resta satisfacción, estabilidad y apoyo de
+trabajadores y jóvenes, y empuja la emigración.
+
+### 4.13 Armamento propio (F7, `weapons.ts`, `weapons.json`)
+Once sistemas (caza, dron, carro, artillería de cohetes, fragata, submarino…), cada uno ligado a un tipo de
+unidad. **Diseño nacional**: rasgos potencia, protección y economía (1–5) con un máximo de `9 + tecMilitar/20`
+puntos; `mejora = base · (0.4 + 0.16·potencia + 0.1·protección) · min(1.3, tecMilitar/tecIdeal)`; el coste unitario
+sube con potencia y protección y baja con economía; el programa se paga cada mes. **Compra**: más barata y rápida,
+calidad según la tecnología del proveedor, pero si este te sanciona (nivel ≥ 2) faltan repuestos y la mejora cae a
+la mitad. Solo cuenta el mejor sistema por tipo de unidad. La IA desarrolla (potencias) o compra (resto).
+
+### 4.14 Armas biológicas y brotes (F7, `bio.ts`)
+- **Programa secreto** (viola la Convención de 1972): capacidad 0–100 que crece con la tecnología y la
+  investigación; coste mensual; riesgo de filtración según la mejor inteligencia rival frente a tu
+  contrainteligencia. Descubierto: −15 de reputación y memoria negativa en todo el mundo.
+- **Diseño de cepas**: objetivo humano, cultivos o ganado; rasgos contagio, letalidad, sigilo y resistencia (1–5)
+  con un máximo de `6 + capacidad/8` puntos; vacuna propia opcional (+4 meses, +40 % de coste).
+- **Brotes**: se propagan por fronteras y comercio (`0.022 · contagio`), crecen dentro de cada país hasta que llega
+  la vacuna (`5 + 3·resistencia − arnm − defensa/25` meses), mutan (2,5 %/mes) y, si no hay vacuna propia, pueden
+  volver al creador. Pasan `1 + 1.2·sigilo` meses sin detectar. Humano: mortalidad, crecimiento y protestas; plagas:
+  producción de alimentos (y precios mundiales). Atribución mensual `0.03 + 0.02·(5 − sigilo) + inteligencia/2500`:
+  −40 de reputación, sanciones máximas de las víctimas y casus belli, sanciones de terceros, +10 de tensión.
+- **Fugas de laboratorio** (menos con bioseguridad) y **escudo biológico**, que también frena pandemias naturales.
+- La IA solo crea programas con personalidades agresivas y poco prudentes, y solo libera patógenos si pierde una
+  guerra de forma clara.
+
+### 4.15 Partidos del jugador (F7)
+Al empezar se puede gobernar con el partido en el poder, con otro partido existente (gana las elecciones y se
+intercambia con el gobierno saliente) o con uno **nuevo** (nombre, ideología y nombre del líder): irrumpe con la
+mayoría del gobierno saliente, que se queda con el 35 % de sus escaños. Se aplica antes de calcular relaciones y
+calibrar, así que la partida empieza estable con la ideología elegida.
+
 ## 5. Sistema local (regiones)
 
 - Los 43 países tienen 4–9 regiones definidas en datos (ciudad principal, coordenadas, peso de
@@ -317,6 +374,12 @@ ajusta la personalidad y suaviza los rencores de la memoria.
 9. **Tamaño del guardado**: historial mensual para el jugador y trimestral para el resto.
 11. **Controles por pasos**: el presupuesto y los impuestos se ajustan con botones de paso fijo (0,1/0,5 pp y 0,5/2 pp)
     en lugar de deslizadores, por preferencia del usuario.
+12. **Pandemias sin endemia infinita**: tras la vacuna, cada país exporta muchos menos casos (×0,15–0,2) y un brote
+    termina a más tardar a los 5–6 años; antes, el contagio cruzado podía mantener una pandemia indefinidamente.
+13. **Armamento**: la mejora de un sistema nuevo se aplica a todo el arsenal de ese tipo al entrar en servicio
+    (se asume reequipamiento progresivo de las unidades existentes).
+14. **Partidas antiguas**: al cargar una partida de la versión 1 se inicializan policía, corrupción por tipos,
+    narcotráfico y necesidades con su estado en ese momento como referencia.
 10. **Previsiones**: la previsión de presupuesto/impuestos simula 12 meses con y sin el cambio
     (sin eventos ni IA) para mostrar el efecto aislado; las previsiones de reacciones usan la misma
     función de evaluación de la IA sin ruido.

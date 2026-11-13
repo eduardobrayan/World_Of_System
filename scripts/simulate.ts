@@ -31,6 +31,15 @@ const last = samples[samples.length - 1];
 console.log('\nExtremos al final:');
 for (const l of last.extremes) console.log('  ' + l);
 console.log('\nCambios de gobierno:', last.govChanges, '· Noticias:', world.news.length, '· Decisiones IA registradas:', world.aiLog.length);
+{
+  const cs = world.order.map((id) => world.countries[id]).filter((c) => c.alive && !c.isBlock);
+  const avg = (f: (c: (typeof cs)[number]) => number, b?: (c: (typeof cs)[number]) => number) =>
+    `${(cs.reduce((a, c) => a + f(c), 0) / cs.length).toFixed(1)}${b ? ` (inicio ${(cs.reduce((a, c) => a + b(c), 0) / cs.length).toFixed(1)})` : ''}`;
+  const top = (f: (c: (typeof cs)[number]) => number) => { const c = cs.slice().sort((a, b) => f(b) - f(a))[0]; return `${c.name} ${f(c).toFixed(0)}`; };
+  console.log('\nSeguridad y sociedad (media de países):');
+  console.log(`  Corrupción ${avg((c) => c.pol.corruption, (c) => c.base.corruption)} · cárteles ${avg((c) => c.narco.cartels, (c) => c.base.narco_cartels)} · criminalidad ${avg((c) => c.police.crime, (c) => c.base.crime)}`);
+  console.log(`  Presión social ${avg((c) => c.soc.pressure)} (máx. ${top((c) => c.soc.pressure)}) · brotes activos ${world.global.outbreaks.length} · programas biológicos ${cs.filter((c) => c.bio.program > 0).length} · sistemas de armas ${cs.reduce((a, c) => a + c.mil.designs.length, 0)}`);
+}
 console.log('\nÚltimas noticias:');
 for (const n of world.news.slice(-12)) console.log(`  [${n.turn}] ${n.text}`);
 const problems = last.problems;

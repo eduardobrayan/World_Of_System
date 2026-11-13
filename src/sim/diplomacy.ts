@@ -30,6 +30,10 @@ export const MEMORY: Record<string, { value: number; halfLife: number; trust: nu
   cesion: { value: 8, halfLife: 36, trust: 0.4, text: 'Cedió ante nuestras demandas' },
   aranceles: { value: -10, halfLife: 36, trust: 0.3, text: 'Nos impuso aranceles' },
   ruptura: { value: -30, halfLife: 60, trust: 0.8, text: 'Rompió relaciones con nosotros' },
+  armas_bio: { value: -25, halfLife: 120, trust: 1, text: 'Programa de armas biológicas' },
+  bioataque: { value: -80, halfLife: 300, trust: 2, text: 'Lanzó un ataque biológico' },
+  antidroga: { value: 8, halfLife: 36, trust: 0.5, text: 'Cooperación antidroga' },
+  narco: { value: -25, halfLife: 60, trust: 1, text: 'Financió a los cárteles' },
 };
 
 export function remember(world: World, holder: Country, about: Id, kind: string, scale = 1) {

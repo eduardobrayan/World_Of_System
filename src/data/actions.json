@@ -175,7 +175,7 @@
    "news": "{country} aprueba una ambiciosa ley anticorrupción."
   },
   "ai": {
-   "utility": "(pol.corruption - 45) * 0.06 + (regime.competitive) * 0.5 - 0.5"
+   "utility": "(pol.corruption - 45) * 0.04 + regime.competitive * 0.6 - 0.7"
   }
  },
  {
@@ -2853,6 +2853,871 @@
    }
   ],
   "params": {},
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "reclutar_policias",
+  "name": "Reclutar 20.000 agentes",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Amplía las plantillas policiales: más presencia en las calles y menos delincuencia, a cambio de más gasto en seguridad.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "effects": [
+   {
+    "path": "budget.security",
+    "add": 0.1
+   }
+  ],
+  "groups": {
+   "workers": 1,
+   "military": 1
+  },
+  "cooldown": 6,
+  "ai": {
+   "utility": "(crime - 45) * 0.03 + (narco.cartels - 55) * 0.02 + ideo.auth * 0.2"
+  }
+ },
+ {
+  "id": "formacion_policial",
+  "name": "Academia y formación policial",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Programa nacional de formación: investigación criminal, derechos humanos y policía científica.",
+  "requires": [
+   {
+    "expr": "flags.formacion_policial_hecha == 0",
+    "text": "Solo una vez"
+   }
+  ],
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0008"
+  },
+  "effects": [
+   {
+    "path": "flags.formacion_policial_hecha",
+    "set": 1
+   }
+  ],
+  "modifiers": [
+   {
+    "id": "formacion_policial",
+    "name": "Formación policial",
+    "duration": -1,
+    "mods": {
+     "police.training": 12
+    }
+   }
+  ],
+  "cooldown": 36,
+  "ai": {
+   "utility": "(50 - police.training) * 0.02"
+  }
+ },
+ {
+  "id": "depuracion_policial",
+  "name": "Depuración de la policía",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Asuntos internos investiga y expulsa a los agentes corruptos. Molesta a los mandos y deja huecos temporales.",
+  "requires": [],
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "depuracion_policial",
+    "name": "Depuración policial",
+    "duration": 36,
+    "mods": {
+     "corr.policial": -14
+    }
+   },
+   {
+    "id": "depuracion_policial_tension",
+    "name": "Malestar en los cuerpos policiales",
+    "duration": 6,
+    "mods": {
+     "stability": -2,
+     "crime": 3
+    }
+   }
+  ],
+  "groups": {
+   "military": -2,
+   "youth": 2
+  },
+  "risks": [
+   "Los agentes expulsados pueden pasarse al crimen organizado"
+  ],
+  "cooldown": 36,
+  "ai": {
+   "utility": "(corr.policial - 62) * 0.03 - (1 - regime.competitive) * 0.6"
+  }
+ },
+ {
+  "id": "policia_comunitaria",
+  "name": "Modelo de policía de proximidad",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Patrullas de barrio, mediación y menos armamento pesado: más confianza ciudadana y menos militarización.",
+  "requires": [
+   {
+    "expr": "flags.policia_comunitaria == 0",
+    "text": "No aprobada antes"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "policia_comunitaria",
+    "name": "Modelo de policía de proximidad",
+    "duration": -1,
+    "mods": {
+     "police.militarization": -15,
+     "trust": 3,
+     "crime": -2
+    }
+   }
+  ],
+  "groups": {
+   "youth": 3,
+   "minorities": 4,
+   "military": -2
+  },
+  "risks": [],
+  "params": {
+   "law": true,
+   "econ": -0.1,
+   "auth": -0.5,
+   "news": "{country} adopta un modelo de policía de proximidad."
+  },
+  "ai": {
+   "utility": "regime.competitive * 0.2 + (police.militarization - 60) * 0.02 - ideo.auth * 0.5"
+  }
+ },
+ {
+  "id": "militarizar_policia",
+  "name": "Militarizar la seguridad",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Guardia nacional con armamento militar contra el crimen organizado. Más mano dura, menos libertades.",
+  "requires": [
+   {
+    "expr": "flags.militarizar_policia == 0",
+    "text": "No aprobada antes"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "militarizar_policia",
+    "name": "Militarizar la seguridad",
+    "duration": -1,
+    "mods": {
+     "police.militarization": 25,
+     "narco.cartels": -4,
+     "crime": -2,
+     "pressFreedom": -3
+    }
+   }
+  ],
+  "groups": {
+   "military": 4,
+   "youth": -4,
+   "minorities": -5
+  },
+  "risks": [
+   "Abusos y violaciones de derechos humanos"
+  ],
+  "params": {
+   "law": true,
+   "econ": 0.1,
+   "auth": 0.6,
+   "news": "{country} militariza la seguridad pública."
+  },
+  "ai": {
+   "utility": "(narco.cartels - 60) * 0.03 + ideo.auth * 0.4 - regime.competitive * 0.3"
+  }
+ },
+ {
+  "id": "ofensiva_antinarco",
+  "name": "Ofensiva contra los cárteles",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Operación a gran escala de policía y ejército contra los cárteles: capturas de capos y decomisos. A corto plazo, la violencia se dispara por la guerra de sucesión.",
+  "requires": [
+   {
+    "expr": "narco.cartels > 20",
+    "text": "Cárteles con presencia relevante (> 20)"
+   }
+  ],
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.002"
+  },
+  "modifiers": [
+   {
+    "id": "ofensiva_antinarco",
+    "name": "Ofensiva antinarco",
+    "duration": 24,
+    "mods": {
+     "narco.cartels": -12,
+     "narco.production": -6,
+     "narco.transit": -6
+    }
+   },
+   {
+    "id": "ofensiva_violencia",
+    "name": "Guerra entre cárteles",
+    "duration": 12,
+    "mods": {
+     "narco.violence": 22,
+     "stability": -2
+    }
+   }
+  ],
+  "groups": {
+   "military": 4,
+   "business": 2
+  },
+  "risks": [
+   "Picos de violencia durante un año",
+   "Los cárteles pueden fragmentarse y reaparecer"
+  ],
+  "cooldown": 24,
+  "ai": {
+   "utility": "(narco.cartels - 55) * 0.03 + ideo.auth * 0.2"
+  },
+  "delayed": [
+   {
+    "in": 24,
+    "effects": [],
+    "mods": [
+     {
+      "id": "ofensiva_fragmentacion",
+      "name": "Fragmentación de los cárteles",
+      "duration": 12,
+      "mods": {
+       "narco.cartels": 4,
+       "narco.violence": 6
+      }
+     }
+    ],
+    "text": "Los cárteles se fragmentan y reaparecen"
+   }
+  ]
+ },
+ {
+  "id": "sustitucion_cultivos",
+  "name": "Sustitución de cultivos ilícitos",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Pagos y créditos a campesinos para cambiar coca, amapola o cannabis por cultivos legales.",
+  "requires": [
+   {
+    "expr": "narco.production > 15",
+    "text": "Producción relevante de drogas (> 15)"
+   }
+  ],
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0015"
+  },
+  "modifiers": [
+   {
+    "id": "sustitucion_cultivos",
+    "name": "Sustitución de cultivos",
+    "duration": 36,
+    "mods": {
+     "narco.production": -15,
+     "group.workers": 2
+    }
+   }
+  ],
+  "cooldown": 36,
+  "ai": {
+   "utility": "(narco.production - 50) * 0.03"
+  }
+ },
+ {
+  "id": "lucha_blanqueo",
+  "name": "Ley contra el blanqueo de capitales",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Registro de titulares reales, control bancario y decomiso de bienes: golpea a cárteles y a la corrupción empresarial.",
+  "requires": [
+   {
+    "expr": "flags.lucha_blanqueo == 0",
+    "text": "No aprobada antes"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "lucha_blanqueo",
+    "name": "Ley contra el blanqueo de capitales",
+    "duration": -1,
+    "mods": {
+     "corr.empresarial": -8,
+     "narco.cartels": -6,
+     "taxEfficiency": 0.01,
+     "growth": -0.05
+    }
+   }
+  ],
+  "groups": {
+   "business": -4,
+   "youth": 2
+  },
+  "risks": [],
+  "params": {
+   "law": true,
+   "econ": 0,
+   "auth": -0.1,
+   "news": "{country} aprueba una dura ley contra el blanqueo."
+  },
+  "ai": {
+   "utility": "(corr.empresarial - 58) * 0.02 + (narco.cartels - 55) * 0.02 - (1 - regime.competitive) * 0.6"
+  }
+ },
+ {
+  "id": "legalizar_cannabis",
+  "name": "Regular el cannabis",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Legaliza y grava el cannabis: quita negocio a los cárteles, pero aumenta algo el consumo y enfada a los sectores religiosos.",
+  "requires": [
+   {
+    "expr": "flags.legalizar_cannabis == 0",
+    "text": "No aprobada antes"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "legalizar_cannabis",
+    "name": "Regular el cannabis",
+    "duration": -1,
+    "mods": {
+     "narco.cartels": -6,
+     "narco.consumption": 5,
+     "taxEfficiency": 0.004
+    }
+   }
+  ],
+  "groups": {
+   "youth": 5,
+   "religious": -8
+  },
+  "risks": [],
+  "params": {
+   "law": true,
+   "econ": 0,
+   "auth": -0.6,
+   "news": "{country} regula el mercado del cannabis."
+  },
+  "ai": {
+   "utility": "(ideo.auth < -0.2 ? 0.3 : -0.6) + (narco.cartels - 45) * 0.01 - ideo.relig * 0.8"
+  }
+ },
+ {
+  "id": "tratamiento_adicciones",
+  "name": "Plan nacional contra las adicciones",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Centros de tratamiento, prevención en escuelas y reducción de daños.",
+  "requires": [
+   {
+    "expr": "flags.plan_adicciones == 0",
+    "text": "Solo una vez"
+   }
+  ],
+  "cost": {
+   "ap": 1
+  },
+  "effects": [
+   {
+    "path": "budget.health",
+    "add": 0.05
+   },
+   {
+    "path": "flags.plan_adicciones",
+    "set": 1
+   }
+  ],
+  "modifiers": [
+   {
+    "id": "tratamiento_adicciones",
+    "name": "Plan contra las adicciones",
+    "duration": -1,
+    "mods": {
+     "narco.consumption": -10,
+     "health": 1
+    }
+   }
+  ],
+  "groups": {
+   "religious": 2,
+   "workers": 1
+  },
+  "ai": {
+   "utility": "(narco.consumption - 60) * 0.03"
+  }
+ },
+ {
+  "id": "negociar_carteles",
+  "name": "Pacto secreto con los cárteles",
+  "category": "gobierno",
+  "target": "none",
+  "desc": "Tregua bajo cuerda: menos violencia a cambio de mirar hacia otro lado. Si se descubre, escándalo mayúsculo.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "modifiers": [
+   {
+    "id": "pacto_carteles",
+    "name": "Pacto secreto con los cárteles",
+    "duration": 24,
+    "mods": {
+     "narco.violence": -18,
+     "narco.cartels": 6,
+     "corr.politica": 6,
+     "corr.judicial": 4,
+     "corr.policial": 5
+    }
+   }
+  ],
+  "risks": [
+   "Puede destaparse como escándalo de corrupción",
+   "Los cárteles salen reforzados"
+  ],
+  "cooldown": 24,
+  "ai": {
+   "utility": "(narco.violence - 55) * 0.03 - regime.competitive * 0.4"
+  }
+ },
+ {
+  "id": "cooperacion_antidroga",
+  "name": "Cooperación antidroga",
+  "category": "diplomacia",
+  "target": "foreign",
+  "desc": "Acuerdo bilateral: intercambio de inteligencia, extradiciones y control de rutas.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "cooldown": 12,
+  "handler": "narco_coop",
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "fiscalia_anticorrupcion",
+  "name": "Fiscalía anticorrupción independiente",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Fiscales blindados frente al Gobierno para investigar a cargos públicos, incluidos los propios.",
+  "requires": [
+   {
+    "expr": "flags.fiscalia_anticorrupcion == 0",
+    "text": "No aprobada antes"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "fiscalia_anticorrupcion",
+    "name": "Fiscalía anticorrupción independiente",
+    "duration": -1,
+    "mods": {
+     "corr.politica": -10,
+     "corr.judicial": -4,
+     "legitimacy": 2
+    }
+   }
+  ],
+  "groups": {
+   "business": -3,
+   "youth": 3
+  },
+  "risks": [
+   "Puede investigar a miembros de tu Gobierno"
+  ],
+  "params": {
+   "law": true,
+   "econ": 0,
+   "auth": -0.3,
+   "news": "{country} crea una fiscalía anticorrupción independiente."
+  },
+  "ai": {
+   "utility": "(corr.politica - 58) * 0.03 + regime.competitive * 0.15 - (1 - regime.competitive) * 0.6"
+  }
+ },
+ {
+  "id": "reforma_judicial",
+  "name": "Reforma de la independencia judicial",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Consejo judicial elegido por los jueces, salarios dignos y rotación de casos: menos sentencias compradas.",
+  "requires": [
+   {
+    "expr": "flags.reforma_judicial == 0",
+    "text": "No aprobada antes"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "reforma_judicial",
+    "name": "Reforma de la independencia judicial",
+    "duration": -1,
+    "mods": {
+     "corr.judicial": -12,
+     "investment": 0.3
+    }
+   }
+  ],
+  "groups": {
+   "business": 2
+  },
+  "risks": [],
+  "params": {
+   "law": true,
+   "econ": 0,
+   "auth": -0.3,
+   "news": "{country} aprueba una reforma de la justicia."
+  },
+  "ai": {
+   "utility": "(corr.judicial - 58) * 0.03 + regime.competitive * 0.1 - (1 - regime.competitive) * 0.6"
+  }
+ },
+ {
+  "id": "administracion_digital",
+  "name": "Administración digital y contratación abierta",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Trámites en línea, licitaciones públicas y datos abiertos: menos ventanillas, menos mordidas.",
+  "requires": [
+   {
+    "expr": "flags.administracion_digital_hecha == 0",
+    "text": "Solo una vez"
+   },
+   {
+    "expr": "tech.level > 30",
+    "text": "Nivel tecnológico > 30"
+   }
+  ],
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.002"
+  },
+  "effects": [
+   {
+    "path": "flags.administracion_digital_hecha",
+    "set": 1
+   }
+  ],
+  "modifiers": [
+   {
+    "id": "administracion_digital",
+    "name": "Administración digital",
+    "duration": -1,
+    "mods": {
+     "corr.administrativa": -10,
+     "taxEfficiency": 0.01
+    }
+   }
+  ],
+  "ai": {
+   "utility": "(corr.administrativa - 55) * 0.02 + (tech.level - 60) * 0.01 - (1 - regime.competitive) * 0.6"
+  }
+ },
+ {
+  "id": "autoridad_electoral",
+  "name": "Autoridad electoral independiente",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Censo auditado, voto verificable y observadores internacionales.",
+  "requires": [
+   {
+    "expr": "flags.autoridad_electoral == 0",
+    "text": "No aprobada antes"
+   },
+   {
+    "expr": "regime.elections",
+    "text": "Debe haber elecciones"
+   }
+  ],
+  "parliament": true,
+  "cost": {
+   "ap": 2
+  },
+  "modifiers": [
+   {
+    "id": "autoridad_electoral",
+    "name": "Autoridad electoral independiente",
+    "duration": -1,
+    "mods": {
+     "corr.electoral": -15,
+     "legitimacy": 4
+    }
+   }
+  ],
+  "groups": {
+   "youth": 3
+  },
+  "risks": [],
+  "params": {
+   "law": true,
+   "econ": 0,
+   "auth": -0.4,
+   "news": "{country} blinda la limpieza de sus elecciones."
+  },
+  "ai": {
+   "utility": "(corr.electoral - 55) * 0.03 + regime.competitive * 0.1 - (1 - regime.competitive) * 0.6"
+  }
+ },
+ {
+  "id": "clientelismo",
+  "name": "Repartir favores y cargos",
+  "category": "gobierno",
+  "target": "none",
+  "desc": "Contratos, subvenciones y puestos para los aliados: compra apoyos (+3 de capital político) a costa de más corrupción.",
+  "requires": [],
+  "cost": {
+   "ap": 0
+  },
+  "effects": [
+   {
+    "path": "pol.ap",
+    "add": 3
+   }
+  ],
+  "modifiers": [
+   {
+    "id": "clientelismo",
+    "name": "Clientelismo",
+    "duration": 24,
+    "mods": {
+     "corr.politica": 6,
+     "corr.administrativa": 4,
+     "group.business": 2
+    }
+   }
+  ],
+  "risks": [
+   "Más escándalos de corrupción"
+  ],
+  "cooldown": 12,
+  "ai": {
+   "utility": "0.1 - regime.competitive * 0.4 + pers.pragmatism * 0.2"
+  }
+ },
+ {
+  "id": "defensa_biologica",
+  "name": "Escudo biológico",
+  "category": "seguridad",
+  "target": "none",
+  "desc": "Laboratorios de alta seguridad, reservas de antivirales y vigilancia genómica: protege de pandemias naturales y de ataques.",
+  "requires": [],
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.002"
+  },
+  "effects": [
+   {
+    "path": "bio.defense",
+    "add": 20
+   },
+   {
+    "path": "bio.lab",
+    "add": 10
+   }
+  ],
+  "cooldown": 24,
+  "ai": {
+   "utility": "outbreak * 20 + world.pandemic * 1.2 + (tech.level - 65) * 0.015 - 0.1"
+  }
+ },
+ {
+  "id": "programa_biologico",
+  "name": "Programa secreto de armas biológicas",
+  "category": "biologico",
+  "target": "none",
+  "desc": "Laboratorios militares clandestinos para diseñar patógenos. Viola la Convención sobre Armas Biológicas: si se descubre, el mundo te castigará.",
+  "requires": [],
+  "cost": {
+   "ap": 3,
+   "money": "gdp * 0.001"
+  },
+  "risks": [
+   "Filtraciones de inteligencia extranjera",
+   "Fugas de laboratorio"
+  ],
+  "handler": "bio_program",
+  "params": {
+   "on": 1
+  },
+  "hidden": true,
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "cerrar_programa_biologico",
+  "name": "Desmantelar el programa biológico",
+  "category": "biologico",
+  "target": "none",
+  "desc": "Destruye las cepas y cierra los laboratorios secretos.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "handler": "bio_program",
+  "params": {
+   "on": 0
+  },
+  "hidden": true,
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "disenar_patogeno",
+  "name": "Diseñar un patógeno",
+  "category": "biologico",
+  "target": "none",
+  "desc": "Crea una cepa a medida: elige su objetivo y sus rasgos.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "handler": "bio_design",
+  "hidden": true,
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "liberar_patogeno",
+  "name": "Liberar un patógeno",
+  "category": "biologico",
+  "target": "foreign",
+  "desc": "Libera en secreto una cepa en otro país.",
+  "requires": [],
+  "cost": {
+   "ap": 4
+  },
+  "risks": [
+   "El brote puede volver a tu país",
+   "Atribución: sanciones y casus belli"
+  ],
+  "handler": "bio_release",
+  "hidden": true,
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_financiar_carteles",
+  "name": "Financiar cárteles",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Armas y dinero para los cárteles de un país rival: violencia, corrupción e inestabilidad.",
+  "requires": [],
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.0003"
+  },
+  "cooldown": 12,
+  "handler": "intel_op",
+  "params": {
+   "op": "narco",
+   "months": 5,
+   "difficulty": 0.05,
+   "exposure": 0.3
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "op_bioespionaje",
+  "name": "Investigar armas biológicas",
+  "category": "inteligencia",
+  "target": "foreign",
+  "desc": "Agentes y análisis de muestras para averiguar si un país tiene un programa biológico (mejora tu defensa).",
+  "requires": [],
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0002"
+  },
+  "cooldown": 6,
+  "handler": "intel_op",
+  "params": {
+   "op": "bioespionaje",
+   "months": 4,
+   "difficulty": 0.1,
+   "exposure": 0.2
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "disenar_arma",
+  "name": "Diseñar armamento propio",
+  "category": "militar_arma",
+  "target": "none",
+  "desc": "Programa nacional de I+D de un sistema de armas.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "handler": "weapon_design",
+  "hidden": true,
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "comprar_armamento",
+  "name": "Comprar armamento",
+  "category": "militar_arma",
+  "target": "foreign",
+  "desc": "Compra un sistema de armas a otro país.",
+  "requires": [],
+  "cost": {
+   "ap": 1
+  },
+  "handler": "weapon_buy",
+  "hidden": true,
   "ai": {
    "utility": "0"
   }

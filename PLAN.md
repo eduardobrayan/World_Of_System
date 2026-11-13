@@ -97,11 +97,21 @@ indexar alianzas, barreras comerciales y relaciones por turno.
       presupuestos, eventos, guerra y paz, IA explicable, guardado determinista) y salud del mundo a 200 turnos
 - [x] README
 
-## F7 — Ampliaciones pedidas por el usuario
-- [ ] Jugar con un partido propio o existente
-- [ ] Diseño y elección de armamento propio
-- [ ] Necesidades civiles y presión social
-- [ ] Armas biológicas y patógenos diseñables
-- [ ] Cuerpos policiales
-- [ ] Corrupción de varios tipos
-- [ ] Narcotráfico
+## F7 — Ampliaciones pedidas por el usuario ✅
+- [x] Jugar con un partido propio o existente (pantalla de inicio: partido del gobierno, otro existente o uno nuevo
+      con nombre, ideología y líder)
+- [x] Diseño y elección de armamento propio (11 sistemas; diseño nacional con rasgos o compra a otro país con
+      dependencia de repuestos; pestaña Armamento; la IA también desarrolla y compra)
+- [x] Necesidades civiles y presión social (9 necesidades con causas en tooltip, presión → protestas, emigración;
+      eventos de vivienda y pensiones)
+- [x] Armas biológicas y patógenos diseñables (programa secreto, cepas humano/cultivos/ganado con 4 rasgos,
+      vacuna propia, liberación, mutaciones, fugas, atribución, escudo biológico, bioespionaje, capa «Brotes»)
+- [x] Cuerpos policiales (tamaño, formación, militarización, integridad, eficacia, criminalidad; 5 acciones)
+- [x] Corrupción de seis tipos con efectos distintos, escándalos y 8 medidas (incluido el clientelismo)
+- [x] Narcotráfico (producción, tránsito, cárteles, violencia y consumo; demanda mundial; ofensivas, sustitución de
+      cultivos, regulación, blanqueo, pactos secretos, cooperación antidroga, financiar cárteles rivales; capa del mapa)
+- [x] Pestaña Seguridad, nuevas capas (corrupción, narcotráfico, brotes), 7 eventos y migración de partidas v1 → v2
+
+**Verificación F7:** 34 tests en verde (11 nuevos); 200 turnos estables con dos semillas (crecimiento ~2,5 %,
+corrupción media 52 → 45 por reformas graduales, cárteles 24 → 21, sin NaN, ~72 ms/turno). Se corrigió una pandemia
+natural que podía volverse endémica para siempre.

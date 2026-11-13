@@ -59,7 +59,7 @@ function countryPanel(app: App, c: Country): HTMLElement[] {
   out.push(...rightExtras(app, c));
   out.push(section('Datos generales',
     plainStat('Población', `${c.soc.pop.toFixed(c.soc.pop < 10 ? 2 : 1)} M`),
-    kpiRow(app, c, 'gdppc'), kpiRow(app, c, 'debt'), kpiRow(app, c, 'power'),
+    kpiRow(app, c, 'gdppc'), kpiRow(app, c, 'debt'), kpiRow(app, c, 'power'), kpiRow(app, c, 'corruption'), kpiRow(app, c, 'cartels'),
     plainStat('Recursos', resourcesText(c)),
     plainStat('Organismos', Object.values(w.orgs).filter((o) => o.type !== 'universal' && o.members.includes(c.id)).map((o) => o.short).join(', ') || '—')));
   return out;

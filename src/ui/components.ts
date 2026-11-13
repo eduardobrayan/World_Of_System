@@ -42,7 +42,7 @@ export function bar(v: number, max = 100, color?: string): HTMLElement {
 
 /** Gráfica histórica de una o varias variables de Snapshot. */
 export function histChart(c: Country, keys: (keyof Snapshot)[], names: string[], fmt?: (v: number) => string, height = 140, zero = false): HTMLElement {
-  const hist = c.history;
+  const hist = c.history.filter((s) => keys.every((k) => typeof s[k] === 'number'));
   return lineChart({
     xs: hist.map((s) => s.t),
     series: keys.map((k, i) => ({ name: names[i], values: hist.map((s) => s[k] as number) })),
@@ -60,4 +60,31 @@ export function delta(c: Country, key: keyof Snapshot, back = 12): number | unde
   const last = hist[hist.length - 1];
   const prev = [...hist].reverse().find((s) => s.t <= last.t - back) ?? hist[0];
   return (last[key] as number) - (prev[key] as number);
+}
+
+/** Selector entero con botones − / + (sin deslizadores). */
+export function intStepper(label: string, desc: string, value: number, min: number, max: number, onChange: (v: number) => void, fmt: (v: number) => string = (v) => String(v)): HTMLElement {
+  let v = value;
+  const valEl = h('span', { class: 'val' }, fmt(v));
+  const set = (nv: number) => {
+    nv = Math.max(min, Math.min(max, nv));
+    if (nv === v) return;
+    v = nv;
+    valEl.textContent = fmt(v);
+    onChange(v);
+  };
+  const lab = h('label', { title: desc }, label);
+  return h('div', { class: 'step-row int' }, lab,
+    h('div', { class: 'stepper' },
+      h('button', { class: 'step', 'aria-label': `Bajar ${label}`, onclick: () => set(v - 1) }, '−'),
+      valEl,
+      h('button', { class: 'step', 'aria-label': `Subir ${label}`, onclick: () => set(v + 1) }, '+')));
+}
+
+/** Barra de una necesidad o índice con su referencia (marca vertical). */
+export function refBar(v: number, ref: number, color?: string): HTMLElement {
+  const el = bar(v, 100, color);
+  el.style.position = 'relative';
+  el.append(h('b', { class: 'bar-ref', style: `left:${Math.max(0, Math.min(100, ref))}%`, title: `Nivel habitual: ${ref.toFixed(0)}` }));
+  return el;
 }

@@ -11,7 +11,7 @@ import { clamp, news, rngOf, timeline, uid } from './util';
 
 export const OP_NAMES: Record<string, string> = {
   espionaje: 'Red de espionaje', oposicion: 'Financiación de la oposición', sabotaje: 'Sabotaje', tecnologia: 'Robo de tecnología',
-  desinformacion: 'Desinformación', ciber: 'Ciberataque', golpe: 'Apoyo a un golpe',
+  desinformacion: 'Desinformación', ciber: 'Ciberataque', golpe: 'Apoyo a un golpe', narco: 'Financiación de cárteles', bioespionaje: 'Espionaje biológico',
 };
 
 export function intelLevel(c: Country): number {
@@ -61,6 +61,18 @@ function applyOpSuccess(world: World, a: Country, t: Country, op: IntelOp) {
       addModifier(world, t, { id: `op_ciber_${a.id}`, name: 'Ciberataque', duration: 2, mods: { growth: -1.2 } }, src);
       t.intel.counter = clamp(t.intel.counter - 3, 0, 100);
       break;
+    case 'narco':
+      addModifier(world, t, { id: `op_narco_${a.id}`, name: 'Cárteles financiados desde el exterior', duration: 18, mods: { 'narco.cartels': 12, 'narco.violence': 10, 'corr.policial': 4 } }, src);
+      break;
+    case 'bioespionaje': {
+      const d = t.bio.designs[0];
+      if (t.bio.program > 0) {
+        a.bio.defense = clamp(a.bio.defense + 10, 0, 100);
+        if (world.player?.country === a.id) news(world, `🕵 Tus agentes confirman que ${t.name} tiene un programa de armas biológicas${d ? ` (cepa «${d.name}»)` : ''}. Tu defensa biológica mejora.`, 'inteligencia', [a.id], 3);
+        if (t.bio.exposed < 0 && world.player?.country === a.id) t.pol.flags.bio_known = world.turn;
+      } else if (world.player?.country === a.id) news(world, `🕵 No hay rastro de armas biológicas en ${t.name}.`, 'inteligencia', [a.id], 2);
+      break;
+    }
     case 'golpe':
       addModifier(world, t, { id: `op_golpe_${a.id}`, name: 'Conspiración militar', duration: 8, mods: { coupRisk: 4, 'group.military': -15 } }, src);
       break;
@@ -101,8 +113,8 @@ export function updateIntel(world: World) {
 }
 
 function exposeOp(world: World, a: Country, t: Country, op: IntelOp) {
-  const severe = op.op === 'golpe' || op.op === 'sabotaje' || op.op === 'oposicion';
-  remember(world, t, a.id, 'espionaje', severe ? 2 : 1);
+  const severe = op.op === 'golpe' || op.op === 'sabotaje' || op.op === 'oposicion' || op.op === 'narco';
+  remember(world, t, a.id, op.op === 'narco' ? 'narco' : 'espionaje', severe ? 2 : 1);
   a.reputation = clamp(a.reputation - (severe ? 8 : 3), 0, 100);
   world.incidents.push({ turn: world.turn, actor: a.id, target: t.id, kind: 'espionaje', magnitude: severe ? 2 : 1, text: OP_NAMES[op.op] });
   if (op.op === 'golpe') t.pol.flags[`cb_${a.id}`] = world.turn;

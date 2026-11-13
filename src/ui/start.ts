@@ -27,6 +27,9 @@ export function showStart(container: HTMLElement, onStart: (opts: NewGameOptions
   let difficulty: 'facil' | 'normal' | 'dificil' = 'normal';
   let seed = randomSeed();
   let objective = 'libre';
+  let partyMode: 'gov' | 'existing' | 'new' = 'gov';
+  let partyName = '';
+  const newParty = { name: '', ideology: 'socialdemocracia', leader: '' };
 
   const canvas = h('canvas', { 'aria-label': 'Mapa: elige país' });
   const hover = h('div', { class: 'hover-card' });
@@ -36,7 +39,7 @@ export function showStart(container: HTMLElement, onStart: (opts: NewGameOptions
 
   const host: MapHost = {
     world: preview, player: null, selected: chosen, selectedRegion: null, layer: 'politico', localLayer: 'development', view: 'world', localId: null,
-    onSelect: (id) => { if (id && playable.has(id)) { chosen = id; host.selected = id; renderSide(); map.invalidate(); } },
+    onSelect: (id) => { if (id && playable.has(id)) { if (id !== chosen) { partyMode = 'gov'; partyName = ''; } chosen = id; host.selected = id; renderSide(); map.invalidate(); } },
     onSelectRegion: () => undefined,
     onOpenLocal: (id) => host.onSelect(id),
     onHover: (el, x, y) => {
@@ -72,6 +75,7 @@ export function showStart(container: HTMLElement, onStart: (opts: NewGameOptions
           h('div', null, `Inflación: ${c.eco.inflation.toFixed(1)} %`), h('div', null, `Deuda: ${((c.eco.debt / c.eco.gdp) * 100).toFixed(0)} %`),
           h('div', null, `Aprobación: ${c.pol.approval.toFixed(0)}`), h('div', null, `Estabilidad: ${c.pol.stability.toFixed(0)}`)),
         h('div', { class: 'small muted', style: 'margin-top:6px' }, difficultyHint(c))) : null,
+      c ? partyPicker(c) : null,
       h('div', { class: 'field' }, h('span', null, 'Dificultad'),
         h('div', { class: 'seg' }, (['facil', 'normal', 'dificil'] as const).map((d) => h('button', { class: d === difficulty ? 'on' : '', onclick: () => { difficulty = d; renderSide(); } }, { facil: 'Fácil', normal: 'Normal', dificil: 'Difícil' }[d]))),
         h('span', { class: 'small muted' }, DIFFICULTY[difficulty])),
@@ -89,12 +93,50 @@ export function showStart(container: HTMLElement, onStart: (opts: NewGameOptions
           return inp;
         })(), h('button', { class: 'btn', title: 'Semilla aleatoria', onclick: () => { seed = randomSeed(); renderSide(); } }, '🎲'))),
       h('div', { class: 'row wrap', style: 'margin-top:12px' },
-        h('button', { class: 'btn primary', disabled: !chosen, onclick: () => { map.destroy(); onStart({ seed: seed || randomSeed(), player: chosen, difficulty, objective }); } }, '▶ Comenzar partida'),
+        h('button', { class: 'btn primary', disabled: !chosen, onclick: () => { map.destroy(); onStart({ seed: seed || randomSeed(), player: chosen, difficulty, objective, party: partyOption() }); } }, '▶ Comenzar partida'),
         h('button', { class: 'btn', onclick: () => { map.destroy(); onStart({ seed: seed || randomSeed(), player: null }); } }, '👁 Observar el mundo')),
       ...startExtras((w) => { map.destroy(); onLoad(w); }),
       h('p', { class: 'small muted', style: 'margin-top:16px' }, 'Datos aproximados de 2026. Mapa: Natural Earth 110m. Los nombres de ministros son ficticios.'));
   };
+  const partyOption = (): NewGameOptions['party'] => {
+    if (partyMode === 'existing' && partyName) return { mode: 'existing', name: partyName };
+    if (partyMode === 'new') return { mode: 'new', name: newParty.name || 'Nuevo Movimiento', ideology: newParty.ideology, color: DATA.ideologies[newParty.ideology]?.color, leader: newParty.leader };
+    return { mode: 'gov' };
+  };
+
+  function partyPicker(c: Country): HTMLElement {
+    const gov = c.pol.parties.find((p) => p.gov);
+    const comp = regimeOf(c.pol.regime).elections;
+    const opt = (on: boolean, color: string, title: string, sub: string, click: () => void) =>
+      h('button', { class: `option ${on ? 'on' : ''}`, onclick: () => { click(); renderSide(); } },
+        h('span', { class: 'party-dot', style: `background:${color}` }), h('b', null, title), h('div', { class: 'small ink2' }, sub));
+    const nameInp = h('input', { type: 'text', value: newParty.name, placeholder: 'Nombre del partido', maxlength: '50', 'aria-label': 'Nombre del nuevo partido' });
+    nameInp.addEventListener('input', () => { newParty.name = nameInp.value; });
+    const leaderInp = h('input', { type: 'text', value: newParty.leader, placeholder: 'Tu nombre como líder (opcional)', maxlength: '40', 'aria-label': 'Nombre del líder' });
+    leaderInp.addEventListener('input', () => { newParty.leader = leaderInp.value; });
+    return h('div', { class: 'field' }, h('span', null, 'Tu partido'),
+      h('div', { class: 'party-list' },
+        opt(partyMode === 'gov', ideologyOf(gov?.ideology ?? c.pol.ideology).color, gov?.name ?? 'Gobierno actual', `En el Gobierno · ${ideologyOf(c.pol.ideology).name} · ${gov?.seats.toFixed(0) ?? '?'} % de escaños`, () => { partyMode = 'gov'; }),
+        ...c.pol.parties.filter((p) => !p.gov).map((p) => opt(partyMode === 'existing' && partyName === p.name, ideologyOf(p.ideology).color, p.name,
+          `${ideologyOf(p.ideology).name} · ${p.seats.toFixed(0)} % · ${comp ? 'acaba de ganar las elecciones' : 'toma el poder'}`, () => { partyMode = 'existing'; partyName = p.name; })),
+        opt(partyMode === 'new', DATA.ideologies[newParty.ideology]?.color ?? '#888', '✚ Fundar un partido nuevo', 'Elige nombre e ideología: tu partido irrumpe y forma Gobierno', () => { partyMode = 'new'; })),
+      partyMode === 'new' ? h('div', { class: 'card', style: 'margin-top:6px' },
+        nameInp,
+        h('select', { style: 'margin-top:6px;width:100%', 'aria-label': 'Ideología', onchange: (e: Event) => { newParty.ideology = (e.target as HTMLSelectElement).value; renderSide(); } },
+          Object.entries(DATA.ideologies).map(([id, ideo]) => h('option', { value: id, selected: id === newParty.ideology }, ideo.name))),
+        h('div', { class: 'small muted', style: 'margin-top:4px' }, ideologyDesc(newParty.ideology)),
+        h('div', { style: 'margin-top:6px' }, leaderInp)) : null,
+      h('span', { class: 'small muted' }, partyMode === 'gov' ? 'Continúas al frente del Gobierno actual.' : 'Tu ideología cambia las preferencias de los grupos sociales, las relaciones con otros países y las votaciones en el parlamento.'));
+  }
+
   renderSide();
+}
+
+function ideologyDesc(id: string): string {
+  const i = ideologyOf(id);
+  const econ = i.econ < -0.3 ? 'izquierda económica' : i.econ > 0.3 ? 'derecha económica' : 'centro económico';
+  const auth = i.auth > 0.3 ? 'autoritaria' : i.auth < -0.3 ? 'libertaria' : 'moderada';
+  return `${econ}, ${auth}${i.nat > 0.5 ? ', nacionalista' : ''}${i.relig > 0.5 ? ', religiosa' : ''}.`;
 }
 
 function difficultyHint(c: Country): string {

@@ -3,6 +3,11 @@
 Simulador de estrategia geopolítica 2D para navegador, de un jugador y por turnos (1 turno = 1 mes, desde enero de 2026).
 Diriges un país real; el resto del mundo lo gobierna una IA con personalidad, memoria y motivos explicables.
 
+Además de economía, política, diplomacia, guerra e inteligencia, puedes gobernar con tu propio partido (o con
+cualquiera de los existentes), atender las necesidades civiles de la población, dirigir la policía, combatir seis
+tipos de corrupción y el narcotráfico, diseñar o comprar tu armamento y —si te atreves— crear patógenos en un
+programa biológico secreto.
+
 ## Cómo jugar
 
 ```bash

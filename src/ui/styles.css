@@ -326,3 +326,19 @@ table.tbl tr.click:hover td { background: var(--surface-2); }
   .stepper .val { min-width: 52px; }
   .country-list { grid-template-columns: 1fr; }
 }
+
+/* F7: barras con referencia, tarjetas de diseño */
+.bar-ref { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); opacity: .7; border-radius: 1px; }
+.need-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) 90px 36px; gap: 6px; align-items: center; padding: 3px 0; cursor: help; }
+.need-row .bar { margin: 0; }
+.need-row .n { text-align: right; font-variant-numeric: tabular-nums; }
+.designer { border: 1px dashed var(--line); border-radius: 8px; padding: 8px; margin-top: 8px; }
+.designer .field { margin: 6px 0; }
+.designer input[type=text], .designer select { width: 100%; }
+.pill { display: inline-block; padding: 1px 7px; border-radius: 10px; background: var(--surface-3); font-size: 11px; margin-right: 4px; }
+.pill.bad { color: var(--critical, #d03b3b); }
+.party-list { display: flex; flex-direction: column; gap: 4px; }
+.party-list button { text-align: left; }
+.party-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.option.on { border-color: var(--accent); background: #1c2532; }
+.step-row.int { grid-template-columns: minmax(0, 1fr) auto; }

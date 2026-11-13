@@ -190,6 +190,23 @@ function baseVar(world: World, c: Country, path: string): number {
       return (r as unknown as Record<string, number>)[p[2] ?? 'prod'] ?? 0;
     }
     case 'hazard': return c.hazards[p[1]] ?? 0;
+    case 'police': return ((c.police as unknown as Record<string, number>)[p[1]]) ?? 0;
+    case 'corr': return c.corr[p[1] as keyof typeof c.corr] ?? 0;
+    case 'narco': return ((c.narco as unknown as Record<string, number>)[p[1]]) ?? 0;
+    case 'needs': return c.soc.needs[p[1]] ?? 0;
+    case 'pressure': return c.soc.pressure;
+    case 'crime': return c.police.crime;
+    case 'bio': {
+      if (p[1] === 'designs') return c.bio.designs.length;
+      if (p[1] === 'exposed') return c.bio.exposed >= 0 ? 1 : 0;
+      const v = (c.bio as unknown as Record<string, unknown>)[p[1]];
+      return typeof v === 'number' ? v : 0;
+    }
+    case 'outbreak': {
+      let s = 0;
+      for (const o of world.global.outbreaks ?? []) if (o.detected) s += o.infected[c.id] ?? 0;
+      return s;
+    }
     case 'minister': {
       const m = c.pol.ministers.find((x) => x.ministry === p[1]);
       return m ? (p[2] === 'loyalty' ? m.loyalty : m.competence) : 50;
