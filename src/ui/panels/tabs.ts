@@ -8,6 +8,7 @@ import { renderWorld } from './world';
 import { renderGovernment } from './government';
 import { renderSociety } from './society';
 import { renderDiplomacy } from './diplomacy';
+import { renderMilitar } from './militar';
 
 export interface TabDef { id: string; icon: string; name: string; short?: string; render: (app: App) => HTMLElement[]; visible?: (app: App) => boolean }
 
@@ -19,6 +20,7 @@ export const TABS: TabDef[] = [
   { id: 'gobierno', icon: '🏛', name: 'Gobierno', render: renderGovernment, visible: hasPlayer },
   { id: 'sociedad', icon: '👥', name: 'Sociedad', render: renderSociety, visible: hasPlayer },
   { id: 'diplomacia', icon: '🤝', name: 'Diplomacia', short: 'Diplom.', render: renderDiplomacy, visible: hasPlayer },
+  { id: 'militar', icon: '🎖', name: 'Defensa', render: renderMilitar, visible: hasPlayer },
   { id: 'territorio', icon: '🗺', name: 'Territorio', short: 'Territ.', render: renderTerritory, visible: hasPlayer },
   { id: 'mercado', icon: '📈', name: 'Mercado', render: renderMarket },
   { id: 'mundo', icon: '📰', name: 'Mundo', render: renderWorld },

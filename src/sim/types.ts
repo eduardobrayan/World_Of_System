@@ -392,6 +392,7 @@ export interface Front {
   kind: 'land' | 'sea';
   control: number; // % del territorio del defensor controlado por el atacante (0..100); negativo = contraofensiva en suelo atacante
   momentum: number;
+  calib?: number; // calibración de frentes que ya existían al empezar la partida
 }
 
 export interface War {

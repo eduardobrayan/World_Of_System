@@ -55,11 +55,22 @@ cientos de eventos), ~25 ms/turno.
 **Verificación F3:** tests en verde; 200 turnos estables (~270 tratados en equilibrio, sin NaN), ~50 ms/turno tras
 indexar alianzas, barreras comerciales y relaciones por turno.
 
-## F4 — Militar y guerras
-- [ ] Unidades por tipo, mantenimiento, producción, movilización, despliegues, maniobras, bloqueos
-- [ ] Guerras por frentes con ocupación regional, desgaste, coste económico, cansancio
-- [ ] Alto el fuego y paz con términos configurables; escalada nuclear
-- [ ] IU: Militar, guerras, negociación de paz, capa de conflictos, iconos de fuerzas en el mapa
+## F4 — Militar y guerras ✅
+- [x] 14 tipos de unidad, mantenimiento frente a presupuesto, reposición automática, encargos, movilización (4 niveles),
+      6 doctrinas, despliegues en aliados, maniobras, bloqueo naval, ataque limitado
+- [x] Guerras por frentes (terrestres y anfibios): fuerza asignada, logística por distancia, terreno, superioridad aérea,
+      moral, apoyo material de terceros, ventaja defensiva de quien combate en casa; ocupación regional, bajas, cansancio,
+      coste económico e inflación de guerra; aliados que intervienen (o abandonan, con memoria)
+- [x] Alto el fuego, paz con términos configurables (cesión ≤35 % de la población, reparaciones, desmilitarización,
+      abandono de alianzas, cambio de régimen), capitulación y desaparición de Estados
+- [x] Escalada nuclear en 4 niveles (rara y solo en derrota grave); el intercambio estratégico termina la partida
+- [x] IA: movilización por amenaza, intimidación, guerras de agresión raras (ventaja clara, disuasión nuclear, coste),
+      intervención en guerras de aliados y paz negociada; enfriamiento de 5 años tras una paz
+- [x] IU: pestaña Defensa, encargos por pasos, negociación de paz con probabilidad y motivos, acciones militares en el
+      panel del país, capa de conflictos con frentes animados y regiones ocupadas rayadas
+
+**Verificación F4:** tests en verde; 200 turnos con 3 semillas: la guerra ruso-ucraniana arranca calibrada en tablas,
+1–2 guerras simultáneas, paces negociadas, sin escalada nuclear catastrófica ni colapsos.
 
 ## F5 — Inteligencia, tecnología, objetivos, fin de partida, guardado
 - [ ] Operaciones encubiertas con riesgo de descubrimiento; información incierta

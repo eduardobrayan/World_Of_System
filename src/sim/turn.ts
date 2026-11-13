@@ -18,6 +18,7 @@ import { ensureHandlers } from './registry';
 import { aiTurn } from './ai';
 import { updateRelations, updateTreaties, resolveResolutions, autoResolutions } from './diplomacy';
 import { expireProposals } from './diplohandlers';
+import { updateWars } from './war';
 
 export function advanceTurn(world: World) {
   if (world.gameOver) return;
@@ -40,6 +41,8 @@ export function advanceTurn(world: World) {
   applyAidFlows(world);
   updateTradeAccess(world);
   updateMarket(world);
+  updateWars(world);
+  if (world.gameOver) return;
 
   for (const id of ids) {
     const c = world.countries[id];

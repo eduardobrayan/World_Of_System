@@ -2273,5 +2273,377 @@
   "ai": {
    "utility": "0"
   }
+ },
+ {
+  "id": "movilizar",
+  "name": "Aumentar la movilización",
+  "category": "militar",
+  "target": "none",
+  "desc": "Llama a reservistas: más poder terrestre a cambio de coste económico y malestar social.",
+  "requires": [
+   {
+    "expr": "mil.mobilization < 3",
+    "text": "Ya estás en movilización total"
+   }
+  ],
+  "parliament": false,
+  "cost": {
+   "ap": 1
+  },
+  "handler": "mobilize",
+  "params": {
+   "delta": 1,
+   "auth": 0.3
+  },
+  "risks": [
+   "Coste económico y descontento de jóvenes y trabajadores"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "desmovilizar",
+  "name": "Reducir la movilización",
+  "category": "militar",
+  "target": "none",
+  "desc": "Devuelve reservistas a la vida civil.",
+  "requires": [
+   {
+    "expr": "mil.mobilization > 0",
+    "text": "No hay movilización"
+   }
+  ],
+  "cost": {
+   "ap": 1
+  },
+  "handler": "mobilize",
+  "params": {
+   "delta": -1
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "producir_unidades",
+  "name": "Encargar unidades",
+  "category": "militar_prod",
+  "target": "none",
+  "desc": "Encarga nuevas unidades a la industria de defensa. Se pagan durante la fabricación.",
+  "requires": [],
+  "cost": {
+   "ap": 0
+  },
+  "handler": "produce",
+  "params": {},
+  "hidden": true,
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "desplegar",
+  "name": "Desplegar tropas en un aliado",
+  "category": "militar",
+  "target": "foreign",
+  "desc": "Destaca el 10 % de tu ejército de tierra: refuerza su defensa y disuade a sus enemigos.",
+  "targetRequires": [
+   {
+    "expr": "allied",
+    "text": "Solo en países aliados"
+   }
+  ],
+  "cost": {
+   "ap": 2
+  },
+  "handler": "deploy",
+  "params": {
+   "share": 0.1
+  },
+  "incident": {
+   "kind": "despliegue",
+   "magnitude": 1
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "retirar_tropas",
+  "name": "Retirar tropas desplegadas",
+  "category": "militar",
+  "target": "foreign",
+  "desc": "Repliega tus fuerzas desplegadas en este país.",
+  "cost": {
+   "ap": 1
+  },
+  "handler": "deploy",
+  "params": {
+   "share": 0
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "maniobras",
+  "name": "Maniobras militares en la frontera",
+  "category": "militar",
+  "target": "foreign",
+  "desc": "Demostración de fuerza: intimida y disuade, pero tensa la relación.",
+  "requires": [],
+  "cost": {
+   "ap": 1,
+   "money": "gdp * 0.0003"
+  },
+  "cooldown": 6,
+  "handler": "maneuvers",
+  "params": {},
+  "incident": {
+   "kind": "maniobras",
+   "magnitude": 2
+  },
+  "risks": [
+   "Escalada",
+   "El objetivo se rearmará y buscará aliados"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "bloqueo_naval",
+  "name": "Bloqueo naval",
+  "category": "militar",
+  "target": "foreign",
+  "desc": "Cierra sus rutas marítimas durante la guerra: su comercio exterior se desploma.",
+  "targetRequires": [
+   {
+    "expr": "atWarWith",
+    "text": "Solo contra un enemigo en guerra"
+   },
+   {
+    "expr": "mil.navalPower > target.mil.navalPower * 1.3",
+    "text": "Necesitas superioridad naval (×1,3)"
+   }
+  ],
+  "cost": {
+   "ap": 2
+  },
+  "handler": "blockade",
+  "params": {},
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "declarar_guerra",
+  "name": "Declarar la guerra",
+  "category": "militar",
+  "target": "foreign",
+  "desc": "Inicia una guerra. Sus aliados pueden intervenir; la comunidad internacional reaccionará.",
+  "requires": [],
+  "targetRequires": [
+   {
+    "expr": "!atWarWith",
+    "text": "Ya estáis en guerra"
+   },
+   {
+    "expr": "!allied",
+    "text": "No puedes atacar a un aliado"
+   }
+  ],
+  "cost": {
+   "ap": 3
+  },
+  "handler": "declare_war",
+  "params": {
+   "goal": "territory"
+  },
+  "risks": [
+   "Sanciones y condena internacional",
+   "Intervención de sus aliados",
+   "Escalada nuclear si es una potencia nuclear",
+   "Cansancio de guerra y crisis económica"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "ataque_limitado",
+  "name": "Ataque limitado",
+  "category": "militar",
+  "target": "foreign",
+  "desc": "Bombardeo selectivo de objetivos militares e infraestructuras sin invasión.",
+  "requires": [],
+  "targetRequires": [
+   {
+    "expr": "!allied",
+    "text": "No puedes atacar a un aliado"
+   }
+  ],
+  "cost": {
+   "ap": 2,
+   "money": "gdp * 0.001"
+  },
+  "cooldown": 6,
+  "handler": "strike",
+  "params": {},
+  "incident": {
+   "kind": "guerra",
+   "magnitude": 2
+  },
+  "risks": [
+   "Puede desencadenar una guerra abierta",
+   "Condena internacional"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "alerta_nuclear",
+  "name": "Elevar la alerta nuclear",
+  "category": "militar",
+  "target": "none",
+  "desc": "Señal de disuasión extrema. Aumenta la tensión mundial y aleja a todos los países.",
+  "requires": [
+   {
+    "expr": "nuclear",
+    "text": "Requiere armas nucleares"
+   },
+   {
+    "expr": "mil.nuclearPosture < 2",
+    "text": "Nivel máximo de alerta sin uso"
+   }
+  ],
+  "cost": {
+   "ap": 2
+  },
+  "handler": "nuclear",
+  "params": {
+   "delta": 1
+  },
+  "risks": [
+   "Pérdida masiva de reputación y relaciones",
+   "Escalada incontrolable"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "uso_nuclear_tactico",
+  "name": "Emplear armas nucleares tácticas",
+  "category": "militar",
+  "target": "none",
+  "desc": "Uso de armas nucleares en el campo de batalla. Consecuencias imprevisibles.",
+  "requires": [
+   {
+    "expr": "nuclear",
+    "text": "Requiere armas nucleares"
+   },
+   {
+    "expr": "atWar",
+    "text": "Solo en guerra"
+   },
+   {
+    "expr": "mil.nuclearPosture >= 2",
+    "text": "Primero eleva la alerta nuclear"
+   }
+  ],
+  "cost": {
+   "ap": 4
+  },
+  "handler": "nuclear",
+  "params": {
+   "delta": 1
+  },
+  "risks": [
+   "Puede provocar un intercambio nuclear global (fin de la partida)",
+   "Aislamiento total"
+  ],
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "bajar_alerta",
+  "name": "Rebajar la alerta nuclear",
+  "category": "militar",
+  "target": "none",
+  "desc": "Vuelve a una postura nuclear normal.",
+  "requires": [
+   {
+    "expr": "mil.nuclearPosture > 0",
+    "text": "No hay alerta"
+   }
+  ],
+  "cost": {
+   "ap": 1
+  },
+  "handler": "nuclear",
+  "params": {
+   "delta": -1
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "programa_nuclear",
+  "name": "Programa de armas nucleares",
+  "category": "militar",
+  "target": "none",
+  "desc": "Desarrolla un arsenal nuclear en 5 años. Varias potencias lo consideran una línea roja.",
+  "requires": [
+   {
+    "expr": "!nuclear",
+    "text": "Ya tienes armas nucleares"
+   },
+   {
+    "expr": "tech.level >= 45",
+    "text": "Requiere nivel tecnológico 45"
+   },
+   {
+    "expr": "flags.programa_nuclear == 0",
+    "text": "Ya en marcha"
+   }
+  ],
+  "cost": {
+   "ap": 3,
+   "money": "gdp * 0.01"
+  },
+  "handler": "nuke_program",
+  "params": {},
+  "risks": [
+   "Sanciones y posibles ataques preventivos",
+   "Línea roja para Israel y Estados Unidos"
+  ],
+  "incident": {
+   "kind": "amenaza",
+   "magnitude": 2
+  },
+  "ai": {
+   "utility": "0"
+  }
+ },
+ {
+  "id": "cambiar_doctrina",
+  "name": "Cambiar la doctrina militar",
+  "category": "militar_doc",
+  "target": "none",
+  "desc": "Reorganiza las fuerzas según una doctrina distinta.",
+  "hidden": true,
+  "cost": {
+   "ap": 2
+  },
+  "handler": "doctrine",
+  "params": {},
+  "ai": {
+   "utility": "0"
+  }
  }
 ]

@@ -321,9 +321,9 @@ export class MapView {
     const pat = this.hatchPattern();
     for (const id of W.order) {
       const c = W.countries[id];
-      const foreign = c.regions.filter((r) => r.controller !== c.id || r.owner !== c.id);
-      if (!foreign.length) continue;
       const origin = (r: typeof c.regions[number]) => r.id.slice(0, r.id.lastIndexOf('_'));
+      const foreign = c.regions.filter((r) => r.controller !== c.id || r.owner !== c.id || origin(r) !== c.id);
+      if (!foreign.length) continue;
       for (const r of foreign) {
         const orig = W.countries[origin(r)] ?? c;
         const occ = W.countries[r.controller] ?? c;

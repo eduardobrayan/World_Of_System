@@ -201,7 +201,7 @@ export function decideProposal(world: World, from: Country, to: Country, kind: s
 
 // ---------- Decisiones de la IA ----------
 
-interface Candidate { def: ActionDef; ctx: ActionCtx; utility: number; factors: Factor[]; text: string }
+export interface Candidate { def: ActionDef; ctx: ActionCtx; utility: number; factors: Factor[]; text: string }
 
 type Generator = (world: World, c: Country, rng: Rng, out: Candidate[]) => void;
 const GENERATORS: Generator[] = [];

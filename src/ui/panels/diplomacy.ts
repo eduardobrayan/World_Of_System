@@ -8,6 +8,7 @@ import { relOp, relTrust, allied } from '../../sim/vars';
 import { answerProposal, DEMANDS } from '../../sim/diplohandlers';
 import { RESOLUTION_KINDS, TREATY_NAMES } from '../../sim/diplomacy';
 import { ACTION_BY_ID } from '../../sim/actions';
+import { acceptPeaceProposal } from '../../sim/war';
 import { openAction } from '../actionui';
 import { dateLabel } from '../../sim/util';
 import { divColor } from '../layers';
@@ -24,6 +25,15 @@ export function renderDiplomacy(app: App): HTMLElement[] {
   out.push(section(`Propuestas recibidas (${props.length})`, props.length ? h('div', { class: 'list' }, props.map((p) => {
     const from = w.countries[p.from];
     const isUlt = p.kind === 'ultimatum';
+    if (p.kind === 'peace') {
+      const war = w.wars.find((x) => x.id === p.terms.war);
+      return h('div', { class: 'item' },
+        h('div', { class: 'row' }, flagEl(from, 18, 12), h('b', null, from.name), h('span', { class: 'tag amber' }, 'Oferta de paz')),
+        h('div', { class: 'small' }, `${war?.name ?? 'Guerra'}${p.terms.cede ? ' · exige quedarse con el territorio ocupado' : ' · paz blanca'}${p.terms.reparations ? ' · y reparaciones' : ''}`),
+        h('div', { class: 'row', style: 'margin-top:4px' },
+          h('button', { class: 'btn sm primary', onclick: () => { toast(acceptPeaceProposal(w, p.id, true), 'good'); app.refresh(); } }, 'Aceptar la paz'),
+          h('button', { class: 'btn sm', onclick: () => { toast(acceptPeaceProposal(w, p.id, false)); app.refresh(); } }, 'Rechazar')));
+    }
     return h('div', { class: 'item' },
       h('div', { class: 'row' }, flagEl(from, 18, 12), h('b', null, from.name), isUlt ? h('span', { class: 'tag red' }, 'Ultimátum') : null),
       h('div', { class: 'small' }, isUlt ? `Exige: ${DEMANDS[String(p.terms.demand)] ?? p.terms.demand}. Si te niegas tendrá un casus belli.` : `Propone: ${TREATY_NAMES[String(p.terms.type)] ?? p.text}`),
