@@ -29,7 +29,9 @@ export function renderTopbar(app: App): HTMLElement[] {
   out.push(h('div', { class: 'speed' }, sp(0, '⏸', 'Pausa (barra espaciadora)'), sp(1, '1×', 'Velocidad normal (tecla 1)'), sp(2, '2×', 'Rápida (tecla 2)'), sp(3, '3×', 'Muy rápida (tecla 3)')));
   if (p) {
     const strip = h('div', { class: 'ind-strip' });
-    for (const [k, hk] of KEYS) {
+    // Vista sencilla: cuatro cifras; con «Avanzado» abierto en el panel de mando, todas
+    const keys = app.ui.cmdAdvanced ? KEYS : KEYS.filter(([k]) => ['gdp', 'growth', 'inflation', 'approval'].includes(k));
+    for (const [k, hk] of keys) {
       const ind = IND[k];
       const d = hk ? delta(p, hk, 1) : undefined;
       const good = d !== undefined && (d > 0) === (ind.better !== 'down');

@@ -5,6 +5,7 @@ import { DATA } from '../sim/data';
 import { h, modal, toast } from './dom';
 import type { App } from './app';
 import { flushNewsToasts } from './hooks';
+import { actionFx } from './fx';
 
 export function effectLines(lines: EffectLine[]): HTMLElement {
   if (!lines.length) return h('div', { class: 'muted small' }, 'Sin efectos directos cuantificables.');
@@ -43,6 +44,7 @@ export function openAction(app: App, def: ActionDef, ctx: Omit<ActionCtx, 'actor
         const res = executeAction(app.world, def, full);
         toast(res.text, res.ok && res.passed ? 'good' : 'bad');
         close();
+        if (res.ok) actionFx(app, def, ctx.target, res.passed);
         flushNewsToasts(app);
         after?.();
         app.refresh();

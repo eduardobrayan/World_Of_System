@@ -1,40 +1,91 @@
-/** Tutorial breve: pasos que explican la interfaz y los sistemas clave. */
+/**
+ * Guía interactiva de los primeros minutos: resalta dónde mirar o hacer clic, con frases cortas.
+ * Algunos pasos esperan a que el jugador haga algo (p. ej. elegir un país en el mapa).
+ * El reloj se detiene mientras dura la guía.
+ */
 import type { App } from './app';
-import { h, modal } from './dom';
+import { h } from './dom';
 
-const STEPS: { title: string; text: string; tab?: string }[] = [
-  { title: 'Bienvenido al gobierno', text: 'Diriges un país real desde enero de 2026 y el tiempo corre solo: los días avanzan y el mundo se actualiza cada mes. Tus decisiones tienen efectos inmediatos, retardados y a veces ocultos, y el resto del mundo reacciona a ellas.' },
-  { title: 'La barra superior', text: 'Muestra la fecha (con los días corriendo), la velocidad del tiempo (pausa con la barra espaciadora; velocidades 1, 2 y 3 con esas teclas) y tus indicadores clave. Pasa el ratón por cualquier indicador para ver qué lo está modificando ahora mismo. ⚡ es tu capital político: lo gastas en cada acción y se recarga cada mes (más si eres popular).' },
-  { title: 'El mapa', text: 'Haz clic en un país para ver sus datos (con "≈" si tu información es aproximada) y actuar sobre él. Doble clic abre su mapa local con regiones, ciudades y obras. Cambia de capa (alianzas, relaciones, renta, estabilidad, conflictos…) con los botones superiores.' },
-  { title: 'Economía', text: 'Ajusta el presupuesto y los impuestos con los botones de paso y usa la previsión a 12 meses para ver el efecto antes de aprobarlo. El parlamento puede rechazarlo si no tienes mayoría.', tab: 'economia' },
-  { title: 'Gobierno y sociedad', text: 'Cambia políticas, aprueba leyes y nombra ministros. Seis grupos sociales (trabajadores, empresarios, militares, jóvenes, religiosos y minorías) reaccionan a todo. Su apoyo decide tu aprobación; su influencia, tu estabilidad. Si pierdes las elecciones, un golpe o una revolución, la partida termina.', tab: 'gobierno' },
-  { title: 'Diplomacia e IA', text: 'Cada país tiene personalidad y memoria: recuerda tus ayudas, amenazas y traiciones. Antes de proponer algo verás su probabilidad de aceptar y los motivos. En el registro de la IA puedes leer por qué cada país tomó sus decisiones.', tab: 'diplomacia' },
-  { title: 'Sociedad y seguridad', text: 'En Sociedad verás las necesidades civiles (alimentación, vivienda, energía, empleo…): si caen por debajo de lo habitual, crece la presión social. En Seguridad gestionas la policía, seis tipos de corrupción y el narcotráfico.', tab: 'seguridad' },
-  { title: 'Defensa', text: 'Gestiona fuerzas, movilización y despliegues. Las guerras se resuelven por frentes: logística, terreno, moral, tecnología y aliados cuentan. Negocia la paz con las condiciones que quieras. La escalada nuclear es posible… y catastrófica. En Armamento diseñas o compras tus propias armas, y existe la tentación de un programa secreto de armas biológicas.', tab: 'militar' },
-  { title: 'Inteligencia, tecnología y objetivos', text: 'Lanza operaciones encubiertas (con riesgo de ser descubierto), elige investigaciones y vigila tu objetivo de partida. Los acontecimientos pueden sugerirte cambiar de objetivo. Guarda la partida desde el menú ☰.', tab: 'objetivos' },
-  { title: 'Eventos', text: 'Los asuntos críticos detienen el reloj y abren una ventana con varias opciones. Los demás llegan a la bandeja inferior: tienes un mes para decidir o tu gabinete elegirá por ti. Tus acciones se aplican al instante. Al cerrar el tutorial, el tiempo empieza a correr.' },
+interface Step {
+  sel: string; // elemento que se resalta
+  title: string;
+  text: string;
+  before?: (app: App) => void;
+  waitFor?: (app: App) => boolean; // el paso avanza solo cuando se cumple
+}
+
+const KEY = 'wos:guia';
+
+const STEPS: Step[] = [
+  { sel: '.cmd-gauges', title: 'Tu panel de mando', text: 'Seis medidores: verde va bien, amarillo regular, rojo mal. La flecha dice si sube o baja.',
+    before: (app) => { app.setTab('mando'); } },
+  { sel: '.advisors', title: 'Tus consejeros', text: 'Te dicen lo más urgente. Pulsa su botón y actúas en un clic.' },
+  { sel: '.topbar .speed', title: 'El tiempo corre solo', text: 'Barra espaciadora: pausa. Teclas 1, 2 y 3: velocidad.' },
+  { sel: 'main.center', title: 'Elige un país', text: 'Haz clic en cualquier país del mapa (no el tuyo).',
+    before: (app) => { app.root.classList.remove('show-left'); },
+    waitFor: (app) => !!app.selected && app.selected !== app.player?.id },
+  { sel: '.quick-actions', title: 'Actúa sobre él', text: 'Comerciar, aliarte, ayudar, sancionar, espiar o atacar. Verás el efecto en el mapa.',
+    before: (app) => { app.root.classList.add('show-right'); app.root.classList.remove('right-collapsed'); } },
+  { sel: 'nav.tabs-v', title: 'Todo lo demás', text: 'Aquí está el detalle, en cinco secciones: gobierno, sociedad, mundo, ejército y tecnología.',
+    before: (app) => { app.root.classList.remove('show-right'); app.root.classList.add('show-left'); } },
 ];
 
 export function showTutorial(app: App, step = 0) {
   const s = STEPS[step];
-  if (s.tab) app.setTab(s.tab);
+  if (!s) return;
+  s.before?.(app);
   app.modalOpen++;
-  let close = () => undefined as void;
-  close = modal({
-    title: s.title, kicker: `Tutorial ${step + 1}/${STEPS.length}`, onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); },
-    body: h('p', { style: 'font-size:15px' }, s.text),
-    footer: [
-      h('button', { class: 'btn ghost', onclick: () => { close(); try { localStorage.setItem('wos:tutorial', 'visto'); } catch { /* sin almacenamiento */ } } }, 'Saltar tutorial'),
-      step > 0 ? h('button', { class: 'btn', onclick: () => { close(); showTutorial(app, step - 1); } }, '◀ Anterior') : null,
-      step < STEPS.length - 1
-        ? h('button', { class: 'btn primary', onclick: () => { close(); showTutorial(app, step + 1); } }, 'Siguiente ▶')
-        : h('button', { class: 'btn primary', onclick: () => { close(); try { localStorage.setItem('wos:tutorial', 'visto'); } catch { /* sin almacenamiento */ } } }, '¡A gobernar!'),
-    ],
+  const spot = h('div', { class: 'coach-spot pulse' });
+  const next = h('button', { class: 'btn primary sm' }, step < STEPS.length - 1 ? 'Siguiente ▶' : '¡A gobernar!');
+  const tipEl = h('div', { class: 'coach-tip', role: 'dialog', 'aria-live': 'polite' },
+    h('div', { class: 'k' }, `Guía ${step + 1}/${STEPS.length}`),
+    h('b', null, s.title), h('div', { style: 'margin-top:4px' }, s.text),
+    h('div', { class: 'row' },
+      h('button', { class: 'btn ghost sm', onclick: () => { done(); remember(); } }, 'Saltar'),
+      s.waitFor ? h('span', { class: 'small muted' }, 'Esperando tu clic…') : next));
+  document.body.append(spot, tipEl);
+  let raf = 0, ended = false;
+  const place = () => {
+    const el = document.querySelector<HTMLElement>(s.sel);
+    const r = el?.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (r && r.width > 0) {
+      spot.style.display = 'block';
+      Object.assign(spot.style, { left: `${r.left - 4}px`, top: `${r.top - 4}px`, width: `${r.width + 8}px`, height: `${r.height + 8}px` });
+      const tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+      // Junto al elemento: a la derecha si cabe; si no, debajo o encima
+      let x = r.right + 14, y = r.top;
+      if (x + tw > vw - 8) { x = Math.min(Math.max(8, r.left), vw - tw - 8); y = r.bottom + 12; if (y + th > vh - 8) y = Math.max(8, r.top - th - 12); }
+      if (r.height > vh * 0.6 && x + tw <= vw - 8) y = Math.max(8, Math.min(r.top + 40, vh - th - 8));
+      Object.assign(tipEl.style, { left: `${x}px`, top: `${Math.min(Math.max(8, y), vh - th - 8)}px` });
+    } else {
+      spot.style.display = 'none';
+      Object.assign(tipEl.style, { left: `${Math.max(8, (vw - tipEl.offsetWidth) / 2)}px`, top: `${vh * 0.3}px` });
+    }
+    if (s.waitFor?.(app)) { done(); setTimeout(() => showTutorial(app, step + 1), 350); return; }
+    if (!ended) raf = requestAnimationFrame(place);
+  };
+  const done = () => {
+    if (ended) return;
+    ended = true;
+    cancelAnimationFrame(raf);
+    spot.remove(); tipEl.remove();
+    app.modalOpen = Math.max(0, app.modalOpen - 1);
+  };
+  next.addEventListener('click', () => {
+    done();
+    if (step < STEPS.length - 1) showTutorial(app, step + 1);
+    else { remember(); app.root.classList.remove('show-left'); }
   });
+  raf = requestAnimationFrame(place);
+}
+
+function remember() {
+  try { localStorage.setItem(KEY, 'visto'); } catch { /* sin almacenamiento */ }
 }
 
 export function maybeShowTutorial(app: App) {
   let seen = false;
-  try { seen = localStorage.getItem('wos:tutorial') === 'visto'; } catch { seen = false; }
-  if (!seen && app.player) setTimeout(() => showTutorial(app), 600);
+  try { seen = localStorage.getItem(KEY) === 'visto'; } catch { seen = false; }
+  if (!seen && app.player) setTimeout(() => showTutorial(app, 0), 600);
 }

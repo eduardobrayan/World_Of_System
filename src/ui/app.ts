@@ -6,13 +6,14 @@ import { MapView, type MapHost } from './map';
 import { renderTopbar } from './panels/topbar';
 import { renderBottom } from './panels/bottom';
 import { renderRight } from './panels/right';
-import { TABS } from './panels/tabs';
+import { TABS, SECTIONS, SECTION_OF } from './panels/tabs';
 import { LAYERS, LOCAL_LAYERS } from './layers';
 import { flagEl } from './flags';
 import { perceived, approxMark } from './perceive';
 import { fmtMoney } from '../sim/util';
 import { hookAfterTurn, hookBeforeTurn } from './hooks';
 import { liveTick } from './live';
+import { markMonth, monthFx } from './fx';
 
 /** Duración real (ms) de un mes de juego en cada velocidad (0 = pausa). */
 export const SPEEDS = [0, 6000, 2600, 1000];
@@ -25,7 +26,7 @@ export class App implements MapHost {
   localLayer = 'development';
   view: 'world' | 'local' = 'world';
   localId: Id | null = null;
-  tab = 'resumen';
+  tab = 'mando';
   speed = 1; // el tiempo corre solo desde el inicio
   lastSpeed = 1; // para reanudar con la barra espaciadora
   dayProgress = 0;
@@ -104,11 +105,11 @@ export class App implements MapHost {
   renderAll() {
     const scroll = this.leftBody.scrollTop;
     mount(this.topEl, renderTopbar(this));
-    mount(this.tabsEl, TABS.filter((t) => !t.visible || t.visible(this)).map((t) =>
-      h('button', { class: this.tab === t.id ? 'on' : '', title: t.name, onclick: () => this.setTab(t.id) },
-        h('span', { class: 'ic' }, t.icon), t.short ?? t.name)));
-    const tab = TABS.find((t) => t.id === this.tab) ?? TABS[0];
-    mount(this.leftBody, tab.render(this));
+    const sec = SECTION_OF[this.tab];
+    mount(this.tabsEl, this.visibleSections().map((s) =>
+      h('button', { class: sec?.id === s.id ? 'on' : '', title: s.name, onclick: () => this.openSection(s.id) },
+        h('span', { class: 'ic' }, s.icon), s.short)));
+    mount(this.leftBody, ...this.renderTab());
     this.leftBody.scrollTop = scroll;
     mount(this.rightEl, renderRight(this));
     mount(this.bottomEl, renderBottom(this));
@@ -119,8 +120,7 @@ export class App implements MapHost {
   /** Refresca solo el panel izquierdo (p. ej. tras mover un control). */
   refreshLeft() {
     const scroll = this.leftBody.scrollTop;
-    const tab = TABS.find((t) => t.id === this.tab) ?? TABS[0];
-    mount(this.leftBody, tab.render(this));
+    mount(this.leftBody, ...this.renderTab());
     this.leftBody.scrollTop = scroll;
   }
 
@@ -212,7 +212,39 @@ export class App implements MapHost {
   }
 
   // ---------- Navegación ----------
+  private tabVisible(id: string): boolean {
+    const t = TABS.find((x) => x.id === id);
+    return !!t && (!t.visible || t.visible(this));
+  }
+
+  visibleSections() {
+    return SECTIONS.filter((s) => s.tabs.some((t) => this.tabVisible(t)));
+  }
+
+  /** Contenido del panel izquierdo: subpestañas (si la sección tiene varias) + la pestaña activa. */
+  private renderTab(): HTMLElement[] {
+    const tab = TABS.find((t) => t.id === this.tab && this.tabVisible(t.id)) ?? TABS[0];
+    const sec = SECTION_OF[tab.id];
+    const subs = sec ? sec.tabs.filter((t) => this.tabVisible(t)) : [];
+    const bar = subs.length > 1
+      ? h('div', { class: 'subtabs', role: 'tablist', 'aria-label': sec!.name }, subs.map((id) => {
+        const t = TABS.find((x) => x.id === id)!;
+        return h('button', { class: id === tab.id ? 'on' : '', role: 'tab', 'aria-selected': String(id === tab.id), onclick: () => this.setTab(id) }, `${t.icon} ${t.short ?? t.name}`);
+      }))
+      : null;
+    return bar ? [bar, ...tab.render(this)] : tab.render(this);
+  }
+
+  openSection(id: string) {
+    const s = SECTIONS.find((x) => x.id === id);
+    if (!s) return;
+    const last = (this.ui.sectionTab as Record<string, string> | undefined)?.[id];
+    this.setTab(last && this.tabVisible(last) ? last : s.tabs.find((t) => this.tabVisible(t)) ?? s.tabs[0]);
+  }
+
   setTab(id: string) {
+    const sec = SECTION_OF[id];
+    if (sec) ((this.ui.sectionTab ??= {}) as Record<string, string>)[sec.id] = id;
     this.tab = id;
     this.root.classList.add('show-left');
     this.refresh();
@@ -259,8 +291,10 @@ export class App implements MapHost {
     if (!hookBeforeTurn(this)) { this.refresh(); return; } // asunto crítico abierto: el reloj espera
     this.dayProgress = 0;
     this.busy = true;
+    const mark = markMonth(this.world, this.player);
     try {
       advanceTurn(this.world);
+      monthFx(this, mark);
     } catch (e) {
       console.error(e);
       toast(`Error en la simulación: ${(e as Error).message}`, 'bad', 8000);

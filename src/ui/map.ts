@@ -30,6 +30,8 @@ interface View { cx: number; cy: number; s: number }
 const OCEAN = '#0f1a26';
 const BORDER = 'rgba(10,12,16,0.85)';
 
+export interface Fx { kind: 'pulse' | 'arrow' | 'boom' | 'float' | 'cloud'; a: Id; b?: Id; text?: string; color: string; dashed?: boolean; offset?: number; t0: number; dur: number }
+
 export class MapView {
   private ctx: CanvasRenderingContext2D;
   private v: View = { cx: 10, cy: 20, s: 3 };
@@ -51,7 +53,7 @@ export class MapView {
     // Animación continua (frentes, tropas en marcha, brotes): ~30 fps mientras haya algo que mover
     const loop = () => {
       this.pulse = (this.pulse + 1) % 3600;
-      if (this.dirty || (this.pulse % 2 === 0 && this.animating())) this.render();
+      if (this.dirty || (this.animating() && (this.fx.length || this.pulse % 2 === 0))) this.render();
       this.raf = requestAnimationFrame(loop);
     };
     this.raf = requestAnimationFrame(loop);
@@ -63,7 +65,83 @@ export class MapView {
   /** Posición animada de cada frente (fracción del trayecto defensor → atacante), interpolada entre meses. */
   private frontPos: Record<string, number> = {};
 
+  // ---------- Efectos visuales transitorios (respuesta a acciones y sucesos) ----------
+  private fx: Fx[] = [];
+
+  /** Lanza un efecto: pulso, flecha entre países, explosión, nube de contagio o texto flotante. */
+  addFx(f: Omit<Fx, 't0' | 'dur'> & { dur?: number; delay?: number }) {
+    this.fx.push({ ...f, t0: performance.now() + (f.delay ?? 0), dur: f.dur ?? (f.kind === 'arrow' ? 1900 : f.kind === 'float' ? 2200 : 1600) });
+    if (this.fx.length > 40) this.fx.splice(0, this.fx.length - 40);
+    this.invalidate();
+  }
+
+  private drawFx(dpr: number) {
+    if (!this.fx.length) return;
+    const ctx = this.ctx;
+    const now = performance.now();
+    this.fx = this.fx.filter((f) => now - f.t0 < f.dur);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (const f of this.fx) {
+      const k = (now - f.t0) / f.dur;
+      if (k < 0) continue;
+      const [x, y] = this.toScreen(...labelPoint(f.a));
+      ctx.save();
+      if (f.kind === 'pulse') {
+        for (let i = 0; i < 3; i++) {
+          const kk = k * 1.3 - i * 0.18;
+          if (kk <= 0 || kk >= 1) continue;
+          ctx.beginPath(); ctx.arc(x, y, 6 + kk * 46, 0, Math.PI * 2);
+          ctx.strokeStyle = f.color; ctx.globalAlpha = 1 - kk; ctx.lineWidth = 3; ctx.stroke();
+        }
+      } else if (f.kind === 'arrow' && f.b) {
+        const [x2, y2] = this.toScreen(...labelPoint(f.b));
+        const dx = x2 - x, dy = y2 - y, len = Math.hypot(dx, dy) || 1;
+        const cx = (x + x2) / 2 - (dy / len) * len * 0.22, cy = (y + y2) / 2 + (dx / len) * len * 0.22;
+        const prog = Math.min(1, k * 1.6);
+        const pt = (t: number) => [(1 - t) * (1 - t) * x + 2 * (1 - t) * t * cx + t * t * x2, (1 - t) * (1 - t) * y + 2 * (1 - t) * t * cy + t * t * y2];
+        ctx.globalAlpha = k > 0.75 ? (1 - k) / 0.25 : 1;
+        ctx.strokeStyle = f.color; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        if (f.dashed) ctx.setLineDash([6, 6]);
+        ctx.beginPath(); ctx.moveTo(x, y);
+        for (let i = 1; i <= 24; i++) { const [px, py] = pt((i / 24) * prog); ctx.lineTo(px, py); }
+        ctx.stroke(); ctx.setLineDash([]);
+        const [hx, hy] = pt(prog);
+        ctx.beginPath(); ctx.arc(hx, hy, 6, 0, Math.PI * 2); ctx.fillStyle = f.color; ctx.fill();
+        if (prog >= 1) { ctx.beginPath(); ctx.arc(x2, y2, 6 + (k - 0.62) * 60, 0, Math.PI * 2); ctx.globalAlpha *= 0.6; ctx.stroke(); }
+      } else if (f.kind === 'boom') {
+        ctx.globalAlpha = 1 - k;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 10 + k * 34);
+        g.addColorStop(0, 'rgba(255,240,180,0.95)'); g.addColorStop(0.5, 'rgba(255,140,40,0.7)'); g.addColorStop(1, 'rgba(200,40,20,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 10 + k * 34, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffb347'; ctx.lineWidth = 2;
+        for (let i = 0; i < 12; i++) {
+          const ang = (i / 12) * Math.PI * 2 + (f.a.charCodeAt(0) % 5);
+          const r0 = 8 + k * 20, r1 = 14 + k * 46;
+          ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * r0, y + Math.sin(ang) * r0); ctx.lineTo(x + Math.cos(ang) * r1, y + Math.sin(ang) * r1); ctx.stroke();
+        }
+      } else if (f.kind === 'cloud') {
+        for (let i = 0; i < 6; i++) {
+          const ang = (i / 6) * Math.PI * 2 + k * 1.5;
+          const r = 10 + k * 26;
+          const px = x + Math.cos(ang) * r, py = y + Math.sin(ang) * r * 0.6;
+          const g = ctx.createRadialGradient(px, py, 0, px, py, 18 + k * 18);
+          g.addColorStop(0, f.color); g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.globalAlpha = (1 - k) * 0.7; ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(px, py, 18 + k * 18, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (f.kind === 'float' && f.text) {
+        ctx.globalAlpha = k < 0.15 ? k / 0.15 : 1 - Math.max(0, (k - 0.6) / 0.4);
+        ctx.font = '700 15px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const yy = y - 18 - k * 42 + (f.offset ?? 0);
+        ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(10,12,16,0.85)'; ctx.strokeText(f.text, x, yy);
+        ctx.fillStyle = f.color; ctx.fillText(f.text, x, yy);
+      }
+      ctx.restore();
+    }
+  }
+
   private animating(): boolean {
+    if (this.fx.length) return true;
     if (this.reducedMotion || this.host.view === 'local') return false;
     const W = this.host.world;
     return W.wars.length > 0 || this.visibleOutbreaks().length > 0;
@@ -352,6 +430,7 @@ export class MapView {
     if (this.host.layer === 'conflictos' || world.wars.length) this.drawFronts();
     if (!this.reducedMotion) this.drawOutbreakPulses();
     this.drawLabels(dpr);
+    this.drawFx(dpr);
   }
 
   private drawOccupation(world: boolean) {
