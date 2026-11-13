@@ -407,3 +407,11 @@ details.adv[open] > summary { border-bottom: 1px solid var(--line); margin-botto
   .coach-tip { max-width: calc(100vw - 24px); }
 }
 @media (prefers-reduced-motion: reduce) { .coach-spot.pulse { animation: none; } .gauge { transition: none; } }
+
+/* Etiqueta encima del control (antes se truncaba: «D…», «Ed…») */
+.step-row { grid-template-columns: auto 46px minmax(0, 1fr); row-gap: 1px; }
+.step-row > label { grid-column: 1 / -1; white-space: normal; }
+.step-row.int { grid-template-columns: minmax(0, 1fr) auto; }
+.step-row.int > label { grid-column: auto; }
+@media (max-width: 560px) { .step-row { grid-template-columns: auto 40px minmax(0, 1fr); } }
+@media (max-width: 560px) { .topbar .date { white-space: nowrap; font-size: 11.5px; } }

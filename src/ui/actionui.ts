@@ -42,9 +42,11 @@ export function openAction(app: App, def: ActionDef, ctx: Omit<ActionCtx, 'actor
       h('button', { class: 'btn', onclick: () => close() }, 'Cancelar'),
       h('button', { class: 'btn primary', disabled: !p.ok, onclick: () => {
         const res = executeAction(app.world, def, full);
-        toast(res.text, res.ok && res.passed ? 'good' : 'bad');
+        // Una propuesta enviada pero rechazada por el otro país también cuenta como «no»
+        const yes = res.ok && res.passed && !/\brechaza/i.test(res.text);
+        toast(res.text, yes ? 'good' : 'bad');
         close();
-        if (res.ok) actionFx(app, def, ctx.target, res.passed);
+        if (res.ok) actionFx(app, def, ctx.target, yes);
         flushNewsToasts(app);
         after?.();
         app.refresh();

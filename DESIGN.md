@@ -402,3 +402,24 @@ calibrar, así que la partida empieza estable con la ideología elegida.
 - **Distribución:** `npm run build` genera un único HTML autocontenido (vite-plugin-singlefile) que funciona con
   doble clic desde `file://`; se copia a `jugar/WorldOfSystem.html`.
 
+### Interfaz sencilla y visual (F8)
+
+- **Decisión:** la profundidad de la simulación no cambia; lo que cambia es la entrada. La vista principal es el mapa
+  y el panel izquierdo abre en el **Panel de mando**: seis medidores 0–100 (economía, felicidad, estabilidad,
+  seguridad, poder militar, relaciones) con color fijo (verde ≥ 65, amarillo ≥ 45, rojo) y flecha de tendencia
+  mensual. Clic en un medidor = su pestaña de detalle. El resumen completo queda en «Avanzado» (plegable), que
+  además muestra todas las cifras de la barra superior (en modo sencillo solo cuatro).
+- **Consejeros** (`adviceFor`): reglas explicables que puntúan lo urgente (asuntos pendientes, estabilidad,
+  guerra, inflación, paro, déficit, protestas, necesidades, corrupción, cárteles, brotes…) y proponen la primera
+  acción disponible de una lista; se muestran las tres más graves con botón de acción directa.
+- **Navegación:** las 14 pestañas se agrupan en 6 secciones con icono grande (Mando, Gobierno y economía, Sociedad y
+  seguridad, Mundo y diplomacia, Ejército, Tecnología); las subpestañas solo aparecen si la sección tiene varias.
+- **Acciones sobre otro país:** al seleccionarlo, una cuadrícula de 6 acciones grandes (Comerciar, Aliarse, Ayudar,
+  Sancionar, Espiar, Atacar) con su coste o el motivo de no estar disponible; el resto, en «Más datos y todas las
+  acciones».
+- **Respuesta visual** (`src/ui/fx.ts`): cada acción deja un efecto en el mapa (flecha curva verde/roja/violeta entre
+  países, pulso, explosión en ataques, nube de contagio, rótulo flotante); cada mes, explosiones en guerras nuevas,
+  nubes en brotes detectados y la variación de tu aprobación flotando sobre tu país. Las cifras animan su cambio.
+- **Guía interactiva** (`tutorial.ts`): 6 pasos que resaltan el elemento real; el paso del mapa espera a que el
+  jugador elija un país. Repetible desde el menú ⚙.
+

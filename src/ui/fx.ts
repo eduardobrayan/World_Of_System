@@ -13,14 +13,29 @@ const ICONS: Record<string, string> = {
   visita_diplomatica: '✈', cumbre: '🤝', declarar_guerra: '⚔', ataque_limitado: '💥', op_espionaje: '🕵', liberar_patogeno: '☣',
 };
 
-const short = (s: string) => (s.length > 24 ? `${s.slice(0, 22)}…` : s);
+const LABELS: Record<string, string> = {
+  acuerdo_comercial: 'Comercio', alianza: 'Alianza', ayuda_exterior: 'Ayuda', sancionar: 'Sanciones', op_espionaje: 'Espionaje',
+  declarar_guerra: '¡Guerra!', ataque_limitado: 'Ataque', pacto_no_agresion: 'No agresión', cooperacion_tecnologica: 'Cooperación',
+  acuerdo_energetico: 'Energía', visita_diplomatica: 'Visita', cumbre: 'Cumbre', aranceles: 'Aranceles',
+};
+const short = (s: string) => {
+  const t = s.replace(/^(Proponer|Imponer|Enviar|Lanzar) /, '');
+  const u = t.charAt(0).toUpperCase() + t.slice(1);
+  return u.length > 22 ? `${u.slice(0, 20)}…` : u;
+};
 
 /** Efecto tras ejecutar una acción con éxito. */
 export function actionFx(app: App, def: ActionDef, target: Country | undefined, passed: boolean) {
   const me = app.player;
   if (!me) return;
   const map = app.map;
-  if (!passed) { map.addFx({ kind: 'float', a: me.id, text: '✗ rechazada', color: BAD }); return; }
+  if (!passed) {
+    if (target && target.id !== me.id) {
+      map.addFx({ kind: 'arrow', a: me.id, b: target.id, color: BAD, dashed: true });
+      map.addFx({ kind: 'float', a: target.id, text: '✗ Rechazada', color: BAD, delay: 900 });
+    } else map.addFx({ kind: 'float', a: me.id, text: '✗ Rechazada', color: BAD });
+    return;
+  }
   const icon = ICONS[def.id] ?? '✓';
   if (target && target.id !== me.id) {
     if (def.id === 'liberar_patogeno') {
@@ -34,11 +49,11 @@ export function actionFx(app: App, def: ActionDef, target: Country | undefined, 
     map.addFx({ kind: 'arrow', a: me.id, b: target.id, color, dashed: spy });
     if (war) map.addFx({ kind: 'boom', a: target.id, color: BAD, delay: 1100 });
     else map.addFx({ kind: 'pulse', a: target.id, color, delay: 1000 });
-    map.addFx({ kind: 'float', a: target.id, text: `${icon} ${short(def.name)}`, color, delay: 900 });
+    map.addFx({ kind: 'float', a: target.id, text: `${icon} ${LABELS[def.id] ?? short(def.name)}`, color, delay: 900 });
     return;
   }
   map.addFx({ kind: 'pulse', a: me.id, color: INFO });
-  map.addFx({ kind: 'float', a: me.id, text: `${icon} ${short(def.name)}`, color: GOOD });
+  map.addFx({ kind: 'float', a: me.id, text: `${icon} ${LABELS[def.id] ?? short(def.name)}`, color: GOOD });
 }
 
 export interface MonthMark { wars: Set<string>; outbreaks: Set<string>; approval: number; growth: number }

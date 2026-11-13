@@ -15,6 +15,7 @@ import { openPendingEvent } from '../events';
 import { renderSummary } from './summary';
 import { tweenNumber } from '../live';
 import { NEEDS } from '../../sim/needs';
+import { topPartners } from '../../sim/market';
 
 const clamp = (v: number, a = 0, b = 100) => Math.max(a, Math.min(b, v));
 
@@ -32,10 +33,10 @@ export function gauges(world: World, c: Country): Gauge[] {
   const relAvg = wsum ? rel / wsum : 0;
   return [
     { id: 'economia', icon: '💰', name: 'Economía', score: eco, detail: `${e.growth >= 0 ? '+' : ''}${e.growth.toFixed(1)} % crec.`, help: 'Crecimiento, inflación, paro y déficit juntos.', tab: 'economia' },
-    { id: 'felicidad', icon: '😊', name: 'Felicidad', score: clamp(c.soc.satisfaction - c.soc.pressure * 0.5), detail: `aprobación ${Math.round(c.pol.approval)}`, help: 'Satisfacción de la gente, menos la presión por necesidades sin cubrir.', tab: 'sociedad' },
+    { id: 'felicidad', icon: '😊', name: 'Felicidad', score: clamp(c.soc.satisfaction - c.soc.pressure * 0.5), detail: `apoyo ${Math.round(c.pol.approval)}`, help: 'Satisfacción de la gente, menos la presión por necesidades sin cubrir.', tab: 'sociedad' },
     { id: 'estabilidad', icon: '🏛', name: 'Estabilidad', score: clamp(c.pol.stability), detail: c.pol.stability < 30 ? 'riesgo de golpe' : `protestas ${Math.round(c.soc.protest)}`, help: 'Solidez del Gobierno. Por debajo de 30, peligro.', tab: 'gobierno' },
     { id: 'seguridad', icon: '🚓', name: 'Seguridad', score: clamp(100 - c.police.crime * 1.2), detail: `delito ${Math.round(c.police.crime)}`, help: 'Delincuencia, cárteles y violencia en las calles.', tab: 'seguridad' },
-    { id: 'militar', icon: '🎖', name: 'Poder militar', score: clamp(Math.sqrt(c.mil.power / maxP) * 100), detail: `n.º ${rank} del mundo`, help: 'Tu fuerza frente a la mayor potencia.', tab: 'militar' },
+    { id: 'militar', icon: '🎖', name: 'Militar', score: clamp(Math.sqrt(c.mil.power / maxP) * 100), detail: `puesto ${rank}`, help: 'Tu fuerza frente a la mayor potencia.', tab: 'militar' },
     { id: 'relaciones', icon: '🤝', name: 'Relaciones', score: clamp(50 + relAvg * 0.8), detail: atWar(world, c.id) ? 'en guerra' : relAvg >= 0 ? 'te aprecian' : 'te desconfían', help: 'Lo que opina de ti el mundo (pesan más los grandes).', tab: 'diplomacia' },
   ];
 }
@@ -89,7 +90,12 @@ export function adviceFor(app: App, c: Country): Advice[] {
   else if (c.police.crime > 45) out.push({ sev: c.police.crime * 0.6, icon: '🚓', title: 'Sube la delincuencia', text: 'Más policías en la calle.', actions: ['reclutar_policias', 'policia_comunitaria'] });
   if ((w.global.outbreaks ?? []).some((o) => o.detected && (o.infected[c.id] ?? 0) > 0.003) || (w.global.pandemic?.infected[c.id] ?? 0) > 0.003) out.push({ sev: 70, icon: '🦠', title: 'Brote en tu país', text: 'Refuerza los hospitales ya.', actions: ['refuerzo_sanitario'] });
   if (c.pol.ap >= 12) out.push({ sev: 25, icon: '⚡', title: 'Capital político sin usar', text: 'Aprovéchalo para una reforma.', tab: 'gobierno', label: 'Ver leyes' });
-  if (out.length < 3) out.push({ sev: 5, icon: '🌍', title: 'Haz amigos', text: 'Pulsa un país del mapa y propón un acuerdo.', run: () => app.map.fitWorld(), label: 'Ver el mapa' });
+  if (out.length < 3) {
+    // Socio comercial con el que aún no hay acuerdo (o el vecino más grande): un clic lo selecciona en el mapa
+    const partner = topPartners(w, c.id, 6).map((p) => w.countries[p.id]).find((x) => x?.alive && x.id !== c.id) ?? null;
+    out.push({ sev: 5, icon: '🌍', title: 'Haz amigos', text: partner ? `${partner.name} es clave para ti: propón un acuerdo.` : 'Pulsa un país y propón un acuerdo.',
+      run: () => { if (partner) { app.onSelect(partner.id); app.map.focus(partner.id); } }, label: partner ? `Ver ${partner.short}` : 'Ver el mapa' });
+  }
   if (out.length < 3) out.push({ sev: 4, icon: '🔬', title: 'Invierte en el futuro', text: 'Elige qué investigar.', tab: 'tecnologia', label: 'Tecnología' });
   if (out.length < 3) out.push({ sev: 3, icon: '🎯', title: 'Revisa tu objetivo', text: 'Mira cuánto te falta.', tab: 'objetivos', label: 'Objetivos' });
   return out.sort((a, b) => b.sev - a.sev);

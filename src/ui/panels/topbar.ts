@@ -26,7 +26,7 @@ export function renderTopbar(app: App): HTMLElement[] {
     h('small', null, h('span', { class: 'day' }, `día ${app.day}`), app.speed ? '' : ' · en pausa'),
     h('span', { class: 'month-bar', 'aria-hidden': 'true' }, h('i', { style: `width:${Math.min(100, app.dayProgress * 100)}%` }))));
   const sp = (n: number, label: string, title: string) => h('button', { class: `btn sm icon ${app.speed === n ? 'active' : ''}`, title, 'aria-pressed': String(app.speed === n), onclick: () => app.setSpeed(n) }, label);
-  out.push(h('div', { class: 'speed' }, sp(0, '⏸', 'Pausa (barra espaciadora)'), sp(1, '1×', 'Velocidad normal (tecla 1)'), sp(2, '2×', 'Rápida (tecla 2)'), sp(3, '3×', 'Muy rápida (tecla 3)')));
+  out.push(h('div', { class: 'speed' }, sp(0, '❚❚', 'Pausa (barra espaciadora)'), sp(1, '1×', 'Velocidad normal (tecla 1)'), sp(2, '2×', 'Rápida (tecla 2)'), sp(3, '3×', 'Muy rápida (tecla 3)')));
   if (p) {
     const strip = h('div', { class: 'ind-strip' });
     // Vista sencilla: cuatro cifras; con «Avanzado» abierto en el panel de mando, todas
@@ -50,7 +50,7 @@ export function renderTopbar(app: App): HTMLElement[] {
     out.push(ap);
   } else out.push(h('div', { class: 'grow muted' }, 'Modo observador'));
   out.push(h('button', { class: 'btn sm ghost skip', disabled: !!w.gameOver || app.busy, title: 'Saltar al próximo mes (calcula el mes ya)', onclick: () => app.endTurn() }, '⏭', h('span', { class: 'lbl' }, ' Próximo mes')));
-  out.push(h('button', { class: 'btn ghost icon', title: 'Menú de partida (guardar, cargar, exportar)', onclick: () => openGameMenu(app, app.onLoad) }, '☰'));
+  out.push(h('button', { class: 'btn ghost icon', title: 'Menú de partida (guardar, cargar, exportar, guía)', onclick: () => openGameMenu(app, app.onLoad) }, '⚙'));
   out.push(h('button', { class: 'btn ghost icon mobile-only', title: 'País seleccionado', onclick: () => { app.root.classList.toggle('show-right'); app.root.classList.remove('show-left'); app.root.classList.remove('right-collapsed'); } }, 'ⓘ'));
   return out;
 }

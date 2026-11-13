@@ -11,7 +11,12 @@ programa biológico secreto.
 
 ## Cómo jugar
 
-Hay dos formas:
+Al empezar, una guía corta te enseña lo básico. El **Panel de mando** resume tu país en seis medidores de color y
+tus **consejeros** te proponen lo más urgente con un botón. Haz clic en otro país del mapa para comerciar, aliarte,
+ayudar, sancionar, espiar o atacar, y mira el efecto en el mapa. Todo el detalle sigue ahí, en «Avanzado» y en las
+secciones de la izquierda.
+
+Para abrirlo hay dos formas:
 
 1. **Sin instalar nada (doble clic):** descarga el repositorio y abre `jugar/WorldOfSystem.html` con doble clic.
    Es un único archivo HTML con todo dentro (código, estilos y mapa), funciona sin conexión y sin servidor.

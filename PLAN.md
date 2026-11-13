@@ -132,6 +132,10 @@ natural que podía volverse endémica para siempre.
 - [x] Tiempo real: reloj continuo con días, pausa con espacio, 1/2/3, «Próximo mes» secundario, eventos no críticos
       a la bandeja con decisión del gabinete al mes, noticias en directo, cifras animadas, frentes y brotes animados
 
+- [x] Interfaz sencilla y visual: Panel de mando con 6 medidores y tendencia, consejeros con acción directa,
+      6 secciones con subpestañas, acciones rápidas con icono sobre otro país, efectos en el mapa por cada acción y
+      suceso, cifras animadas, guía interactiva que resalta dónde hacer clic, textos más cortos y «Avanzado» plegable
+
 **Verificación F8:** 38 tests en verde (4 nuevos); 200 meses estables; build sin avisos; recorrido con Playwright
 desde `file://` (escritorio y móvil) sin errores de consola; el reloj avanza solo sin interacción.
 
