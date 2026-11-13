@@ -87,7 +87,21 @@ indexar alianzas, barreras comerciales y relaciones por turno.
 
 **Verificación F5:** tests en verde; 200 turnos estables con pandemias e impagos; guardar y cargar probado en navegador.
 
-## F6 — Equilibrado, tutorial y pulido
-- [ ] Ajuste de parámetros con simulaciones largas
-- [ ] Tutorial breve
-- [ ] Pulido de interfaz, accesibilidad, rendimiento
+## F6 — Equilibrado, tutorial y pulido ✅
+- [x] Equilibrado de la economía, las guerras (frentes heredados calibrados, sin contraofensivas irreales, escalada
+      nuclear rara), la saturación de tratados y la fórmula electoral (pruebas con jugador pasivo en 15 países)
+- [x] Rendimiento: cachés por turno de alianzas, barreras comerciales, cuotas de comercio y relaciones (~55 ms/turno)
+- [x] Tutorial breve de 9 pasos (se muestra al empezar; repetible desde el menú)
+- [x] Diseño adaptable a móvil (paneles desplegables, barra superior compacta, capas desplazables)
+- [x] 23 tests: datos (todas las expresiones compilan, todos los handlers existen), sistemas (leyes, previsión,
+      presupuestos, eventos, guerra y paz, IA explicable, guardado determinista) y salud del mundo a 200 turnos
+- [x] README
+
+## F7 — Ampliaciones pedidas por el usuario
+- [ ] Jugar con un partido propio o existente
+- [ ] Diseño y elección de armamento propio
+- [ ] Necesidades civiles y presión social
+- [ ] Armas biológicas y patógenos diseñables
+- [ ] Cuerpos policiales
+- [ ] Corrupción de varios tipos
+- [ ] Narcotráfico

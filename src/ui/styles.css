@@ -308,6 +308,17 @@ table.tbl tr.click:hover td { background: var(--surface-2); }
 }
 @media (max-width: 560px) {
   body { font-size: 13.5px; }
+  .ind-strip { display: none; }
+  .topbar .who { display: none; }
+  .ap-pill .small { display: none; }
+  .topbar .date { min-width: 0; font-size: 12px; }
+  .topbar .date small { display: none; }
+  .topbar .speed .btn:nth-child(4) { display: none; }
+  .topbar .btn.primary { padding: 6px 8px; }
+  .layers { flex-wrap: nowrap; overflow-x: auto; max-width: calc(100% - 56px); scrollbar-width: none; }
+  .layers::-webkit-scrollbar { display: none; }
+  .layers button { flex: none; }
+  .legend { max-width: calc(100% - 20px); font-size: 11px; padding: 6px 8px; }
   .topbar { gap: 6px; padding: 0 6px; }
   .topbar .date { min-width: 96px; }
   .kpis { grid-template-columns: repeat(2, 1fr); }

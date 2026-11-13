@@ -17,8 +17,12 @@ export function projectedVote(world: World, c: Country): { value: number; parts:
   const p: Contribution[] = [];
   const hist = c.history.slice(-12);
   const g12 = hist.length ? hist.reduce((a, s) => a + s.growth, 0) / hist.length : c.eco.growth;
-  let v = part(p, 'Base electoral', 24);
-  v += part(p, 'Aprobación del gobierno', 0.6 * c.pol.approval);
+  let v = part(p, 'Base electoral (fragmentación de la oposición)', 28);
+  v += part(p, 'Aprobación del gobierno', 0.56 * c.pol.approval);
+  if (world.player?.country === c.id) {
+    const d = world.player.difficulty;
+    v += part(p, 'Dificultad', d === 'facil' ? 3 : d === 'dificil' ? -2 : 0);
+  }
   v += part(p, 'Economía (crecimiento medio)', clamp((g12 - 1.5) * 1.4, -6, 5));
   v += part(p, 'Empleo', clamp(((c.base.unemployment ?? c.eco.unemployment) - c.eco.unemployment) * 0.5, -5, 4));
   v += part(p, 'Inflación', -clamp(c.eco.inflation - 5, 0, 40) * 0.3);

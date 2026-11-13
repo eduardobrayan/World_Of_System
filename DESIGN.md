@@ -277,7 +277,7 @@ marcadas `hidden` se muestran como "consecuencia incierta". La dificultad escala
 
 ### 4.10 Elecciones y cambios de régimen
 
-`votoGobierno = 24 + 0.6·aprobación + economía(crecimiento 12 m, paro, inflación) + manipulación − cansancio de guerra`
+`votoGobierno = 28 + 0.56·aprobación + economía(crecimiento 12 m, paro, inflación) + manipulación − cansancio de guerra (+3/−2 según dificultad)`
 ± ruido (σ 3.5). Por debajo del 50 % el gobierno pierde: el jugador es derrotado; en un país IA gobierna el mayor partido
 de la oposición. Golpe: probabilidad mensual `riesgoGolpe`, éxito `0.35 + 0.015·(35 − apoyoMilitar) + 0.01·(40 − estabilidad)`.
 Revolución: análogo con protestas y estabilidad. Todo cambio de gobierno recalcula la relación estructural con cada país,

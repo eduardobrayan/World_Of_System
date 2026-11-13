@@ -224,7 +224,9 @@ export function updateEconomy(world: World, c: Country) {
     { label: 'Obras, ayudas y gastos extraordinarios', value: ((e.extraSpending + e.aidOut) / e.gdp) * 100 },
     { label: 'Ingresos', value: -(e.revenue / e.gdp) * 100 },
   ];
-  e.debt = Math.max(0, e.debt + deficitBn / 12 - (e.debt * clamp(e.inflation, -5, 200)) / 1200);
+  // La deuda en moneda extranjera (habitual en emergentes) no se erosiona con la inflación local
+  const localShare = e.reserveCurrency || e.euro || gdppc(c) > 30000 ? 0.9 : 0.5;
+  e.debt = Math.max(0, e.debt + deficitBn / 12 - (e.debt * clamp(e.inflation, -5, 200) * localShare) / 1200);
   e.riskPremium = approach(e.riskPremium, riskPremiumTarget(world, c), 0.15);
   // Impago soberano: sin acceso a los mercados y sin reservas
   const months = (e.gdp * e.imports) / 100 / 12;
