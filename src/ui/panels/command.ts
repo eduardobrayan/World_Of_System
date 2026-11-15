@@ -16,10 +16,11 @@ import { renderSummary } from './summary';
 import { tweenNumber } from '../live';
 import { NEEDS } from '../../sim/needs';
 import { topPartners } from '../../sim/market';
+import { hubEl, openGoal } from '../hub';
 
 const clamp = (v: number, a = 0, b = 100) => Math.max(a, Math.min(b, v));
 
-export interface Gauge { id: string; icon: string; name: string; score: number; detail: string; help: string; tab: string }
+export interface Gauge { id: string; icon: string; name: string; score: number; detail: string; help: string; tab: string; goal: string }
 
 /** Medidores 0–100 (100 = muy bien). Reglas sencillas y explicables. */
 export function gauges(world: World, c: Country): Gauge[] {
@@ -32,12 +33,12 @@ export function gauges(world: World, c: Country): Gauge[] {
   for (const x of alive) { const wt = Math.sqrt(x.eco.gdp); rel += relOp(world, x.id, c.id) * wt; wsum += wt; }
   const relAvg = wsum ? rel / wsum : 0;
   return [
-    { id: 'economia', icon: '💰', name: 'Economía', score: eco, detail: `${e.growth >= 0 ? '+' : ''}${e.growth.toFixed(1)} % crec.`, help: 'Crecimiento, inflación, paro y déficit juntos.', tab: 'economia' },
-    { id: 'felicidad', icon: '😊', name: 'Felicidad', score: clamp(c.soc.satisfaction - c.soc.pressure * 0.5), detail: `apoyo ${Math.round(c.pol.approval)}`, help: 'Satisfacción de la gente, menos la presión por necesidades sin cubrir.', tab: 'sociedad' },
-    { id: 'estabilidad', icon: '🏛', name: 'Estabilidad', score: clamp(c.pol.stability), detail: c.pol.stability < 30 ? 'riesgo de golpe' : `protestas ${Math.round(c.soc.protest)}`, help: 'Solidez del Gobierno. Por debajo de 30, peligro.', tab: 'gobierno' },
-    { id: 'seguridad', icon: '🚓', name: 'Seguridad', score: clamp(100 - c.police.crime * 1.2), detail: `delito ${Math.round(c.police.crime)}`, help: 'Delincuencia, cárteles y violencia en las calles.', tab: 'seguridad' },
-    { id: 'militar', icon: '🎖', name: 'Militar', score: clamp(Math.sqrt(c.mil.power / maxP) * 100), detail: `puesto ${rank}`, help: 'Tu fuerza frente a la mayor potencia.', tab: 'militar' },
-    { id: 'relaciones', icon: '🤝', name: 'Relaciones', score: clamp(50 + relAvg * 0.8), detail: atWar(world, c.id) ? 'en guerra' : relAvg >= 0 ? 'te aprecian' : 'te desconfían', help: 'Lo que opina de ti el mundo (pesan más los grandes).', tab: 'diplomacia' },
+    { id: 'economia', icon: '💰', name: 'Economía', score: eco, detail: `${e.growth >= 0 ? '+' : ''}${e.growth.toFixed(1)} % crec.`, help: 'Crecimiento, inflación, paro y déficit juntos.', tab: 'economia', goal: 'economia' },
+    { id: 'felicidad', icon: '😊', name: 'Felicidad', score: clamp(c.soc.satisfaction - c.soc.pressure * 0.5), detail: `apoyo ${Math.round(c.pol.approval)}`, help: 'Satisfacción de la gente, menos la presión por necesidades sin cubrir.', tab: 'sociedad', goal: 'bienestar' },
+    { id: 'estabilidad', icon: '🏛', name: 'Estabilidad', score: clamp(c.pol.stability), detail: c.pol.stability < 30 ? 'riesgo de golpe' : `protestas ${Math.round(c.soc.protest)}`, help: 'Solidez del Gobierno. Por debajo de 30, peligro.', tab: 'gobierno', goal: 'politica' },
+    { id: 'seguridad', icon: '🚓', name: 'Seguridad', score: clamp(100 - c.police.crime * 1.2), detail: `delito ${Math.round(c.police.crime)}`, help: 'Delincuencia, cárteles y violencia en las calles.', tab: 'seguridad', goal: 'seguridad' },
+    { id: 'militar', icon: '🎖', name: 'Militar', score: clamp(Math.sqrt(c.mil.power / maxP) * 100), detail: `puesto ${rank}`, help: 'Tu fuerza frente a la mayor potencia.', tab: 'militar', goal: 'ejercito' },
+    { id: 'relaciones', icon: '🤝', name: 'Relaciones', score: clamp(50 + relAvg * 0.8), detail: atWar(world, c.id) ? 'en guerra' : relAvg >= 0 ? 'te aprecian' : 'te desconfían', help: 'Lo que opina de ti el mundo (pesan más los grandes).', tab: 'diplomacia', goal: 'mundo' },
   ];
 }
 
@@ -54,13 +55,13 @@ function gaugeEl(app: App, g: Gauge): HTMLElement {
   const col = scoreColor(g.score);
   const num = h('span', { class: 'g-num' }, String(Math.round(g.score)));
   tweenNumber(app, `gauge:${g.id}`, num, g.score, (v) => String(Math.round(v)));
-  const el = h('button', { class: 'gauge', style: `--p:${g.score.toFixed(0)};--c:${col}`, 'data-gauge': g.id, onclick: () => app.setTab(g.tab), 'aria-label': `${g.name}: ${Math.round(g.score)} de 100` },
+  const el = h('button', { class: 'gauge', style: `--p:${g.score.toFixed(0)};--c:${col}`, 'data-gauge': g.id, onclick: () => openGoal(app, g.goal), 'aria-label': `${g.name}: ${Math.round(g.score)} de 100` },
     h('span', { class: 'ring' }, h('span', { class: 'ic' }, g.icon)),
     h('span', { class: 'g-txt' },
       h('span', { class: 'g-name' }, g.name),
       h('span', { class: 'g-val' }, num, Math.abs(d) >= 0.5 ? h('span', { class: `trend ${d > 0 ? 'good' : 'bad'}` }, d > 0 ? '▲' : '▼') : h('span', { class: 'trend flat' }, '▬')),
       h('span', { class: 'g-detail' }, g.detail)));
-  tip(el, () => h('div', null, h('div', { class: 't' }, `${g.icon} ${g.name}: ${Math.round(g.score)}/100`), h('div', { class: 'small' }, g.help), h('div', { class: 'small muted' }, 'Clic: ver detalles')));
+  tip(el, () => h('div', null, h('div', { class: 't' }, `${g.icon} ${g.name}: ${Math.round(g.score)}/100`), h('div', { class: 'small' }, g.help), h('div', { class: 'small muted' }, 'Clic: ver qué puedes hacer')));
   return el;
 }
 
@@ -129,8 +130,10 @@ export function renderCommand(app: App): HTMLElement[] {
   return [
     h('h2', { class: 'cmd-title' }, '🎛 Panel de mando'),
     h('div', { class: 'cmd-gauges' }, gauges(app.world, c).map((g) => gaugeEl(app, g))),
-    h('h3', { class: 'cmd-sub' }, '🧑‍💼 Tus consejeros'),
+    h('h3', { class: 'cmd-sub' }, '🧑‍💼 Lo más urgente'),
     h('div', { class: 'advisors' }, adviceFor(app, c).slice(0, 3).map((a) => adviceEl(app, c, a))),
+    h('div', { class: 'cmd-tip' }, '👇 Para actuar, usa los botones grandes de debajo del mapa o pulsa un país.'),
+    h('div', { class: 'hub-mobile' }, h('h3', { class: 'cmd-sub' }, '👉 ¿Qué quieres hacer?'), hubEl(app)),
     adv,
   ];
 }

@@ -17,9 +17,11 @@ interface Step {
 const KEY = 'wos:guia';
 
 const STEPS: Step[] = [
-  { sel: '.cmd-gauges', title: 'Tu panel de mando', text: 'Seis medidores: verde va bien, amarillo regular, rojo mal. La flecha dice si sube o baja.',
+  { sel: '.cmd-gauges', title: 'Tu panel de mando', text: 'Seis medidores: verde va bien, amarillo regular, rojo mal. La flecha dice si sube o baja. Pulsa uno y verás qué puedes hacer.',
     before: (app) => { app.setTab('mando'); } },
   { sel: '.advisors', title: 'Tus consejeros', text: 'Te dicen lo más urgente. Pulsa su botón y actúas en un clic.' },
+  { sel: '.dock', title: 'Tus acciones', text: 'Todo lo que puedes hacer está aquí, por temas. Con 🔎 buscas cualquier cosa escribiendo una palabra.',
+    before: (app) => { app.root.classList.remove('show-left'); } },
   { sel: '.topbar .speed', title: 'El tiempo corre solo', text: 'Barra espaciadora: pausa. Teclas 1, 2 y 3: velocidad.' },
   { sel: 'main.center', title: 'Elige un país', text: 'Haz clic en cualquier país del mapa (no el tuyo).',
     before: (app) => { app.root.classList.remove('show-left'); },

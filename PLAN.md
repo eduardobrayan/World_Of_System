@@ -139,3 +139,11 @@ natural que podía volverse endémica para siempre.
 **Verificación F8:** 38 tests en verde (4 nuevos); 200 meses estables; build sin avisos; recorrido con Playwright
 desde `file://` (escritorio y móvil) sin errores de consola; el reloj avanza solo sin interacción.
 
+
+## F9 — Todo a la vista ✅
+- [x] Barra de acciones siempre visible bajo el mapa: un botón grande por tema (Economía, Bienestar, Política, Policía,
+      Corrupción, Narcotráfico, Ejército, Biológico, Otros países, Ciencia)
+- [x] Cada tema abre un catálogo de tarjetas con frase corta, efectos en verde/rojo, coste y motivo si está bloqueada
+- [x] Buscador de acciones (botón 🔎 o tecla B): «paro», «policía», «armas»…
+- [x] Los medidores del panel de mando abren directamente las acciones que los mejoran
+- [x] Capas del mapa plegadas en un solo botón con iconos; el panel derecho solo aparece al elegir otro país o región

@@ -8,6 +8,9 @@ import { renderBottom } from './panels/bottom';
 import { renderRight } from './panels/right';
 import { TABS, SECTIONS, SECTION_OF } from './panels/tabs';
 import { LAYERS, LOCAL_LAYERS } from './layers';
+import { dockEl, openSearch } from './hub';
+
+const LAYER_ICONS: Record<string, string> = { politico: '🗺', alianzas: '🤝', relaciones: '❤', pib: '💰', crecimiento: '📈', inflacion: '🏷', estabilidad: '🏛', corrupcion: '💼', narco: '💀', brotes: '🦠', regimen: '🗳', ideologia: '🎭', conflictos: '⚔' };
 import { flagEl } from './flags';
 import { perceived, approxMark } from './perceive';
 import { fmtMoney } from '../sim/util';
@@ -65,6 +68,9 @@ export class App implements MapHost {
     if (e.code === 'Space' || e.key === ' ') {
       e.preventDefault();
       this.setSpeed(this.speed ? 0 : this.lastSpeed || 1);
+    } else if (e.key === 'b' || e.key === 'B' || e.key === '/') {
+      e.preventDefault();
+      openSearch(this);
     } else if (e.key === '1' || e.key === '2' || e.key === '3') {
       this.setSpeed(Number(e.key));
     }
@@ -111,6 +117,8 @@ export class App implements MapHost {
         h('span', { class: 'ic' }, s.icon), s.short)));
     mount(this.leftBody, ...this.renderTab());
     this.leftBody.scrollTop = scroll;
+    // El panel derecho solo aparece cuando hay algo que mirar: otro país o una región
+    this.root.classList.toggle('right-collapsed', !this.selectedRegion && (!this.selected || this.selected === this.player?.id));
     mount(this.rightEl, renderRight(this));
     mount(this.bottomEl, renderBottom(this));
     this.renderMapUi();
@@ -145,10 +153,15 @@ export class App implements MapHost {
           h('div', { class: 'small muted' }, '★ capital · 🏗 obras en curso · rayado: ocupada')));
     } else {
       mount(this.mapUi,
-        h('div', { class: 'layers' }, LAYERS.filter((l) => !l.needsPlayer || this.player).map((l) =>
-          h('button', { class: l.id === this.layer ? 'on' : '', onclick: () => { this.layer = l.id; this.renderMapUi(); this.map.invalidate(); } }, l.name))),
+        h('div', { class: 'layer-pick' },
+          h('button', { class: 'layer-btn', 'aria-expanded': String(!!this.ui.layersOpen), onclick: () => { this.ui.layersOpen = !this.ui.layersOpen; this.renderMapUi(); } },
+            `${LAYER_ICONS[legendLayer.id] ?? '🗺'} Ver en el mapa: `, h('b', null, legendLayer.name), this.ui.layersOpen ? ' ▴' : ' ▾'),
+          this.ui.layersOpen ? h('div', { class: 'layer-grid' }, LAYERS.filter((l) => !l.needsPlayer || this.player).map((l) =>
+            h('button', { class: l.id === this.layer ? 'on' : '', onclick: () => { this.layer = l.id; this.ui.layersOpen = false; this.renderMapUi(); this.map.invalidate(); } },
+              h('span', { class: 'lg-ic' }, LAYER_ICONS[l.id] ?? '🗺'), l.name))) : null),
         zoom,
-        h('div', { class: 'legend' }, legendLayer.legend(ctx)));
+        this.layer === 'politico' ? null : h('div', { class: 'legend above-dock' }, legendLayer.legend(ctx)),
+        dockEl(this));
     }
   }
 
@@ -251,7 +264,9 @@ export class App implements MapHost {
   }
 
   toggleRight() {
-    this.root.classList.toggle('right-collapsed');
+    this.selectedRegion = null;
+    this.selected = null;
+    this.refresh();
   }
 
   // ---------- Tiempo ----------
