@@ -96,7 +96,7 @@ export function renderEconomy(app: App): HTMLElement[] {
 
   out.push(section('Presupuesto (% del PIB)',
     h('div', { class: 'small muted', style: 'margin-bottom:4px' }, 'Ajusta cada partida con los botones (− / + pasos pequeños, −− / ++ grandes) y aprueba el presupuesto. Los efectos tardan meses en notarse.'),
-    ...BUDGET_ITEMS.map((k) => stepRow(BUDGET_INFO[k][0], BUDGET_INFO[k][1], d.budget[k], 0, Math.max(30, c.eco.budget[k] * 2), 0.1, 0.5, c.eco.budget[k], (v) => { d.budget[k] = v; }))));
+    ...BUDGET_ITEMS.map((k) => stepRow(BUDGET_INFO[k][0], BUDGET_INFO[k][1], d.budget[k], 0, Math.min(60, Math.max(30, c.eco.budget[k] * 2)), 0.1, 0.5, c.eco.budget[k], (v) => { d.budget[k] = v; }))));
 
   out.push(section('Impuestos (tipos efectivos)',
     ...TAXES.map((k) => stepRow(TAX_INFO[k][0], TAX_INFO[k][1], d.taxes[k], 0, TAX_INFO[k][2], 0.5, 2, c.eco.taxes[k], (v) => { d.taxes[k] = v; }))));
@@ -109,7 +109,7 @@ export function renderEconomy(app: App): HTMLElement[] {
         plainStat('Regla de Taylor (objetivo del banco)', `${taylorRate(c).toFixed(2)} %`),
         plainStat('Meta de inflación', `${c.eco.cbTarget.toFixed(1)} %`),
         h('div', { class: 'small muted', style: 'margin-top:4px' }, 'El banco central es independiente: fija los tipos con una regla de Taylor. Puedes subordinarlo con la política «Banco central» (pestaña Gobierno), a costa de credibilidad.'))
-      : stepRow('Tipo de interés oficial', 'El banco central está subordinado: tú fijas los tipos. Bajarlos impulsa el crecimiento y deprecia la moneda; subirlos frena la inflación.', d.rate, 0, Math.max(40, c.eco.policyRate * 1.5), 0.25, 1, c.eco.policyRate, (v) => { d.rate = v; })));
+      : stepRow('Tipo de interés oficial', 'El banco central está subordinado: tú fijas los tipos. Bajarlos impulsa el crecimiento y deprecia la moneda; subirlos frena la inflación.', d.rate, 0, Math.min(200, Math.max(40, c.eco.policyRate * 1.5)), 0.25, 1, c.eco.policyRate, (v) => { d.rate = v; })));
 
   updateSummary();
   out.push(h('div', { class: 'card', style: 'border-color:#2a4a70' }, summary, forecastBox));

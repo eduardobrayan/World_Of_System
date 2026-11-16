@@ -51,7 +51,7 @@ export function renderGovernment(app: App): HTMLElement[] {
       h('div', { class: 'row between' }, h('b', null, pd.name), h('span', { class: 'small muted' }, `⚡${pd.ap}`)),
       h('div', { class: 'seg', style: 'margin-top:3px;flex-wrap:wrap' }, pd.levels.map((lv, i) => h('button', {
         class: i === cur ? 'on' : '', title: lv.desc,
-        onclick: () => { if (i !== cur) openAction(app, ACTION_BY_ID.cambio_politica, { params: { policy: pd.id, level: i, policyAp: pd.ap } }); },
+        onclick: () => { if (i !== cur) openAction(app, ACTION_BY_ID.cambio_politica, { params: { policy: pd.id, level: i } }); },
       }, lv.name))));
     tip(row.firstChild as HTMLElement, () => h('div', null, h('div', { class: 't' }, pd.name), h('div', { class: 'desc' }, pd.desc), ...pd.levels.map((lv, i) => h('div', { class: 'small' }, `${i === cur ? '▶ ' : ''}${lv.name}: ${lv.desc}`))));
     return row;

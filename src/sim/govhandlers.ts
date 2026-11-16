@@ -57,7 +57,7 @@ export function registerGovHandlers() {
       const pd = POLICY_BY_ID[id];
       if (!pd) return 'Política desconocida';
       const lv = Number(ctx.params?.level ?? -1);
-      if (lv < 0 || lv >= pd.levels.length) return 'Nivel no válido';
+      if (!Number.isInteger(lv) || lv < 0 || lv >= pd.levels.length) return 'Nivel no válido';
       if ((ctx.actor.pol.policies[id] ?? 0) === lv) return 'Ese ya es el nivel actual';
       return null;
     },
@@ -96,6 +96,8 @@ export function registerGovHandlers() {
     validate: (world, def, ctx) => {
       const m = String(ctx.params?.ministry ?? '');
       if (!MINISTRY_NAMES[m as Ministry]) return 'Ministerio desconocido';
+      const idx = Number(ctx.params?.idx ?? 0);
+      if (!Number.isInteger(idx) || idx < 0 || idx >= ministerCandidates(world, ctx.actor, m as Ministry).length) return 'Candidato no válido';
       return null;
     },
     preview: (world, def, ctx, p) => {

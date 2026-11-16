@@ -39,7 +39,12 @@ export function registerMilHandlers() {
   });
 
   registerHandler('produce', {
-    validate: (world, def, ctx) => (UNIT_BY_ID[String(ctx.params?.unit ?? '')] ? null : 'Unidad desconocida'),
+    validate: (world, def, ctx) => {
+      if (!UNIT_BY_ID[String(ctx.params?.unit ?? '')]) return 'Unidad desconocida';
+      const qty = Number(ctx.params?.qty ?? 1);
+      if (!Number.isSafeInteger(qty) || qty <= 0) return 'La cantidad debe ser un entero positivo';
+      return null;
+    },
     preview: (world, def, ctx, p) => {
       const k = String(ctx.params?.unit) as UnitType;
       const q = Number(ctx.params?.qty ?? 1);
@@ -48,7 +53,7 @@ export function registerMilHandlers() {
     apply: (world, def, ctx) => {
       const c = ctx.actor;
       const k = String(ctx.params?.unit) as UnitType;
-      const q = Math.max(1, Math.round(Number(ctx.params?.qty ?? 1)));
+      const q = Number(ctx.params?.qty ?? 1);
       c.mil.production.push({ unit: k, qty: q, remaining: UNIT_BY_ID[k].build, cost: unitCost(c, k) * q });
       return { ok: true, passed: true, text: `Encargadas ${q} unidades de ${UNIT_BY_ID[k].name}.` };
     },

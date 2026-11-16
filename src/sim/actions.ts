@@ -10,7 +10,7 @@ import { evalExpr } from './expr';
 import { resolver } from './vars';
 import { addModifier, applyEffects, removeModifier, schedule, fillTemplate } from './effects';
 import { forecastVote, type Lean, type VoteForecast } from './parliament';
-import { DATA, regimeOf } from './data';
+import { DATA, POLICY_BY_ID, regimeOf } from './data';
 import { clamp, news, rngOf, timeline } from './util';
 import actionsJson from '../data/actions.json';
 
@@ -172,6 +172,7 @@ export function checkRequirements(world: World, def: ActionDef, ctx: ActionCtx):
   if (def.regimes && !def.regimes.includes(c.pol.regime)) unmet.push(`Solo para: ${def.regimes.map((x) => regimeOf(x).name).join(', ')}`);
   const cd = c.pol.cooldowns[def.id + (ctx.target ? `:${ctx.target.id}` : '')] ?? -1;
   if (cd > world.turn) unmet.push(`Disponible de nuevo en ${cd - world.turn} meses`);
+  if (def.handler && !HANDLERS[def.handler]) unmet.push(`Mecánica desconocida: ${def.handler}`);
   if (def.handler && HANDLERS[def.handler]?.validate) {
     const why = HANDLERS[def.handler].validate!(world, def, ctx);
     if (why) unmet.push(why);
@@ -180,7 +181,10 @@ export function checkRequirements(world: World, def: ActionDef, ctx: ActionCtx):
 }
 
 export function actionCost(world: World, def: ActionDef, ctx: ActionCtx): { ap: number; money: number } {
-  const r = resolver(world, ctx.actor, ctx.target, ctx.params as Record<string, number> | undefined);
+  const params = { ...ctx.params };
+  // El coste pertenece a la definición de la política, no a los parámetros de la interfaz.
+  if (def.handler === 'policy') params.policyAp = POLICY_BY_ID[String(params.policy)]?.ap ?? 0;
+  const r = resolver(world, ctx.actor, ctx.target, params as Record<string, number>);
   return { ap: evalExpr(def.cost.ap ?? 0, r), money: evalExpr(def.cost.money ?? 0, r) };
 }
 
@@ -197,6 +201,8 @@ export function needsParliament(def: ActionDef, c: Country): boolean {
 export function previewAction(world: World, def: ActionDef, ctx: ActionCtx): ActionPreview {
   const c = ctx.actor;
   const { met, unmet } = checkRequirements(world, def, ctx);
+  // Los callbacks específicos presuponen un objetivo y parámetros válidos.
+  const requirementsMet = unmet.length === 0;
   const cost = actionCost(world, def, ctx);
   if (c.pol.ap < cost.ap) unmet.push(`Capital político insuficiente (${c.pol.ap.toFixed(1)}/${cost.ap})`);
   const lines: EffectLine[] = [];
@@ -208,9 +214,9 @@ export function previewAction(world: World, def: ActionDef, ctx: ActionCtx): Act
   }
   describeModifiers(world, c, def.modifiers, lines, ctx.target);
   const groups = GROUPS.filter((g) => def.groups?.[g]).map((g) => ({ group: g, name: DATA.groups[g].name, delta: def.groups![g]! }));
-  const vote = needsParliament(def, c) ? forecastVote(world, c, leanOf(world, def, ctx)) : null;
+  const vote = requirementsMet && needsParliament(def, c) ? forecastVote(world, c, leanOf(world, def, ctx)) : null;
   const p: ActionPreview = { ok: unmet.length === 0, unmet, met, ap: cost.ap, money: cost.money, vote, lines, groups, risks: [...(def.risks ?? [])], extra: [] };
-  if (def.handler && HANDLERS[def.handler]?.preview) HANDLERS[def.handler].preview!(world, def, ctx, p);
+  if (requirementsMet && def.handler && HANDLERS[def.handler]?.preview) HANDLERS[def.handler].preview!(world, def, ctx, p);
   return p;
 }
 
@@ -220,7 +226,6 @@ export function executeAction(world: World, def: ActionDef, ctx: ActionCtx): Act
   const pv = previewAction(world, def, ctx);
   if (!pv.ok) return { ok: false, passed: false, text: pv.unmet.join(' · ') };
   c.pol.ap = clamp(c.pol.ap - pv.ap, 0, 20);
-  if (pv.money) c.eco.debt = Math.max(0, c.eco.debt + pv.money);
   if (def.cooldown) c.pol.cooldowns[def.id + (ctx.target ? `:${ctx.target.id}` : '')] = world.turn + def.cooldown;
   if (pv.vote) {
     const rng = rngOf(world);
@@ -233,6 +238,8 @@ export function executeAction(world: World, def: ActionDef, ctx: ActionCtx): Act
       return { ok: true, passed: false, text: `El parlamento ha rechazado «${def.name}». Has perdido el capital político invertido.` };
     }
   }
+  // La inversión solo se desembolsa cuando el parlamento autoriza la medida.
+  if (pv.money) c.eco.debt = Math.max(0, c.eco.debt + pv.money);
   let text = `${def.name}: aprobado.`;
   if (def.handler) {
     const h = HANDLERS[def.handler];

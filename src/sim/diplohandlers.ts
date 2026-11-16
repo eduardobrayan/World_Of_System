@@ -33,6 +33,10 @@ export function answerProposal(world: World, id: string, accept: boolean): strin
   const from = world.countries[p.from], to = world.countries[p.to];
   if (!from || !to) return '';
   if (!accept) {
+    if (p.kind === 'ultimatum') {
+      rejectUltimatum(world, from, to);
+      return 'Ultimátum rechazado. El país que lo envió tiene ahora un casus belli.';
+    }
     remember(world, from, to.id, 'rechazo');
     news(world, `${to.name} rechaza la propuesta de ${from.name}.`, 'diplomacia', [from.id, to.id], 1);
     return 'Propuesta rechazada.';

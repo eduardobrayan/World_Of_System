@@ -75,8 +75,9 @@ export function advanceTurn(world: World) {
 
   updateGlobals(world);
   world.turn += 1;
-  processScheduled(world);
+  // Solo envejecen los modificadores del mes que acaba de simularse.
   for (const id of ids) tickModifiers(world.countries[id]);
+  processScheduled(world);
   for (const id of ids) snapshot(world, world.countries[id]);
   worldSnapshot(world);
   if (!world.gameOver) generateEvents(world);
