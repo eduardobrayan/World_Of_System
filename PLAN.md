@@ -147,3 +147,15 @@ desde `file://` (escritorio y móvil) sin errores de consola; el reloj avanza so
 - [x] Buscador de acciones (botón 🔎 o tecla B): «paro», «policía», «armas»…
 - [x] Los medidores del panel de mando abren directamente las acciones que los mejoran
 - [x] Capas del mapa plegadas en un solo botón con iconos; el panel derecho solo aparece al elegir otro país o región
+
+## F10 — Interfaz rediseñada y mapa animado ✅
+- [x] Sistema visual nuevo (tema azul noche, paneles de cristal, colores con significado fijo) e inicio en 3 pasos
+- [x] Barra superior mínima, medidores en anillo, tarjetas urgentes, barra de acciones con iconos; móvil a pantalla completa
+- [x] Confirmación de acciones, eventos y ficha de país con iconos grandes, efectos en pastillas y botones grandes
+- [x] Motor de efectos sobre el mapa (`src/ui/anim/`): misiles en arco con estela y explosión, cazas, tanques, barcos,
+      arma nuclear, rutas de comercio, sanciones, ayuda, espionaje, ciberataques, contagios, protestas, desastres…
+- [x] Las acciones públicas de la IA también se ven; frentes de guerra y bloqueos animados de forma continua
+- [x] Mapa más cuidado (océano, costas, capitales, transiciones de cámara) y sonidos sintetizados con botón de silencio
+
+**Pendiente:** efectos en la vista regional; ficha de país en móvil tapa el mapa; revisión a fondo de Inteligencia,
+Mercado, Territorio, Objetivos y Tecnología; los barcos pueden cruzar tierra.
