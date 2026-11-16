@@ -16,7 +16,7 @@ import { perceived, approxMark } from './perceive';
 import { fmtMoney } from '../sim/util';
 import { hookAfterTurn, hookBeforeTurn } from './hooks';
 import { liveTick } from './live';
-import { markMonth, monthFx } from './fx';
+import { initMapFx, markMonth, monthFx } from './fx';
 
 /** Duración real (ms) de un mes de juego en cada velocidad (0 = pausa). */
 export const SPEEDS = [0, 6000, 2600, 1000];
@@ -95,6 +95,7 @@ export class App implements MapHost {
     this.root = h('div', { class: 'game' }, this.topEl, left, center, this.rightEl, this.bottomEl);
     mount(this.container, this.root);
     this.map = new MapView(canvas, this);
+    initMapFx(this);
     requestAnimationFrame(() => this.map.fitWorld());
   }
 
@@ -112,11 +113,17 @@ export class App implements MapHost {
     const scroll = this.leftBody.scrollTop;
     mount(this.topEl, renderTopbar(this));
     const sec = SECTION_OF[this.tab];
-    mount(this.tabsEl, this.visibleSections().map((s) =>
-      h('button', { class: sec?.id === s.id ? 'on' : '', title: s.name, onclick: () => this.openSection(s.id) },
-        h('span', { class: 'ic' }, s.icon), s.short)));
+    // Carril de secciones: «Mando» arriba, el resto («Más») debajo; en móvil, botón para volver al mapa
+    mount(this.tabsEl, this.visibleSections().map((s, i) => [
+      i === 1 ? h('span', { class: 'rail-sep', 'aria-hidden': 'true' }) : null,
+      i === 1 ? h('span', { class: 'rail-more' }, 'Más') : null,
+      h('button', { class: sec?.id === s.id ? 'on' : '', title: s.name, 'aria-current': sec?.id === s.id ? 'page' : undefined, onclick: () => this.openSection(s.id) },
+        h('span', { class: 'ic' }, s.icon), s.short)]),
+    h('button', { class: 'rail-close mobile-only', title: 'Volver al mapa', onclick: () => this.root.classList.remove('show-left') }, h('span', { class: 'ic' }, '🗺️'), 'Mapa'));
     mount(this.leftBody, ...this.renderTab());
     this.leftBody.scrollTop = scroll;
+    // Las pestañas detalladas necesitan más anchura que el panel de mando
+    this.root.classList.toggle('wide-left', !!this.player && sec?.id !== 'mando');
     // El panel derecho solo aparece cuando hay algo que mirar: otro país o una región
     this.root.classList.toggle('right-collapsed', !this.selectedRegion && (!this.selected || this.selected === this.player?.id));
     mount(this.rightEl, renderRight(this));

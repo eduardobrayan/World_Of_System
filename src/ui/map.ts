@@ -3,8 +3,11 @@ import type { Country, Id, World } from '../sim/types';
 import { BUILDING_BY_ID } from '../sim/data';
 import {
   BY_ENTITY, BY_NAME, FEATURES, cellPath, entityArea, entityPath, featurePath, hitFeature, hitRegion, invMillerY,
-  labelPoint, localFrame, millerY, regionCells, regionSeed, type Pt,
+  labelPoint, landPath, localFrame, millerY, regionCells, regionSeed, type Pt,
 } from './geo';
+import { FxEngine, easeInOut, type Proj } from './anim/engine';
+import { Ambient } from './anim/ambient';
+import { capitalPt } from './anim/anchors';
 import { LAYER_BY_ID, LOCAL_LAYERS, localColor, type LayerCtx } from './layers';
 import { SERIES } from './charts';
 
@@ -27,10 +30,7 @@ export interface MapHost {
 
 interface View { cx: number; cy: number; s: number }
 
-const OCEAN = '#0f1a26';
-const BORDER = 'rgba(10,12,16,0.85)';
-
-export interface Fx { kind: 'pulse' | 'arrow' | 'boom' | 'float' | 'cloud'; a: Id; b?: Id; text?: string; color: string; dashed?: boolean; offset?: number; t0: number; dur: number }
+const BORDER = 'rgba(8,11,16,0.9)';
 
 export class MapView {
   private ctx: CanvasRenderingContext2D;
@@ -44,135 +44,81 @@ export class MapView {
   private raf = 0;
   private hatch: CanvasPattern | null = null;
   private touched = false;
-  pulse = 0;
+  private reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** Transición suave de la vista (enfocar, acercar, encuadrar). */
+  private tw: { from: View; to: View; t0: number; dur: number } | null = null;
+  /** Clave de lo que se dibuja (vista + capa) para el fundido al cambiar de capa. */
+  private drawnKey = '';
+  private snap: HTMLCanvasElement | null = null;
+  private overlay: HTMLCanvasElement;
+  /** Motor de efectos superpuesto (misiles, explosiones, barcos…). */
+  readonly fx: FxEngine;
+  private ambient: Ambient;
 
   constructor(private canvas: HTMLCanvasElement, private host: MapHost) {
     this.ctx = canvas.getContext('2d')!;
+    this.overlay = document.createElement('canvas');
+    this.overlay.className = 'map-fx';
+    this.overlay.setAttribute('aria-hidden', 'true');
+    Object.assign(this.overlay.style, { position: 'absolute', left: '0', top: '0', pointerEvents: 'none' });
+    this.placeOverlay();
+    this.fx = new FxEngine(this.overlay, () => this.proj(), [canvas, this.overlay]);
+    this.ambient = new Ambient(this.fx, host);
+    this.fx.live2 = (g, p, now, dt) => this.ambient.draw(g, p, now, dt);
     this.bind();
-    new ResizeObserver(() => { this.fitIfNeeded(); this.invalidate(); }).observe(canvas);
-    // Animación continua (frentes, tropas en marcha, brotes): ~30 fps mientras haya algo que mover
-    const loop = () => {
-      this.pulse = (this.pulse + 1) % 3600;
-      if (this.dirty || (this.animating() && (this.fx.length || this.pulse % 2 === 0))) this.render();
+    new ResizeObserver(() => { this.placeOverlay(); this.fitIfNeeded(); this.invalidate(); }).observe(canvas);
+    // El mapa base solo se redibuja cuando cambia algo; lo animado va en el lienzo de efectos
+    const loop = (now: number) => {
+      if (this.tw) this.stepTween(now);
+      if (this.dirty) { this.render(); this.fx.redraw(); }
       this.raf = requestAnimationFrame(loop);
     };
     this.raf = requestAnimationFrame(loop);
   }
 
-  destroy() { cancelAnimationFrame(this.raf); }
+  destroy() { cancelAnimationFrame(this.raf); this.fx.destroy(); }
 
-  private reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  /** Posición animada de cada frente (fracción del trayecto defensor → atacante), interpolada entre meses. */
-  private frontPos: Record<string, number> = {};
-
-  // ---------- Efectos visuales transitorios (respuesta a acciones y sucesos) ----------
-  private fx: Fx[] = [];
-
-  /** Lanza un efecto: pulso, flecha entre países, explosión, nube de contagio o texto flotante. */
-  addFx(f: Omit<Fx, 't0' | 'dur'> & { dur?: number; delay?: number }) {
-    this.fx.push({ ...f, t0: performance.now() + (f.delay ?? 0), dur: f.dur ?? (f.kind === 'arrow' ? 1900 : f.kind === 'float' ? 2200 : 1600) });
-    if (this.fx.length > 40) this.fx.splice(0, this.fx.length - 40);
-    this.invalidate();
+  /** Coloca el lienzo de efectos exactamente encima del mapa. */
+  private placeOverlay() {
+    const c = this.canvas;
+    if (!this.overlay.isConnected && c.parentElement) c.after(this.overlay);
+    Object.assign(this.overlay.style, { left: `${c.offsetLeft}px`, top: `${c.offsetTop}px`, width: `${c.clientWidth}px`, height: `${c.clientHeight}px` });
   }
 
-  private drawFx(dpr: number) {
-    if (!this.fx.length) return;
-    const ctx = this.ctx;
-    const now = performance.now();
-    this.fx = this.fx.filter((f) => now - f.t0 < f.dur);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    for (const f of this.fx) {
-      const k = (now - f.t0) / f.dur;
-      if (k < 0) continue;
-      const [x, y] = this.toScreen(...labelPoint(f.a));
-      ctx.save();
-      if (f.kind === 'pulse') {
-        for (let i = 0; i < 3; i++) {
-          const kk = k * 1.3 - i * 0.18;
-          if (kk <= 0 || kk >= 1) continue;
-          ctx.beginPath(); ctx.arc(x, y, 6 + kk * 46, 0, Math.PI * 2);
-          ctx.strokeStyle = f.color; ctx.globalAlpha = 1 - kk; ctx.lineWidth = 3; ctx.stroke();
-        }
-      } else if (f.kind === 'arrow' && f.b) {
-        const [x2, y2] = this.toScreen(...labelPoint(f.b));
-        const dx = x2 - x, dy = y2 - y, len = Math.hypot(dx, dy) || 1;
-        const cx = (x + x2) / 2 - (dy / len) * len * 0.22, cy = (y + y2) / 2 + (dx / len) * len * 0.22;
-        const prog = Math.min(1, k * 1.6);
-        const pt = (t: number) => [(1 - t) * (1 - t) * x + 2 * (1 - t) * t * cx + t * t * x2, (1 - t) * (1 - t) * y + 2 * (1 - t) * t * cy + t * t * y2];
-        ctx.globalAlpha = k > 0.75 ? (1 - k) / 0.25 : 1;
-        ctx.strokeStyle = f.color; ctx.lineWidth = 3; ctx.lineCap = 'round';
-        if (f.dashed) ctx.setLineDash([6, 6]);
-        ctx.beginPath(); ctx.moveTo(x, y);
-        for (let i = 1; i <= 24; i++) { const [px, py] = pt((i / 24) * prog); ctx.lineTo(px, py); }
-        ctx.stroke(); ctx.setLineDash([]);
-        const [hx, hy] = pt(prog);
-        ctx.beginPath(); ctx.arc(hx, hy, 6, 0, Math.PI * 2); ctx.fillStyle = f.color; ctx.fill();
-        if (prog >= 1) { ctx.beginPath(); ctx.arc(x2, y2, 6 + (k - 0.62) * 60, 0, Math.PI * 2); ctx.globalAlpha *= 0.6; ctx.stroke(); }
-      } else if (f.kind === 'boom') {
-        ctx.globalAlpha = 1 - k;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, 10 + k * 34);
-        g.addColorStop(0, 'rgba(255,240,180,0.95)'); g.addColorStop(0.5, 'rgba(255,140,40,0.7)'); g.addColorStop(1, 'rgba(200,40,20,0)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 10 + k * 34, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#ffb347'; ctx.lineWidth = 2;
-        for (let i = 0; i < 12; i++) {
-          const ang = (i / 12) * Math.PI * 2 + (f.a.charCodeAt(0) % 5);
-          const r0 = 8 + k * 20, r1 = 14 + k * 46;
-          ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * r0, y + Math.sin(ang) * r0); ctx.lineTo(x + Math.cos(ang) * r1, y + Math.sin(ang) * r1); ctx.stroke();
-        }
-      } else if (f.kind === 'cloud') {
-        for (let i = 0; i < 6; i++) {
-          const ang = (i / 6) * Math.PI * 2 + k * 1.5;
-          const r = 10 + k * 26;
-          const px = x + Math.cos(ang) * r, py = y + Math.sin(ang) * r * 0.6;
-          const g = ctx.createRadialGradient(px, py, 0, px, py, 18 + k * 18);
-          g.addColorStop(0, f.color); g.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.globalAlpha = (1 - k) * 0.7; ctx.fillStyle = g;
-          ctx.beginPath(); ctx.arc(px, py, 18 + k * 18, 0, Math.PI * 2); ctx.fill();
-        }
-      } else if (f.kind === 'float' && f.text) {
-        ctx.globalAlpha = k < 0.15 ? k / 0.15 : 1 - Math.max(0, (k - 0.6) / 0.4);
-        ctx.font = '700 15px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        const yy = y - 18 - k * 42 + (f.offset ?? 0);
-        ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(10,12,16,0.85)'; ctx.strokeText(f.text, x, yy);
-        ctx.fillStyle = f.color; ctx.fillText(f.text, x, yy);
-      }
-      ctx.restore();
+  /** Proyección actual para el motor de efectos. */
+  private proj(): Proj {
+    const { w, h } = this.size();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const v = this.v;
+    return {
+      s: v.s, w, h, dpr,
+      k: Math.max(0.75, Math.min(1.45, 0.62 + Math.sqrt(v.s) * 0.2)) * (w < 600 ? 0.85 : 1),
+      toScreen: (x, y) => [(x - v.cx) * v.s + w / 2, (v.cy - y) * v.s + h / 2],
+      toWorld: (px, py) => [(px - w / 2) / v.s + v.cx, v.cy - (py - h / 2) / v.s],
+      worldXform: (g) => g.setTransform(dpr * v.s, 0, 0, -dpr * v.s, dpr * (w / 2 - v.cx * v.s), dpr * (h / 2 + v.cy * v.s)),
+      screenXform: (g) => g.setTransform(dpr, 0, 0, dpr, 0, 0),
+    };
+  }
+
+  /** Lleva la vista a `to` con una transición suave (inmediata si se prefiere menos movimiento). */
+  private animateTo(to: View, dur = 650) {
+    const v = this.v;
+    if (this.reducedMotion || (Math.abs(v.cx - to.cx) < 1e-3 && Math.abs(v.cy - to.cy) < 1e-3 && Math.abs(v.s - to.s) < 1e-3)) {
+      this.tw = null; this.v = { ...to }; this.invalidate(); return;
     }
+    this.tw = { from: { ...v }, to, t0: performance.now(), dur };
   }
 
-  private animating(): boolean {
-    if (this.fx.length) return true;
-    if (this.reducedMotion || this.host.view === 'local') return false;
-    const W = this.host.world;
-    return W.wars.length > 0 || this.visibleOutbreaks().length > 0;
+  private stepTween(now: number) {
+    const tw = this.tw!;
+    const k = Math.min(1, (now - tw.t0) / tw.dur);
+    const e = easeInOut(k);
+    const ls = Math.log(tw.from.s) + (Math.log(tw.to.s) - Math.log(tw.from.s)) * e;
+    this.v = { cx: tw.from.cx + (tw.to.cx - tw.from.cx) * e, cy: tw.from.cy + (tw.to.cy - tw.from.cy) * e, s: Math.exp(ls) };
+    if (k >= 1) this.tw = null;
+    this.dirty = true;
   }
 
-  private visibleOutbreaks() {
-    const W = this.host.world, pid = this.host.player?.id;
-    const out: { infected: Record<string, number>; human: boolean }[] = [];
-    for (const o of W.global.outbreaks ?? []) if (o.detected || o.creator === pid) out.push({ infected: o.infected, human: o.kind === 'humano' });
-    if (W.global.pandemic) out.push({ infected: W.global.pandemic.infected, human: true });
-    return out;
-  }
-
-  /** Anillos que laten sobre los países con brotes conocidos (más grandes cuanto más afectados). */
-  private drawOutbreakPulses() {
-    const ctx = this.ctx, s = this.v.s;
-    const t = this.pulse / 60;
-    for (const o of this.visibleOutbreaks()) {
-      for (const [id, inf] of Object.entries(o.infected)) {
-        if (inf < 0.003 || !this.host.world.countries[id]?.alive) continue;
-        const [x, y] = labelPoint(id);
-        const ph = (t * 0.8 + (id.charCodeAt(0) % 7) / 7) % 1;
-        const base = (4 + Math.sqrt(inf / 0.4) * 14) / s;
-        ctx.beginPath();
-        ctx.arc(x, y, base * (0.6 + ph * 1.2), 0, Math.PI * 2);
-        ctx.strokeStyle = o.human ? `rgba(240,165,124,${0.75 * (1 - ph)})` : `rgba(181,214,96,${0.75 * (1 - ph)})`;
-        ctx.lineWidth = 2 / s;
-        ctx.stroke();
-      }
-    }
-  }
   invalidate() { this.dirty = true; }
 
   private size() { return { w: this.canvas.clientWidth || 800, h: this.canvas.clientHeight || 500 }; }
@@ -180,8 +126,9 @@ export class MapView {
   fitWorld() {
     const { w, h } = this.size();
     const s = Math.min(w / 345, h / 140);
-    this.v = { cx: 8, cy: 22, s: Math.max(0.5, s) };
-    this.invalidate();
+    const to = { cx: 8, cy: 22, s: Math.max(0.5, s) };
+    if (this.touched && this.drawnKey) this.animateTo(to, 750);
+    else { this.tw = null; this.v = to; this.invalidate(); }
   }
 
   fitLocal(id: Id) {
@@ -189,23 +136,44 @@ export class MapView {
     const { w, h } = this.size();
     const bw = fr.bbox.x1 - fr.bbox.x0, bh = fr.bbox.y1 - fr.bbox.y0;
     const s = Math.min((w * 0.82) / Math.max(1, bw), (h * 0.78) / Math.max(1, bh));
-    this.v = { cx: (fr.bbox.x0 + fr.bbox.x1) / 2, cy: (fr.bbox.y0 + fr.bbox.y1) / 2, s: Math.min(140, s) };
-    this.invalidate();
+    const to = { cx: (fr.bbox.x0 + fr.bbox.x1) / 2, cy: (fr.bbox.y0 + fr.bbox.y1) / 2, s: Math.min(140, s) };
+    if (this.drawnKey) this.animateTo(to, 700);
+    else { this.v = to; this.invalidate(); }
   }
 
   focus(id: Id) {
     this.touched = true;
     const p = labelPoint(id);
-    this.v.cx = p[0];
-    this.v.cy = p[1];
-    this.v.s = Math.max(this.v.s, 4);
-    this.invalidate();
+    const cur = this.tw?.to ?? this.v;
+    this.animateTo({ cx: p[0], cy: p[1], s: Math.max(cur.s, 4) }, 800);
+  }
+
+  /**
+   * Encuadre «cinematográfico» de una acción: si los puntos se ven demasiado pequeños o quedan fuera,
+   * acerca y centra la cámara suavemente (nunca aleja más de lo que ya está).
+   */
+  frame(pts: Pt[], maxScale = 6) {
+    if (this.host.view !== 'world' || !pts.length) return;
+    const { w, h } = this.size();
+    const x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0]));
+    const y0 = Math.min(...pts.map((p) => p[1])), y1 = Math.max(...pts.map((p) => p[1]));
+    const cur = this.tw?.to ?? this.v;
+    const fit = Math.min((w * 0.5) / Math.max(4, x1 - x0), (h * 0.42) / Math.max(3, y1 - y0));
+    // Acerca si se ve pequeño; aleja solo lo justo para que quepan ambos extremos
+    const s = Math.max(0.6, Math.min(Math.max(cur.s, Math.min(maxScale, fit)), fit * 1.6));
+    const inside = pts.every((p) => {
+      const sx = (p[0] - cur.cx) * s + w / 2, sy = (cur.cy - p[1]) * s + h / 2;
+      return sx > w * 0.12 && sx < w * 0.88 && sy > h * 0.2 && sy < h * (w < 600 ? 0.62 : 0.78);
+    });
+    if (s <= cur.s * 1.15 && s >= cur.s * 0.87 && inside) return;
+    this.touched = true;
+    this.animateTo({ cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 - (h * (w < 600 ? 0.1 : 0.04)) / s, s }, 900);
   }
 
   zoom(f: number) {
     this.touched = true;
-    this.v.s = Math.max(0.6, Math.min(160, this.v.s * f));
-    this.invalidate();
+    const cur = this.tw?.to ?? this.v;
+    this.animateTo({ ...cur, s: Math.max(0.6, Math.min(160, cur.s * f)) }, 260);
   }
 
   private fitIfNeeded() {
@@ -233,6 +201,7 @@ export class MapView {
     const c = this.canvas;
     c.addEventListener('pointerdown', (e) => {
       this.touched = true;
+      this.tw = null;
       c.setPointerCapture(e.pointerId);
       this.pointers.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
       if (this.pointers.size === 2) {
@@ -278,6 +247,7 @@ export class MapView {
     c.addEventListener('wheel', (e) => {
       e.preventDefault();
       this.touched = true;
+      this.tw = null;
       this.zoomAt(e.offsetX, e.offsetY, Math.exp(-e.deltaY * 0.0015));
     }, { passive: false });
     c.addEventListener('dblclick', (e) => {
@@ -354,26 +324,59 @@ export class MapView {
   render() {
     this.dirty = false;
     const { w, h } = this.size();
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const key = this.host.view === 'local' ? `L:${this.host.localId}:${this.host.localLayer}` : `W:${this.host.layer}`;
+    // Fundido suave al cambiar de capa o de vista: el motor de efectos pinta la imagen anterior desvaneciéndose
+    if (this.drawnKey && key !== this.drawnKey && this.canvas.width > 0) {
+      const snap = (this.snap ??= document.createElement('canvas'));
+      snap.width = this.canvas.width; snap.height = this.canvas.height;
+      snap.getContext('2d')!.drawImage(this.canvas, 0, 0);
+      this.fx.crossfade(snap);
+    }
+    this.drawnKey = key;
     if (this.canvas.width !== Math.round(w * dpr) || this.canvas.height !== Math.round(h * dpr)) {
       this.canvas.width = Math.round(w * dpr);
       this.canvas.height = Math.round(h * dpr);
     }
     const ctx = this.ctx;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = OCEAN;
-    ctx.fillRect(0, 0, w, h);
+    this.drawOcean(w, h);
     this.drawGraticule(w, h);
     const s = this.v.s;
     ctx.setTransform(dpr * s, 0, 0, -dpr * s, dpr * (w / 2 - this.v.cx * s), dpr * (h / 2 + this.v.cy * s));
     if (this.host.view === 'local' && this.host.localId) this.drawLocal(dpr);
     else this.drawWorld(dpr);
+    // Viñeta
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const vg = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.45, w / 2, h / 2, Math.hypot(w, h) * 0.62);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(2,5,10,0.42)');
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  /** Océano con degradado radial y un brillo suave. */
+  private drawOcean(w: number, h: number) {
+    const ctx = this.ctx;
+    const g = ctx.createRadialGradient(w * 0.5, h * 0.42, 0, w * 0.5, h * 0.5, Math.hypot(w, h) * 0.6);
+    g.addColorStop(0, '#173452');
+    g.addColorStop(0.45, '#102539');
+    g.addColorStop(1, '#081321');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    const sh = ctx.createLinearGradient(0, 0, w, h);
+    sh.addColorStop(0, 'rgba(120,180,255,0.05)');
+    sh.addColorStop(0.5, 'rgba(120,180,255,0)');
+    sh.addColorStop(1, 'rgba(0,0,0,0.08)');
+    ctx.fillStyle = sh;
+    ctx.fillRect(0, 0, w, h);
   }
 
   private drawGraticule(w: number, h: number) {
     const ctx = this.ctx;
-    ctx.strokeStyle = 'rgba(120,150,190,0.07)';
+    ctx.strokeStyle = 'rgba(140,180,230,0.07)';
     ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
     for (let lon = -180; lon <= 180; lon += 30) {
       const [x] = this.toScreen(lon, 0);
       if (x < -2 || x > w + 2) continue;
@@ -384,6 +387,10 @@ export class MapView {
       if (y < -2 || y > h + 2) continue;
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
     }
+    ctx.setLineDash([]);
+    // Ecuador algo más visible
+    const [, ye] = this.toScreen(0, 0);
+    if (ye > 0 && ye < h) { ctx.strokeStyle = 'rgba(140,180,230,0.11)'; ctx.beginPath(); ctx.moveTo(0, ye); ctx.lineTo(w, ye); ctx.stroke(); }
   }
 
   private layerCtx(): LayerCtx { return { world: this.host.world, player: this.host.player }; }
@@ -394,6 +401,14 @@ export class MapView {
     const layer = LAYER_BY_ID[this.host.layer] ?? LAYER_BY_ID.politico;
     const lctx = this.layerCtx();
     const s = this.v.s;
+    const land = landPath();
+    // Resplandor de las costas
+    ctx.lineJoin = 'round';
+    for (const [lw, a] of [[11, 0.05], [6, 0.08], [2.6, 0.14]] as const) {
+      ctx.lineWidth = lw / s;
+      ctx.strokeStyle = `rgba(110,190,255,${a})`;
+      ctx.stroke(land);
+    }
     const colorCache: Record<string, string> = {};
     for (const f of FEATURES) {
       const c = world.countries[f.entity];
@@ -405,9 +420,16 @@ export class MapView {
     }
     // Ocupaciones y cesiones territoriales
     this.drawOccupation(true);
+    // Sombreado suave: luz desde el norte, algo de sombra hacia el sur
+    const shade = ctx.createLinearGradient(0, 95, 0, -65);
+    shade.addColorStop(0, 'rgba(255,255,255,0.10)');
+    shade.addColorStop(0.45, 'rgba(255,255,255,0.0)');
+    shade.addColorStop(1, 'rgba(0,0,0,0.16)');
+    ctx.fillStyle = shade;
+    ctx.fill(land, 'evenodd');
     // Fronteras internas (miembros de bloques) y externas
     ctx.lineWidth = 0.6 / s;
-    ctx.strokeStyle = 'rgba(10,12,16,0.35)';
+    ctx.strokeStyle = 'rgba(10,12,16,0.3)';
     for (const f of FEATURES) if (world.countries[f.entity]?.isBlock) ctx.stroke(featurePath(f));
     ctx.lineWidth = 1 / s;
     ctx.strokeStyle = BORDER;
@@ -415,22 +437,49 @@ export class MapView {
       if (world.countries[id].isBlock) for (const f of BY_ENTITY[id] ?? []) ctx.stroke(featurePath(f));
     }
     for (const f of FEATURES) if (!world.countries[f.entity]?.isBlock) ctx.stroke(featurePath(f));
-    // Hover, jugador, selección
-    const outline = (id: Id, color: string, px: number, glow = 0) => {
+    // Línea de costa nítida
+    ctx.lineWidth = 0.8 / s;
+    ctx.strokeStyle = 'rgba(190,225,255,0.22)';
+    ctx.stroke(land);
+    // Hover (el propio país y el seleccionado llevan halo animado en el lienzo de efectos)
+    if (this.hovered && this.hovered !== this.host.selected) {
       ctx.save();
-      if (glow) { ctx.shadowColor = color; ctx.shadowBlur = glow * dpr; }
-      ctx.strokeStyle = color;
-      ctx.lineWidth = px / s;
-      for (const f of BY_ENTITY[id] ?? []) ctx.stroke(featurePath(f));
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      for (const f of BY_ENTITY[this.hovered] ?? []) ctx.fill(featurePath(f), 'evenodd');
+      ctx.strokeStyle = 'rgba(240,239,236,0.7)';
+      ctx.lineWidth = 1.4 / s;
+      for (const f of BY_ENTITY[this.hovered] ?? []) ctx.stroke(featurePath(f));
       ctx.restore();
-    };
-    if (this.hovered && this.hovered !== this.host.selected) outline(this.hovered, 'rgba(240,239,236,0.55)', 1.3);
-    if (this.host.player) outline(this.host.player.id, '#f0efec', 1.6);
-    if (this.host.selected) outline(this.host.selected, '#5598e7', 2.6, 8);
-    if (this.host.layer === 'conflictos' || world.wars.length) this.drawFronts();
-    if (!this.reducedMotion) this.drawOutbreakPulses();
+    }
+    this.drawCapitals(dpr);
     this.drawLabels(dpr);
-    this.drawFx(dpr);
+  }
+
+  /** Capitales como puntos luminosos (la tuya, dorada y más grande). */
+  private drawCapitals(dpr: number) {
+    const ctx = this.ctx, W = this.host.world, s = this.v.s;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const { w, h } = this.size();
+    const pid = this.host.player?.id;
+    const r0 = Math.max(1.3, Math.min(2.6, 0.7 + s * 0.28));
+    for (const id of W.order) {
+      const c = W.countries[id];
+      if (!c.alive) continue;
+      const big = Math.sqrt(entityArea(id)) * s;
+      if (big < 14 && id !== pid) continue;
+      const pt = capitalPt(W, id);
+      const [x, y] = this.toScreen(pt[0], pt[1]);
+      if (x < -10 || y < -10 || x > w + 10 || y > h + 10) continue;
+      const mine = id === pid;
+      const R = (mine ? 5 : 3.6) * (r0 / 2);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = mine ? 0.8 : 0.28;
+      ctx.drawImage(this.fx.glow(mine ? '#ffcf5a' : '#fff1cf'), x - R * 2, y - R * 2, R * 4, R * 4);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = mine ? '#fff3c4' : '#fffaf0';
+      ctx.beginPath(); ctx.arc(x, y, mine ? r0 * 1.3 : r0 * 0.75, 0, Math.PI * 2); ctx.fill();
+    }
   }
 
   private drawOccupation(world: boolean) {
@@ -462,55 +511,6 @@ export class MapView {
           if (pat && r.controller !== r.owner) this.fillHatch(p);
         }
         ctx.restore();
-      }
-    }
-  }
-
-  private drawFronts() {
-    const ctx = this.ctx;
-    const W = this.host.world;
-    const s = this.v.s;
-    const t = this.pulse / 60;
-    for (const war of W.wars) {
-      for (const fr of war.fronts) {
-        const a = labelPoint(fr.a), d = labelPoint(fr.d);
-        // La línea del frente avanza hacia el defensor cuanto más territorio controla el atacante (y se desliza suavemente entre meses)
-        const key = `${war.id}:${fr.a}:${fr.d}`;
-        const target = Math.max(0.08, Math.min(0.85, 0.42 - fr.control / 260));
-        const cur = this.frontPos[key] ?? target;
-        const f = this.reducedMotion ? target : cur + (target - cur) * 0.04;
-        this.frontPos[key] = f;
-        const mx = d[0] + (a[0] - d[0]) * f, my = d[1] + (a[1] - d[1]) * f;
-        const r = (5 + Math.sin(t * Math.PI) * 1.5) / s;
-        ctx.beginPath();
-        ctx.arc(mx, my, r * 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = war.ceasefire > 0 ? 'rgba(180,180,170,0.25)' : 'rgba(230,103,103,0.25)';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(mx, my, r, 0, Math.PI * 2);
-        ctx.fillStyle = war.ceasefire > 0 ? '#9a9a92' : '#e66767';
-        ctx.fill();
-        ctx.lineWidth = 1.5 / s;
-        ctx.strokeStyle = '#1a1a19';
-        ctx.stroke();
-        ctx.setLineDash([4 / s, 3 / s]);
-        ctx.lineDashOffset = war.ceasefire > 0 ? 0 : (-t * 6) / s; // la línea de suministro «marcha» hacia el frente
-        ctx.strokeStyle = war.ceasefire > 0 ? 'rgba(180,180,170,0.6)' : 'rgba(230,103,103,0.75)';
-        ctx.lineWidth = 1.4 / s;
-        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(mx, my); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.lineDashOffset = 0;
-        if (war.ceasefire <= 0) {
-          // Columnas de tropas: el atacante avanza hacia el frente y el defensor envía refuerzos
-          for (let i = 0; i < 3; i++) {
-            const k = (t * 0.35 + i / 3) % 1;
-            ctx.fillStyle = '#f0a57c';
-            ctx.fillRect(a[0] + (mx - a[0]) * k - 1.6 / s, a[1] + (my - a[1]) * k - 1.6 / s, 3.2 / s, 3.2 / s);
-            const k2 = (t * 0.25 + i / 3 + 0.17) % 1;
-            ctx.fillStyle = '#86b6ef';
-            ctx.fillRect(d[0] + (mx - d[0]) * k2 - 1.6 / s, d[1] + (my - d[1]) * k2 - 1.6 / s, 3.2 / s, 3.2 / s);
-          }
-        }
       }
     }
   }

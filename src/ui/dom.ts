@@ -36,25 +36,41 @@ export function mount(el: Element, ...children: Child[]) {
   append(el, children);
 }
 
-export function toast(text: string, kind: 'info' | 'good' | 'bad' = 'info', ms = 4200) {
+export function toast(text: string, kind: 'info' | 'good' | 'bad' = 'info', ms = 4200, icon?: string) {
   let wrap = document.querySelector('.toast-wrap');
   if (!wrap) {
-    wrap = h('div', { class: 'toast-wrap' });
+    wrap = h('div', { class: 'toast-wrap', 'aria-live': 'polite' });
     document.body.appendChild(wrap);
   }
-  const t = h('div', { class: `toast ${kind === 'info' ? '' : kind}` }, text);
+  // Si el texto ya empieza por un emoji, ese es el icono
+  const m = /^(\p{Extended_Pictographic}\uFE0F?)\s*/u.exec(text);
+  const ic = icon ?? (m ? m[1] : kind === 'good' ? '✅' : kind === 'bad' ? '⚠️' : '📰');
+  const body = m && !icon ? text.slice(m[0].length) : text;
+  const t = h('div', { class: `toast ${kind === 'info' ? '' : kind}`, role: 'status' }, h('span', { class: 't-ic' }, ic), h('span', null, body));
   wrap.appendChild(t);
+  while (wrap.children.length > 3) wrap.firstElementChild?.remove();
   setTimeout(() => t.remove(), ms);
 }
 
-export function modal(opts: { title: string; kicker?: string; body: Child; footer?: Child; wide?: boolean; onClose?: () => void; closable?: boolean }): () => void {
+export interface ModalOpts {
+  title: string; kicker?: string; body: Child; footer?: Child; wide?: boolean; onClose?: () => void; closable?: boolean;
+  /** Icono grande junto al título (emoji). */
+  icon?: string; bigIcon?: boolean; hotKicker?: boolean; cls?: string;
+}
+
+export function modal(opts: ModalOpts): () => void {
   let closed = false;
-  const close = () => { if (closed) return; closed = true; back.remove(); opts.onClose?.(); };
+  const close = () => { if (closed) return; closed = true; back.remove(); document.removeEventListener('keydown', onKey); opts.onClose?.(); };
+  const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && opts.closable !== false && [...document.querySelectorAll('.modal-back')].pop() === back) close(); };
+  document.addEventListener('keydown', onKey);
   const back = h('div', { class: 'modal-back', onclick: (e: Event) => { if (e.target === back && opts.closable !== false) close(); } },
-    h('div', { class: `modal ${opts.wide ? 'wide' : ''}`, role: 'dialog', 'aria-modal': 'true' },
-      h('header', null, opts.kicker ? h('div', { class: 'kicker' }, opts.kicker) : null, h('h2', null, opts.title)),
+    h('div', { class: `modal ${opts.wide ? 'wide' : ''} ${opts.cls ?? ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': opts.title },
+      h('header', null,
+        opts.icon ? h('span', { class: `m-ic ${opts.bigIcon ? 'huge' : ''}`, 'aria-hidden': 'true' }, opts.icon) : null,
+        h('div', { class: 'm-tt' }, opts.kicker ? h('div', { class: `kicker ${opts.hotKicker ? 'hot' : ''}` }, opts.kicker) : null, h('h2', null, opts.title)),
+        opts.closable !== false ? h('button', { class: 'close-x m-close', 'aria-label': 'Cerrar', title: 'Cerrar', onclick: () => close() }, '✕') : null),
       h('div', { class: 'body' }, opts.body),
-      opts.footer !== undefined ? h('footer', null, opts.footer) : h('footer', null, h('button', { class: 'btn', onclick: close }, 'Cerrar'))));
+      opts.footer !== undefined ? (opts.footer === null ? null : h('footer', null, opts.footer)) : h('footer', null, h('button', { class: 'btn', onclick: close }, 'Cerrar'))));
   document.body.appendChild(back);
   return close;
 }

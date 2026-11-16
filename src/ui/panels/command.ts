@@ -16,7 +16,7 @@ import { renderSummary } from './summary';
 import { tweenNumber } from '../live';
 import { NEEDS } from '../../sim/needs';
 import { topPartners } from '../../sim/market';
-import { hubEl, openGoal } from '../hub';
+import { openGoal } from '../hub';
 
 const clamp = (v: number, a = 0, b = 100) => Math.max(a, Math.min(b, v));
 
@@ -43,7 +43,7 @@ export function gauges(world: World, c: Country): Gauge[] {
 }
 
 export function scoreColor(v: number): string {
-  return v >= 65 ? '#2fae4e' : v >= 45 ? '#e0a92a' : '#d64545';
+  return v >= 65 ? '#3ccf78' : v >= 45 ? '#f5b740' : '#f2605e';
 }
 
 function gaugeEl(app: App, g: Gauge): HTMLElement {
@@ -59,7 +59,7 @@ function gaugeEl(app: App, g: Gauge): HTMLElement {
     h('span', { class: 'ring' }, h('span', { class: 'ic' }, g.icon)),
     h('span', { class: 'g-txt' },
       h('span', { class: 'g-name' }, g.name),
-      h('span', { class: 'g-val' }, num, Math.abs(d) >= 0.5 ? h('span', { class: `trend ${d > 0 ? 'good' : 'bad'}` }, d > 0 ? '▲' : '▼') : h('span', { class: 'trend flat' }, '▬')),
+      h('span', { class: 'g-val' }, num, Math.abs(d) >= 0.5 ? h('span', { class: `trend ${d > 0 ? 'good' : 'bad'}` }, d > 0 ? '▲' : '▼') : null),
       h('span', { class: 'g-detail' }, g.detail)));
   tip(el, () => h('div', null, h('div', { class: 't' }, `${g.icon} ${g.name}: ${Math.round(g.score)}/100`), h('div', { class: 'small' }, g.help), h('div', { class: 'small muted' }, 'Clic: ver qué puedes hacer')));
   return el;
@@ -106,20 +106,20 @@ function adviceEl(app: App, c: Country, a: Advice): HTMLElement {
   // Primera acción disponible de la lista (si ninguna lo está, se ofrece ir a la pestaña)
   const def = (a.actions ?? []).map((id) => ACTION_BY_ID[id]).find((d) => d && previewAction(app.world, d, { actor: c }).ok);
   const btn = a.run
-    ? h('button', { class: 'btn sm primary', onclick: a.run }, a.label ?? 'Ir')
+    ? h('button', { class: 'btn primary a-btn', onclick: a.run }, h('span', { class: 'a-nm' }, a.label ?? 'Ir'), h('span', null, '›'))
     : def
-      ? h('button', { class: 'btn sm primary', title: def.desc, onclick: () => openAction(app, def, {}) }, `${def.name} ⚡${previewAction(app.world, def, { actor: c }).ap}`)
-      : h('button', { class: 'btn sm', onclick: () => app.setTab(a.tab ?? 'gobierno') }, a.label ?? 'Ver');
+      ? h('button', { class: 'btn primary a-btn', title: def.desc, onclick: () => openAction(app, def, {}) }, h('span', { class: 'a-nm' }, def.name), h('span', { class: 'a-ap' }, `⚡${previewAction(app.world, def, { actor: c }).ap}`))
+      : h('button', { class: 'btn a-btn', onclick: () => app.setTab(a.tab ?? 'gobierno') }, h('span', { class: 'a-nm' }, a.label ?? 'Ver'), h('span', null, '›'));
   const sevCls = a.sev >= 60 ? 'hi' : a.sev >= 35 ? 'mid' : 'lo';
-  return h('div', { class: `advice ${sevCls}` }, h('span', { class: 'a-ic' }, a.icon),
-    h('div', { class: 'a-body' }, h('b', null, a.title), h('div', { class: 'small ink2' }, a.text), btn));
+  return h('div', { class: `advice ${sevCls}` }, h('span', { class: 'a-ic', 'aria-hidden': 'true' }, a.icon),
+    h('div', { class: 'a-body' }, h('b', null, a.title), h('div', { class: 'small' }, a.text)), btn);
 }
 
 export function renderCommand(app: App): HTMLElement[] {
   const c = app.player;
   if (!c) return renderSummary(app);
   const adv = h('details', { class: 'adv', open: app.ui.cmdAdvanced ? '' : undefined },
-    h('summary', null, '📋 Avanzado: todos los datos'),
+    h('summary', null, '📋 Más datos (avanzado)'),
     h('div', null, ...renderSummary(app)));
   adv.addEventListener('toggle', () => {
     const open = (adv as HTMLDetailsElement).open;
@@ -127,13 +127,15 @@ export function renderCommand(app: App): HTMLElement[] {
     app.ui.cmdAdvanced = open;
     app.refresh(); // la barra superior muestra todas las cifras en modo avanzado
   });
+  // Lo urgente: hasta 3, pero los consejos de relleno (poco importantes) solo si no hay nada más
+  const all = adviceFor(app, c);
+  const urgent = all.filter((a) => a.sev >= 20).slice(0, 3);
+  const shown = urgent.length ? urgent : all.slice(0, 1);
   return [
-    h('h2', { class: 'cmd-title' }, '🎛 Panel de mando'),
+    h('div', { class: 'cmd-head' }, h('h2', { class: 'cmd-title' }, '🎛 ¿Cómo va el país?')),
     h('div', { class: 'cmd-gauges' }, gauges(app.world, c).map((g) => gaugeEl(app, g))),
-    h('h3', { class: 'cmd-sub' }, '🧑‍💼 Lo más urgente'),
-    h('div', { class: 'advisors' }, adviceFor(app, c).slice(0, 3).map((a) => adviceEl(app, c, a))),
-    h('div', { class: 'cmd-tip' }, '👇 Para actuar, usa los botones grandes de debajo del mapa o pulsa un país.'),
-    h('div', { class: 'hub-mobile' }, h('h3', { class: 'cmd-sub' }, '👉 ¿Qué quieres hacer?'), hubEl(app)),
+    h('h3', { class: 'cmd-sub' }, urgent.length ? '🔔 Lo urgente' : '💡 Una idea'),
+    h('div', { class: 'advisors' }, shown.map((a) => adviceEl(app, c, a))),
     adv,
   ];
 }

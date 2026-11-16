@@ -13,14 +13,15 @@ import { tip } from '../tooltip';
 import { rightExtras } from './rightExtras';
 import { ACTION_BY_ID, previewAction } from '../../sim/actions';
 import { openAction } from '../actionui';
+import { relOp, allied } from '../../sim/vars';
+import { relationTarget } from '../../sim/diplomacy';
 
 export function renderRight(app: App): HTMLElement[] {
   const w = app.world;
   const id = app.selected ?? app.player?.id ?? null;
-  const header = h('div', { class: 'row between', style: 'padding:8px 12px;border-bottom:1px solid var(--line)' },
-    h('span', { class: 'small muted' }, app.selectedRegion ? 'Región seleccionada' : 'País seleccionado'),
-    h('button', { class: 'btn sm ghost', title: 'Ocultar panel', onclick: () => { app.toggleRight(); app.root.classList.remove('show-right'); } }, '✕'));
-  if (!id) return [header, h('div', { class: 'panel-body muted' }, 'Haz clic en un país del mapa para ver su información.')];
+  const header = h('div', { class: 'right-head' },
+    h('button', { class: 'close-x', title: 'Cerrar', 'aria-label': 'Cerrar', onclick: () => { app.toggleRight(); app.root.classList.remove('show-right'); } }, '✕'));
+  if (!id) return [header, h('div', { class: 'panel-body muted' }, 'Pulsa un país del mapa para verlo.')];
   const c = w.countries[id];
   if (app.selectedRegion) {
     const owner = Object.values(w.countries).find((x) => x.regions.some((r) => r.id === app.selectedRegion));
@@ -30,44 +31,68 @@ export function renderRight(app: App): HTMLElement[] {
   return [header, h('div', { class: 'panel-body' }, countryPanel(app, c))];
 }
 
+/** Cara, texto y color de la relación (opinión de −100 a 100). */
+function moodOf(op: number): [string, string, string] {
+  if (op >= 40) return ['😄', 'Muy buena', 'var(--good)'];
+  if (op >= 12) return ['🙂', 'Buena', 'var(--good)'];
+  if (op >= -12) return ['😐', 'Normal', 'var(--warning)'];
+  if (op >= -40) return ['😟', 'Mala', 'var(--serious)'];
+  return ['😡', 'Hostil', 'var(--critical)'];
+}
+
 function countryPanel(app: App, c: Country): HTMLElement[] {
   const w = app.world;
-  const isMe = app.player?.id === c.id;
+  const me = app.player;
+  const isMe = me?.id === c.id;
   const reg = regimeOf(c.pol.regime);
   const ideo = ideologyOf(c.pol.ideology);
-  const acc = accuracyOf(w, app.player, c);
+  const acc = accuracyOf(w, me, c);
   const out: HTMLElement[] = [];
-  out.push(h('div', { class: 'row', style: 'margin-bottom:6px' }, flagEl(c, 36, 24),
-    h('div', { class: 'grow' }, h('h2', { style: 'margin:0' }, c.name),
-      h('div', { class: 'small ink2' }, c.isBlock ? `Bloque regional · capital de referencia: ${c.capital}` : `${c.pol.leaderTitle} · ${c.pol.govParty || 'Gobierno'} · ${c.capital}`))));
-  out.push(h('div', { class: 'row wrap', style: 'margin-bottom:8px' },
-    h('span', { class: 'tag' }, reg.name), h('span', { class: 'tag', style: `border-color:${ideo.color}` }, ideo.name),
-    isMe ? h('span', { class: 'tag blue' }, 'Tu país') : null,
-    c.isBlock ? h('span', { class: 'tag' }, `${c.regions.length} países`) : null,
-    c.mil.nukes > 0 ? h('span', { class: 'tag red', title: 'Potencia nuclear' }, '☢ nuclear') : null));
-  if (!isMe && app.player) {
-    const accEl = h('div', { class: 'small', style: 'margin-bottom:8px' },
-      h('div', { class: 'row between' }, h('span', { class: 'ink2' }, 'Precisión de la información'), h('b', null, `${Math.round(acc * 100)} %`)),
-      bar(acc * 100, 100, acc > 0.85 ? '#0ca30c' : acc > 0.6 ? '#fab219' : '#d03b3b'));
-    tip(accEl, () => 'Los datos de otros países se muestran con ruido según tu red de espionaje, tu capacidad de inteligencia, la transparencia del país (libertad de prensa) y tus alianzas. "≈" indica un valor aproximado.');
-    out.push(accEl);
+  out.push(h('div', { class: 'cp-head' }, flagEl(c, 64, 42),
+    h('div', { class: 'grow' }, h('h2', null, c.name),
+      h('div', { class: 'sub' }, c.isBlock ? `Bloque de ${c.regions.length} países` : `${reg.name}`),
+      isMe ? h('span', { class: 'tag blue', style: 'margin-top:4px' }, '⭐ Tu país') : null)));
+  if (!isMe && me) {
+    const op = relOp(w, c.id, me.id);
+    const [face, label, col] = moodOf(op);
+    const war = w.wars.some((x) => x.ceasefire <= 0 && ((x.attackers.includes(c.id) && x.defenders.includes(me.id)) || (x.defenders.includes(c.id) && x.attackers.includes(me.id))));
+    const mood = h('div', { class: 'mood' }, h('span', { class: 'face', 'aria-hidden': 'true' }, war ? '⚔️' : face),
+      h('div', { class: 'm-tx' }, h('span', { class: 'm-k' }, 'Cómo nos llevamos'),
+        h('span', { class: 'm-v', style: `color:${war ? 'var(--critical)' : col}` }, war ? 'En guerra' : label),
+        bar((op + 100) / 2, 100, war ? 'var(--critical)' : col),
+        h('span', { class: 'tags' },
+          allied(w, c.id, me.id) ? h('span', { class: 'tag green' }, '🛡️ Aliados') : null,
+          c.mil.nukes > 0 ? h('span', { class: 'tag red' }, '☢️ Nuclear') : null)));
+    tip(mood, () => h('div', null, h('div', { class: 't' }, `Opinión de ${c.short} sobre ti: ${op.toFixed(0)}`),
+      h('div', { class: 'desc' }, `Va hacia ${relationTarget(w, c, me).value.toFixed(0)}. Sube con comercio, ayuda y tratados; baja con sanciones, amenazas y espionaje descubierto.`)));
+    out.push(mood);
+    out.push(quickActions(app, c));
   }
-  if (!isMe && app.player) out.push(quickActions(app, c));
-  out.push(h('div', { class: 'kpis' },
-    kpi(app, 'gdp', c), kpi(app, 'growth', c), kpi(app, 'inflation', c),
-    kpi(app, 'unemployment', c), kpi(app, 'stability', c), kpi(app, 'approval', c)));
-  out.push(h('div', { class: 'row wrap', style: 'margin-bottom:10px' },
-    h('button', { class: 'btn sm', onclick: () => app.onOpenLocal(c.id) }, '🗺 Ver territorio'),
+  out.push(h('div', { class: 'cp-mini' }, kpi(app, 'gdp', c), kpi(app, 'growth', c), kpi(app, 'stability', c)));
+  out.push(h('div', { class: 'cp-tools' },
+    h('button', { class: 'btn sm', onclick: () => app.onOpenLocal(c.id) }, '🗺️ Territorio'),
     h('button', { class: 'btn sm', onclick: () => app.map.focus(c.id) }, '🎯 Centrar')));
   // Lo detallado, plegado (modo avanzado)
-  const more: HTMLElement[] = [...rightExtras(app, c)];
+  const more: HTMLElement[] = [];
+  more.push(h('div', { class: 'row wrap', style: 'margin-bottom:10px' },
+    h('span', { class: 'tag' }, reg.name), h('span', { class: 'tag', style: `border-color:${ideo.color}` }, ideo.name),
+    c.isBlock ? h('span', { class: 'tag' }, `capital de referencia: ${c.capital}`) : h('span', { class: 'tag' }, `${c.pol.leaderTitle} · ${c.pol.govParty || 'Gobierno'}`)));
+  if (!isMe && me) {
+    const accEl = h('div', { class: 'small', style: 'margin-bottom:10px' },
+      h('div', { class: 'row between' }, h('span', { class: 'ink2' }, '🔍 Fiabilidad de estos datos'), h('b', null, `${Math.round(acc * 100)} %`)),
+      bar(acc * 100, 100, acc > 0.85 ? 'var(--good)' : acc > 0.6 ? 'var(--warning)' : 'var(--critical)'));
+    tip(accEl, () => 'Los datos de otros países llevan ruido según tu red de espionaje, tu inteligencia, la libertad de prensa del país y tus alianzas. «≈» indica un valor aproximado.');
+    more.push(accEl);
+  }
+  more.push(h('div', { class: 'kpis' }, kpi(app, 'inflation', c), kpi(app, 'unemployment', c), kpi(app, 'approval', c)));
+  more.push(...rightExtras(app, c));
   more.push(section('Datos generales',
     plainStat('Población', `${c.soc.pop.toFixed(c.soc.pop < 10 ? 2 : 1)} M`),
     kpiRow(app, c, 'gdppc'), kpiRow(app, c, 'debt'), kpiRow(app, c, 'power'), kpiRow(app, c, 'corruption'), kpiRow(app, c, 'cartels'),
     plainStat('Recursos', resourcesText(c)),
     plainStat('Organismos', Object.values(w.orgs).filter((o) => o.type !== 'universal' && o.members.includes(c.id)).map((o) => o.short).join(', ') || '—')));
   const adv = h('details', { class: 'adv', open: app.ui.rightAdvanced ? '' : undefined },
-    h('summary', null, isMe ? '📋 Más datos de tu país' : '📋 Más datos y todas las acciones'), h('div', null, ...more));
+    h('summary', null, isMe ? '📋 Más datos' : '📋 Más datos y todas las acciones'), h('div', null, ...more));
   adv.addEventListener('toggle', () => { app.ui.rightAdvanced = (adv as HTMLDetailsElement).open; });
   out.push(adv);
   return out;
@@ -158,11 +183,11 @@ export function effectsText(fx: Record<string, number>): string {
 /** Acciones grandes con icono sobre otro país (las listas completas siguen en «Más datos» y en Diplomacia). */
 const QUICK: { id: string; icon: string; label: string; cls: string }[] = [
   { id: 'acuerdo_comercial', icon: '🤝', label: 'Comerciar', cls: 'good' },
-  { id: 'alianza', icon: '🛡', label: 'Aliarse', cls: 'good' },
+  { id: 'alianza', icon: '🛡️', label: 'Aliarse', cls: 'good' },
   { id: 'ayuda_exterior', icon: '🎁', label: 'Ayudar', cls: 'good' },
   { id: 'sancionar', icon: '🚫', label: 'Sancionar', cls: 'bad' },
-  { id: 'op_espionaje', icon: '🕵', label: 'Espiar', cls: 'spy' },
-  { id: 'declarar_guerra', icon: '⚔', label: 'Atacar', cls: 'bad' },
+  { id: 'op_espionaje', icon: '🕵️', label: 'Espiar', cls: 'spy' },
+  { id: 'declarar_guerra', icon: '⚔️', label: 'Atacar', cls: 'bad' },
 ];
 
 function quickActions(app: App, c: Country): HTMLElement {
@@ -171,8 +196,8 @@ function quickActions(app: App, c: Country): HTMLElement {
     const def = ACTION_BY_ID[q.id];
     if (!def) return null;
     const pv = previewAction(app.world, def, { actor: me, target: c });
-    const b = h('button', { class: `qa ${q.cls}`, disabled: !pv.ok, onclick: () => openAction(app, def, { target: c }) },
-      h('span', { class: 'ic' }, q.icon), h('span', null, q.label), h('span', { class: 'ap' }, pv.ok ? `⚡${pv.ap}` : 'no disponible'));
+    const b = h('button', { class: `qa ${q.cls} ${pv.ok ? '' : 'locked'}`, 'aria-disabled': String(!pv.ok), onclick: () => openAction(app, def, { target: c }) },
+      h('span', { class: 'ic' }, q.icon), h('span', null, q.label), h('span', { class: 'ap' }, pv.ok ? `⚡${pv.ap}` : '🔒'));
     tip(b, () => h('div', null, h('div', { class: 't' }, def.name), h('div', { class: 'small' }, pv.ok ? def.desc : pv.unmet.join(' · '))));
     return b;
   }));

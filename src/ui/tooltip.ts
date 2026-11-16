@@ -5,11 +5,15 @@ import { IND, explainOf } from './info';
 
 let tipEl: HTMLElement | null = null;
 let hideTimer: number | undefined;
+let lastTouch = 0; // los toques generan «mouseenter» de compatibilidad: no deben abrir la ayuda flotante
 
 function el(): HTMLElement {
   if (!tipEl) {
     tipEl = h('div', { class: 'tip', role: 'tooltip' });
     document.body.appendChild(tipEl);
+    // Un toque en cualquier otro sitio (o un cambio de pantalla) cierra la ayuda abierta
+    document.addEventListener('pointerdown', (e) => { lastTouch = e.pointerType === 'touch' ? Date.now() : 0; hideTip(); }, true);
+    document.addEventListener('scroll', hideTip, true);
   }
   return tipEl;
 }
@@ -33,16 +37,25 @@ export function showTip(content: HTMLElement | string, x: number, y: number) {
   place(x, y);
 }
 
+/** Si el elemento que abrió la ayuda desaparece (la pantalla se redibuja), la ayuda se cierra. */
+let watchTimer: number | undefined;
+function watch(target: HTMLElement) {
+  clearInterval(watchTimer);
+  watchTimer = window.setInterval(() => { if (!target.isConnected || tipEl?.style.display === 'none') { clearInterval(watchTimer); if (!target.isConnected) hideTip(); } }, 300);
+}
+
 export function hideTip() {
   if (tipEl) tipEl.style.display = 'none';
 }
 
 export function tip(target: HTMLElement, content: () => HTMLElement | string) {
-  target.addEventListener('mouseenter', (e) => showTip(content(), e.clientX, e.clientY));
+  el();
+  target.addEventListener('mouseenter', (e) => { if (Date.now() - lastTouch > 800) { showTip(content(), e.clientX, e.clientY); watch(target); } });
+  target.addEventListener('click', () => { if (Date.now() - lastTouch > 800) hideTip(); });
   target.addEventListener('mousemove', (e) => place(e.clientX, e.clientY));
   target.addEventListener('mouseleave', hideTip);
   target.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'touch') return;
+    if (e.pointerType !== 'touch' || target.tagName === 'BUTTON') return; // un botón táctil actúa, no explica
     showTip(content(), e.clientX, e.clientY);
     clearTimeout(hideTimer);
     hideTimer = window.setTimeout(hideTip, 3500);

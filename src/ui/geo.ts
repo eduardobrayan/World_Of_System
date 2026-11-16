@@ -218,3 +218,13 @@ export function entityPath(entity: string): Path2D {
   for (const f of BY_ENTITY[entity] ?? []) p.addPath(featurePath(f));
   return p;
 }
+
+let landCache: Path2D | null = null;
+/** Todas las tierras emergidas en un único trazo (para el resplandor de las costas y el sombreado). */
+export function landPath(): Path2D {
+  if (!landCache) {
+    landCache = new Path2D();
+    for (const f of FEATURES) landCache.addPath(featurePath(f));
+  }
+  return landCache;
+}

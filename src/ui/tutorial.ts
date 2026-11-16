@@ -4,10 +4,11 @@
  * El reloj se detiene mientras dura la guía.
  */
 import type { App } from './app';
-import { h } from './dom';
+import { h, toast } from './dom';
 
 interface Step {
-  sel: string; // elemento que se resalta
+  sel: string | (() => string); // elemento que se resalta
+  icon: string;
   title: string;
   text: string;
   before?: (app: App) => void;
@@ -15,21 +16,19 @@ interface Step {
 }
 
 const KEY = 'wos:guia';
+const narrow = () => window.matchMedia('(max-width: 980px)').matches;
 
 const STEPS: Step[] = [
-  { sel: '.cmd-gauges', title: 'Tu panel de mando', text: 'Seis medidores: verde va bien, amarillo regular, rojo mal. La flecha dice si sube o baja. Pulsa uno y verás qué puedes hacer.',
+  { sel: () => (narrow() ? '.mini-gauges' : '.cmd-gauges'), icon: '🎛', title: 'Cómo va tu país', text: 'Verde: bien. Ámbar: regular. Rojo: mal. Pulsa uno para mejorarlo.',
+    before: (app) => { app.setTab('mando'); app.root.classList.remove('show-left'); } },
+  { sel: '.advisors', icon: '🔔', title: 'Lo urgente', text: 'Aquí sale lo que corre prisa, con el botón para arreglarlo.',
     before: (app) => { app.setTab('mando'); } },
-  { sel: '.advisors', title: 'Tus consejeros', text: 'Te dicen lo más urgente. Pulsa su botón y actúas en un clic.' },
-  { sel: '.dock', title: 'Tus acciones', text: 'Todo lo que puedes hacer está aquí, por temas. Con 🔎 buscas cualquier cosa escribiendo una palabra.',
+  { sel: '.dock', icon: '👇', title: 'Tus acciones', text: 'Todo lo que puedes hacer, por temas. Pulsa uno.',
     before: (app) => { app.root.classList.remove('show-left'); } },
-  { sel: '.topbar .speed', title: 'El tiempo corre solo', text: 'Barra espaciadora: pausa. Teclas 1, 2 y 3: velocidad.' },
-  { sel: 'main.center', title: 'Elige un país', text: 'Haz clic en cualquier país del mapa (no el tuyo).',
+  { sel: '.topbar .speed', icon: '⏱', title: 'El tiempo corre solo', text: 'Pausa cuando quieras pensar (barra espaciadora).' },
+  { sel: 'main.center', icon: '🌍', title: 'Otros países', text: 'Pulsa un país del mapa para comerciar, aliarte… o atacar.',
     before: (app) => { app.root.classList.remove('show-left'); },
     waitFor: (app) => !!app.selected && app.selected !== app.player?.id },
-  { sel: '.quick-actions', title: 'Actúa sobre él', text: 'Comerciar, aliarte, ayudar, sancionar, espiar o atacar. Verás el efecto en el mapa.',
-    before: (app) => { app.root.classList.add('show-right'); app.root.classList.remove('right-collapsed'); } },
-  { sel: 'nav.tabs-v', title: 'Todo lo demás', text: 'Aquí está el detalle, en cinco secciones: gobierno, sociedad, mundo, ejército y tecnología.',
-    before: (app) => { app.root.classList.remove('show-right'); app.root.classList.add('show-left'); } },
 ];
 
 export function showTutorial(app: App, step = 0) {
@@ -38,17 +37,19 @@ export function showTutorial(app: App, step = 0) {
   s.before?.(app);
   app.modalOpen++;
   const spot = h('div', { class: 'coach-spot pulse' });
-  const next = h('button', { class: 'btn primary sm' }, step < STEPS.length - 1 ? 'Siguiente ▶' : '¡A gobernar!');
+  const next = h('button', { class: 'btn primary' }, step < STEPS.length - 1 ? 'Siguiente ▶' : '¡A gobernar!');
   const tipEl = h('div', { class: 'coach-tip', role: 'dialog', 'aria-live': 'polite' },
-    h('div', { class: 'k' }, `Guía ${step + 1}/${STEPS.length}`),
+    h('div', { class: 'c-ic', 'aria-hidden': 'true' }, s.icon),
     h('b', null, s.title), h('div', { style: 'margin-top:4px' }, s.text),
     h('div', { class: 'row' },
-      h('button', { class: 'btn ghost sm', onclick: () => { done(); remember(); } }, 'Saltar'),
-      s.waitFor ? h('span', { class: 'small muted' }, 'Esperando tu clic…') : next));
+      h('span', { class: 'dots', 'aria-label': `Paso ${step + 1} de ${STEPS.length}` }, STEPS.map((_, i) => h('i', { class: i === step ? 'on' : '' }))),
+      h('span', { class: 'row', style: 'margin:0;gap:6px' },
+        h('button', { class: 'btn ghost sm', onclick: () => { done(); remember(); } }, 'Saltar'),
+        s.waitFor ? h('span', { class: 'small muted' }, '👆 Pulsa uno…') : next)));
   document.body.append(spot, tipEl);
   let raf = 0, ended = false;
   const place = () => {
-    const el = document.querySelector<HTMLElement>(s.sel);
+    const el = document.querySelector<HTMLElement>(typeof s.sel === 'function' ? s.sel() : s.sel);
     const r = el?.getBoundingClientRect();
     const vw = window.innerWidth, vh = window.innerHeight;
     if (r && r.width > 0) {
@@ -64,7 +65,7 @@ export function showTutorial(app: App, step = 0) {
       spot.style.display = 'none';
       Object.assign(tipEl.style, { left: `${Math.max(8, (vw - tipEl.offsetWidth) / 2)}px`, top: `${vh * 0.3}px` });
     }
-    if (s.waitFor?.(app)) { done(); setTimeout(() => showTutorial(app, step + 1), 350); return; }
+    if (s.waitFor?.(app)) { done(); if (step < STEPS.length - 1) setTimeout(() => showTutorial(app, step + 1), 350); else { remember(); toast('¡Bien! Usa los botones grandes de su ficha para actuar sobre él.', 'good', 6000, '👏'); } return; }
     if (!ended) raf = requestAnimationFrame(place);
   };
   const done = () => {

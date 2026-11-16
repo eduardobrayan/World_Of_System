@@ -25,13 +25,13 @@ export function openGameMenu(app: App, onLoad: (w: import('../sim/types').World)
   };
   paint();
   close = modal({
-    title: 'Partida', kicker: 'Menú', onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); },
+    title: 'Partida', kicker: 'Menú', icon: '⚙️', onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); },
     body: h('div', null, slotsEl,
       h('div', { class: 'row wrap', style: 'margin-top:10px' },
         h('button', { class: 'btn', onclick: () => exportJSON(app.world) }, '⬇ Exportar a JSON'),
         h('button', { class: 'btn', onclick: async () => { try { const w = await importJSON(); close(); onLoad(w); } catch (e) { toast((e as Error).message, 'bad'); } } }, '⬆ Importar JSON'),
-        h('button', { class: 'btn', onclick: () => { close(); showTutorial(app); } }, '❓ Tutorial'),
+        h('button', { class: 'btn', onclick: () => { close(); showTutorial(app); } }, '❓ Guía rápida'),
         h('button', { class: 'btn danger', onclick: () => { close(); app.onExit(); } }, 'Salir al menú principal')),
-      h('p', { class: 'small muted', style: 'margin-top:8px' }, 'La partida se autoguarda cada 3 meses. Las partidas guardadas viven en este navegador; exporta a JSON para conservarlas o moverlas.')),
+      h('p', { class: 'small muted', style: 'margin-top:8px' }, '💾 Se guarda sola cada 3 meses, en este navegador. Exporta a JSON para llevarla a otro sitio.')),
   });
 }

@@ -8,7 +8,7 @@ import type { App } from './app';
 import type { ActionDef, Contribution, Country } from '../sim/types';
 import { h, modal, mount } from './dom';
 import { ACTIONS, ACTION_BY_ID, previewAction } from '../sim/actions';
-import { openAction } from './actionui';
+import { actionIcon, effectPill, openAction } from './actionui';
 
 interface Link { icon: string; name: string; text: string; run: (app: App) => void; words?: string }
 export interface Goal { id: string; icon: string; name: string; hint: string; color: string; actions: string[]; links?: Link[]; explain?: string; words: string }
@@ -66,32 +66,32 @@ function firstSentence(s: string): string {
 }
 
 /** Tarjeta visual de una acción: nombre, frase corta, efectos principales y coste. */
-export function actionCard(app: App, c: Country, def: ActionDef, icon: string, onPick?: () => void): HTMLElement {
+export function actionCard(app: App, c: Country, def: ActionDef, icon: string, onPick?: () => void, color?: string): HTMLElement {
   const pv = previewAction(app.world, def, { actor: c });
   const done = !!(def.params?.law && c.pol.flags[def.id]);
-  const chips = pv.lines.filter((l) => !l.hidden && l.good !== undefined).slice(0, 3)
-    .map((l) => h('span', { class: `chip ${l.good ? 'good' : 'bad'}` }, `${/[:×=]\s*[-−]|×0\./.test(l.text) ? '▼' : '▲'} ${l.text.split(':')[0].replace(/^desde el mes \d+, /, '')}`));
+  const chips = pv.lines.filter((l) => !l.hidden && l.good !== undefined).slice(0, 3).map((l) => effectPill(l, true));
   const why = done ? 'Ya está en vigor' : pv.unmet[0];
   return h('button', { class: `acard ${done ? 'done' : pv.ok ? '' : 'off'}`, title: def.desc, onclick: () => { onPick?.(); openAction(app, def, {}); } },
-    h('span', { class: 'ac-ic' }, done ? '✅' : icon),
+    h('span', { class: 'ac-ic', style: `--gc:${color ?? '#9aa4b2'}` }, done ? '✅' : actionIcon(def) || icon),
     h('span', { class: 'ac-body' },
       h('b', null, def.name),
-      h('span', { class: 'ac-desc' }, firstSentence(def.desc)),
+      h('span', { class: 'ac-desc' }, firstSentence(def.desc))),
+    h('span', { class: 'ac-cost' }, done ? '' : h('span', { class: 'apc' }, `⚡${pv.ap}`), pv.money > 0.05 && !done ? h('small', null, `💰 ${pv.money.toFixed(1)}`) : null),
+    chips.length || why ? h('span', { class: 'ac-foot' },
       chips.length ? h('span', { class: 'ac-chips' }, chips) : null,
-      why ? h('span', { class: 'ac-why' }, `🔒 ${why}`) : null),
-    h('span', { class: 'ac-cost' }, done ? '' : `⚡${pv.ap}`, pv.money > 0.05 && !done ? h('small', null, `${pv.money.toFixed(1)} mm$`) : null));
+      why ? h('span', { class: 'ac-why' }, `🔒 ${why}`) : null) : null);
 }
 
 function linkCard(app: App, l: Link, onPick?: () => void): HTMLElement {
-  return h('button', { class: 'acard link', onclick: () => { onPick?.(); l.run(app); } },
-    h('span', { class: 'ac-ic' }, l.icon), h('span', { class: 'ac-body' }, h('b', null, l.name), h('span', { class: 'ac-desc' }, l.text)), h('span', { class: 'ac-cost' }, '›'));
+  return h('button', { class: 'alink', title: l.text, onclick: () => { onPick?.(); l.run(app); } },
+    h('span', { class: 'al-ic' }, l.icon), h('span', { class: 'al-tx' }, h('b', null, l.name), h('span', null, l.text)), h('span', { class: 'al-go' }, '›'));
 }
 
 function causes(parts: Contribution[] | undefined): HTMLElement | null {
   if (!parts?.length) return null;
   const top = parts.filter((p) => !/inicial|calibra|estructural|potencial/i.test(p.label)).sort((a, b) => Math.abs(b.value) - Math.abs(a.value)).slice(0, 4);
   if (!top.length) return null;
-  return h('div', { class: 'causes' }, h('span', { class: 'small muted' }, 'Lo que más influye ahora:'),
+  return h('div', { class: 'causes' }, h('span', { class: 'small muted', style: 'margin-right:4px' }, '🔍 Lo que más influye ahora:'),
     top.map((p) => h('span', { class: `chip ${p.value >= 0 ? 'good' : 'bad'}` }, `${p.value >= 0 ? '▲' : '▼'} ${p.label}`)));
 }
 
@@ -108,9 +108,10 @@ export function openGoal(app: App, id: string) {
   defs.sort((a, b) => ok(a) - ok(b));
   const body = h('div', null,
     g.explain === 'crime' ? null : causes(g.explain ? c.explain[g.explain] : undefined),
-    h('div', { class: 'acards' }, (g.links ?? []).map((l) => linkCard(app, l, pick)), defs.map((d) => actionCard(app, c, d, g.icon, pick))),
-    h('div', { class: 'small muted', style: 'margin-top:8px' }, `Tienes ⚡${c.pol.ap.toFixed(1)} de capital político. Al pulsar una tarjeta verás todos los efectos antes de confirmar.`));
-  close = modal({ title: `${g.icon} ${g.name}`, kicker: g.hint, body, wide: true, onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); } });
+    g.links?.length ? h('div', { class: 'alinks' }, g.links.map((l) => linkCard(app, l, pick))) : null,
+    h('div', { class: 'acards' }, defs.map((d) => actionCard(app, c, d, g.icon, pick, g.color))),
+    h('div', { class: 'cat-foot' }, `⚡ Tienes ${c.pol.ap.toFixed(1)} de capital político · pulsa una tarjeta para ver qué pasará antes de hacerlo.`));
+  close = modal({ title: g.name, kicker: g.hint, icon: g.icon, body, wide: true, footer: null, onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); } });
 }
 
 const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -121,7 +122,7 @@ export function hubEl(app: App, onPick?: () => void): HTMLElement {
   const results = h('div', { class: 'acards' });
   const grid = h('div', { class: 'goal-grid' }, GOALS.map((g) => h('button', { class: 'goal', style: `--gc:${g.color}`, 'data-goal': g.id, onclick: () => { onPick?.(); openGoal(app, g.id); } },
     h('span', { class: 'goal-ic' }, g.icon), h('b', null, g.name), h('span', { class: 'goal-hint' }, g.hint))));
-  const inp = h('input', { type: 'search', class: 'hub-search', placeholder: '🔎 Busca: paro, policía, armas, vivienda…', 'aria-label': 'Buscar acciones', value: String(app.ui.hubQuery ?? '') });
+  const inp = h('input', { type: 'search', class: 'hub-search', placeholder: 'Escribe: paro, policía, armas, vivienda…', 'aria-label': 'Buscar acciones', value: String(app.ui.hubQuery ?? '') });
   const run = () => {
     const q = norm(inp.value.trim());
     app.ui.hubQuery = inp.value;
@@ -135,7 +136,7 @@ export function hubEl(app: App, onPick?: () => void): HTMLElement {
       for (const id of g.actions) {
         const d = ACTION_BY_ID[id];
         if (!d || seen.has(id) || (d.regimes && !d.regimes.includes(c.pol.regime))) continue;
-        if (gHit || norm(`${d.name} ${d.desc}`).includes(q)) { seen.add(id); cards.push(actionCard(app, c, d, g.icon, onPick)); }
+        if (gHit || norm(`${d.name} ${d.desc}`).includes(q)) { seen.add(id); cards.push(actionCard(app, c, d, g.icon, onPick, g.color)); }
       }
     }
     mount(results, cards.length ? cards.slice(0, 14) : h('div', { class: 'small muted' }, 'Nada con ese nombre. Prueba otra palabra o pulsa un país en el mapa.'));
@@ -152,14 +153,19 @@ export function openSearch(app: App) {
   let close = () => undefined as void;
   app.ui.hubQuery = '';
   const body = hubEl(app, () => close());
-  close = modal({ title: '🔎 ¿Qué quieres hacer?', kicker: 'Escribe una palabra o elige un tema', body, wide: true, onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); } });
+  close = modal({ title: '¿Qué quieres hacer?', kicker: 'Escribe una palabra o elige un tema', icon: '🔎', body, wide: true, footer: null, onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); } });
   (body.querySelector('.hub-search') as HTMLInputElement | null)?.focus();
 }
+
+const SHORT: Record<string, string> = { narco: 'Narco', mundo: 'Países', corrupcion: 'Corrupción', bio: 'Biológico' };
 
 /** Barra de acciones siempre visible bajo el mapa: un botón grande por tema. */
 export function dockEl(app: App): HTMLElement | null {
   if (!app.player) return null;
   return h('div', { class: 'dock', role: 'toolbar', 'aria-label': 'Acciones' },
-    h('button', { class: 'dock-btn', style: '--gc:#9aa4b2', title: 'Buscar cualquier acción (tecla B)', onclick: () => openSearch(app) }, h('span', { class: 'dock-ic' }, '🔎'), 'Buscar'),
-    GOALS.map((g) => h('button', { class: 'dock-btn', style: `--gc:${g.color}`, title: g.hint, 'data-goal': g.id, onclick: () => openGoal(app, g.id) }, h('span', { class: 'dock-ic' }, g.icon), g.name)));
+    h('button', { class: 'dock-btn search', style: '--gc:#9aa4b2', title: 'Buscar cualquier acción (tecla B)', onclick: () => openSearch(app) }, h('span', { class: 'dock-ic' }, '🔎'), h('span', { class: 'd-lbl' }, 'Buscar')),
+    h('span', { class: 'dock-sep', 'aria-hidden': 'true' }),
+    GOALS.map((g) => h('button', { class: 'dock-btn', style: `--gc:${g.color}`, title: `${g.name}: ${g.hint}`, 'data-goal': g.id, onclick: () => openGoal(app, g.id) },
+      h('span', { class: 'dock-ic' }, g.icon), h('span', { class: 'd-lbl' }, SHORT[g.id] ?? g.name))),
+    h('button', { class: 'dock-btn mobile-only', style: '--gc:#9aa4b2', title: 'Panel de mando y todos los datos', onclick: () => { app.setTab('mando'); app.root.classList.add('show-left'); } }, h('span', { class: 'dock-ic' }, '📋'), h('span', { class: 'd-lbl' }, 'Más')));
 }

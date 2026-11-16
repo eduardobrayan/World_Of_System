@@ -1,0 +1,10 @@
+/* Efectos del mapa: lienzo superpuesto y botón de silencio (los estilos generales están en styles.css) */
+.map-fx { pointer-events: none; z-index: 1; }
+.fx-mute {
+  position: absolute; right: 10px; top: 122px; z-index: 3;
+  width: 32px; height: 32px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(26, 26, 25, 0.9); color: #f0efec; font-size: 15px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.fx-mute:hover { background: rgba(48, 48, 46, 0.95); }
+.fx-mute[aria-pressed='true'] { opacity: 0.7; }
