@@ -2,8 +2,9 @@
 import type { World } from './types';
 import { initSecurity } from './security';
 import { initNeeds } from './needs';
+import { newMissionState } from './missions';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export function serialize(world: World): string {
   return JSON.stringify(world);
@@ -32,6 +33,8 @@ export function deserialize(json: string): World {
     }
     if (!c.soc.needs) initNeeds(w, c);
   }
+  // v3: misiones del jugador
+  if (w.player) w.player.missions ??= newMissionState();
   w.version = SAVE_VERSION;
   return w;
 }

@@ -159,3 +159,18 @@ desde `file://` (escritorio y móvil) sin errores de consola; el reloj avanza so
 
 **Pendiente:** efectos en la vista regional; ficha de país en móvil tapa el mapa; revisión a fondo de Inteligencia,
 Mercado, Territorio, Objetivos y Tecnología; los barcos pueden cruzar tierra.
+
+## F11 — Misiones: siempre hay algo que hacer ✅
+- [x] Sistema de misiones en la simulación (`sim/missions.ts`, `data/missions.json`): una misión en curso, premio
+      (capital político + prestigio) al cumplirla y siguiente misión automática; determinista y guardado con la partida (v3)
+- [x] «Primeros pasos» (3 misiones que enseñan a jugar haciendo) y 18 misiones que se eligen según lo que peor va en
+      el país, el objetivo de la partida y lo ya hecho (variedad); plazos sin castigo
+- [x] Rangos por prestigio (Recién llegado → Gestor → Líder respetado → Estadista → Leyenda) como progreso a largo plazo
+- [x] Interfaz: tarjeta «Tu misión» arriba del panel de mando, barra sobre el mapa (móvil y otras pestañas), botón
+      «¡Vamos!» que lleva al sitio exacto, ⭐ en las acciones que sirven a la misión, celebración con confeti y sonido
+- [x] Sección «Misiones» (Mi mandato): escalera de rangos, cambio de misión e historial; rango en la pantalla final
+- [x] Guía inicial rehecha alrededor de la misión; medidores calculados en `sim/gauges.ts`
+- [x] 8 pruebas nuevas (46 en total), simulación de 200 turnos y jugador automático de 10 años en 8 países
+
+**Pendiente:** efectos en la vista regional; ficha de país en móvil tapa el mapa; revisión a fondo de Inteligencia,
+Mercado, Territorio y Tecnología; los barcos pueden cruzar tierra; misiones encadenadas con historia propia por país.

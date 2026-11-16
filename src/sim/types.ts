@@ -543,6 +543,27 @@ export interface PlayerState {
   objectiveSuggestion?: string;
   actionsThisTurn: number;
   intelAccuracy: Dict<number>;
+  missions: MissionState;
+}
+
+/** Misión en curso: qué se pide, desde cuándo y con qué punto de partida. */
+export interface MissionRun {
+  id: string;
+  start: number; // turno en que se asignó
+  from: number; // valor de partida (misiones de medidor) o contador de acciones al empezar
+  target: number; // valor a alcanzar
+  deadline: number; // turno límite; -1 sin límite
+}
+
+export interface MissionEntry { id: string; name: string; turn: number; ok: boolean }
+
+/** Misiones del jugador: la actual, el historial, el prestigio ganado y los contadores de acciones. */
+export interface MissionState {
+  current: MissionRun | null;
+  log: MissionEntry[];
+  prestige: number;
+  done: number;
+  acts: Dict<number>; // n = aprobadas; f = aprobadas sobre otro país; t y tf = intentos; a:<id> por acción; c:<categoría>
 }
 
 export interface GameOver {

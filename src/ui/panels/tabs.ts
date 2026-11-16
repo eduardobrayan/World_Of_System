@@ -35,14 +35,15 @@ export const TABS: TabDef[] = [
   { id: 'territorio', icon: '🗺', name: 'Territorio', short: 'Territ.', render: renderTerritory, visible: hasPlayer },
   { id: 'mercado', icon: '📈', name: 'Mercado', render: renderMarket },
   { id: 'mundo', icon: '📰', name: 'Mundo', render: renderWorld },
-  { id: 'objetivos', icon: '🎯', name: 'Objetivos', short: 'Objet.', render: renderObjectives, visible: hasPlayer },
+  { id: 'objetivos', icon: '🎯', name: 'Misiones', render: renderObjectives, visible: hasPlayer },
 ];
 
 /** Secciones grandes del panel izquierdo (agrupan las pestañas; las subpestañas solo aparecen si hay varias). */
 export interface SectionDef { id: string; icon: string; name: string; short: string; tabs: string[] }
 export const SECTIONS: SectionDef[] = [
   { id: 'mando', icon: '🎛', name: 'Panel de mando', short: 'Mando', tabs: ['mando'] },
-  { id: 'gobierno', icon: '🏛', name: 'Gobierno y economía', short: 'Gobierno', tabs: ['economia', 'gobierno', 'mercado', 'objetivos'] },
+  { id: 'misiones', icon: '🎯', name: 'Misiones y mandato', short: 'Misiones', tabs: ['objetivos'] },
+  { id: 'gobierno', icon: '🏛', name: 'Gobierno y economía', short: 'Gobierno', tabs: ['economia', 'gobierno', 'mercado'] },
   { id: 'sociedad', icon: '👥', name: 'Sociedad y seguridad', short: 'Sociedad', tabs: ['sociedad', 'seguridad', 'territorio'] },
   { id: 'mundo', icon: '🌍', name: 'Mundo y diplomacia', short: 'Mundo', tabs: ['diplomacia', 'inteligencia', 'mundo'] },
   { id: 'ejercito', icon: '🎖', name: 'Ejército', short: 'Ejército', tabs: ['militar', 'armamento'] },

@@ -8,7 +8,8 @@ import type { App } from '../app';
 import type { Country, World } from '../../sim/types';
 import { h } from '../dom';
 import { tip } from '../tooltip';
-import { relOp, atWar } from '../../sim/vars';
+import { atWar } from '../../sim/vars';
+import { gaugeValues } from '../../sim/gauges';
 import { ACTION_BY_ID, previewAction } from '../../sim/actions';
 import { openAction } from '../actionui';
 import { openPendingEvent } from '../events';
@@ -17,28 +18,21 @@ import { tweenNumber } from '../live';
 import { NEEDS } from '../../sim/needs';
 import { topPartners } from '../../sim/market';
 import { openGoal } from '../hub';
-
-const clamp = (v: number, a = 0, b = 100) => Math.max(a, Math.min(b, v));
+import { missionCard } from '../missions';
 
 export interface Gauge { id: string; icon: string; name: string; score: number; detail: string; help: string; tab: string; goal: string }
 
-/** Medidores 0–100 (100 = muy bien). Reglas sencillas y explicables. */
+/** Medidores 0–100 (100 = muy bien). El cálculo vive en la simulación (`sim/gauges.ts`); aquí solo se visten. */
 export function gauges(world: World, c: Country): Gauge[] {
   const e = c.eco;
-  const eco = clamp(55 + e.growth * 9 - Math.max(0, e.inflation - 3) * 3 - Math.max(0, e.unemployment - 6) * 2.5 - Math.max(0, e.deficit - 4) * 2);
-  const alive = world.order.map((id) => world.countries[id]).filter((x) => x.alive && x.id !== c.id);
-  const rank = 1 + alive.filter((x) => x.mil.power > c.mil.power).length;
-  const maxP = Math.max(c.mil.power, ...alive.map((x) => x.mil.power)) || 1;
-  let rel = 0, wsum = 0;
-  for (const x of alive) { const wt = Math.sqrt(x.eco.gdp); rel += relOp(world, x.id, c.id) * wt; wsum += wt; }
-  const relAvg = wsum ? rel / wsum : 0;
+  const v = gaugeValues(world, c);
   return [
-    { id: 'economia', icon: '💰', name: 'Economía', score: eco, detail: `${e.growth >= 0 ? '+' : ''}${e.growth.toFixed(1)} % crec.`, help: 'Crecimiento, inflación, paro y déficit juntos.', tab: 'economia', goal: 'economia' },
-    { id: 'felicidad', icon: '😊', name: 'Felicidad', score: clamp(c.soc.satisfaction - c.soc.pressure * 0.5), detail: `apoyo ${Math.round(c.pol.approval)}`, help: 'Satisfacción de la gente, menos la presión por necesidades sin cubrir.', tab: 'sociedad', goal: 'bienestar' },
-    { id: 'estabilidad', icon: '🏛', name: 'Estabilidad', score: clamp(c.pol.stability), detail: c.pol.stability < 30 ? 'riesgo de golpe' : `protestas ${Math.round(c.soc.protest)}`, help: 'Solidez del Gobierno. Por debajo de 30, peligro.', tab: 'gobierno', goal: 'politica' },
-    { id: 'seguridad', icon: '🚓', name: 'Seguridad', score: clamp(100 - c.police.crime * 1.2), detail: `delito ${Math.round(c.police.crime)}`, help: 'Delincuencia, cárteles y violencia en las calles.', tab: 'seguridad', goal: 'seguridad' },
-    { id: 'militar', icon: '🎖', name: 'Militar', score: clamp(Math.sqrt(c.mil.power / maxP) * 100), detail: `puesto ${rank}`, help: 'Tu fuerza frente a la mayor potencia.', tab: 'militar', goal: 'ejercito' },
-    { id: 'relaciones', icon: '🤝', name: 'Relaciones', score: clamp(50 + relAvg * 0.8), detail: atWar(world, c.id) ? 'en guerra' : relAvg >= 0 ? 'te aprecian' : 'te desconfían', help: 'Lo que opina de ti el mundo (pesan más los grandes).', tab: 'diplomacia', goal: 'mundo' },
+    { id: 'economia', icon: '💰', name: 'Economía', score: v.economia, detail: `${e.growth >= 0 ? '+' : ''}${e.growth.toFixed(1)} % crec.`, help: 'Crecimiento, inflación, paro y déficit juntos.', tab: 'economia', goal: 'economia' },
+    { id: 'felicidad', icon: '😊', name: 'Felicidad', score: v.felicidad, detail: `apoyo ${Math.round(c.pol.approval)}`, help: 'Satisfacción de la gente, menos la presión por necesidades sin cubrir.', tab: 'sociedad', goal: 'bienestar' },
+    { id: 'estabilidad', icon: '🏛', name: 'Estabilidad', score: v.estabilidad, detail: c.pol.stability < 30 ? 'riesgo de golpe' : `protestas ${Math.round(c.soc.protest)}`, help: 'Solidez del Gobierno. Por debajo de 30, peligro.', tab: 'gobierno', goal: 'politica' },
+    { id: 'seguridad', icon: '🚓', name: 'Seguridad', score: v.seguridad, detail: `delito ${Math.round(c.police.crime)}`, help: 'Delincuencia, cárteles y violencia en las calles.', tab: 'seguridad', goal: 'seguridad' },
+    { id: 'militar', icon: '🎖', name: 'Militar', score: v.militar, detail: `puesto ${v.rank}`, help: 'Tu fuerza frente a la mayor potencia.', tab: 'militar', goal: 'ejercito' },
+    { id: 'relaciones', icon: '🤝', name: 'Relaciones', score: v.relaciones, detail: atWar(world, c.id) ? 'en guerra' : v.relAvg >= 0 ? 'te aprecian' : 'te desconfían', help: 'Lo que opina de ti el mundo (pesan más los grandes).', tab: 'diplomacia', goal: 'mundo' },
   ];
 }
 
@@ -98,7 +92,6 @@ export function adviceFor(app: App, c: Country): Advice[] {
       run: () => { if (partner) { app.onSelect(partner.id); app.map.focus(partner.id); } }, label: partner ? `Ver ${partner.short}` : 'Ver el mapa' });
   }
   if (out.length < 3) out.push({ sev: 4, icon: '🔬', title: 'Invierte en el futuro', text: 'Elige qué investigar.', tab: 'tecnologia', label: 'Tecnología' });
-  if (out.length < 3) out.push({ sev: 3, icon: '🎯', title: 'Revisa tu objetivo', text: 'Mira cuánto te falta.', tab: 'objetivos', label: 'Objetivos' });
   return out.sort((a, b) => b.sev - a.sev);
 }
 
@@ -131,7 +124,9 @@ export function renderCommand(app: App): HTMLElement[] {
   const all = adviceFor(app, c);
   const urgent = all.filter((a) => a.sev >= 20).slice(0, 3);
   const shown = urgent.length ? urgent : all.slice(0, 1);
+  const mission = missionCard(app);
   return [
+    ...(mission ? [mission] : []),
     h('div', { class: 'cmd-head' }, h('h2', { class: 'cmd-title' }, '🎛 ¿Cómo va el país?')),
     h('div', { class: 'cmd-gauges' }, gauges(app.world, c).map((g) => gaugeEl(app, g))),
     h('h3', { class: 'cmd-sub' }, urgent.length ? '🔔 Lo urgente' : '💡 Una idea'),

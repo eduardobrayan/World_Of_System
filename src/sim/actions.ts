@@ -3,6 +3,7 @@
  *   requisitos → costes → efectos inmediatos → efectos retardados → modificadores con duración.
  * Las mecánicas especiales (tratados, guerra, operaciones…) se conectan como "handlers".
  */
+import { recordPlayerAction } from './missions';
 import type { ActionDef, Country, Dict, EffectDef, GroupId, Id, ModifierDef, World } from './types';
 import { GROUPS } from './types';
 import { evalExpr } from './expr';
@@ -228,7 +229,7 @@ export function executeAction(world: World, def: ActionDef, ctx: ActionCtx): Act
     if (!passed) {
       c.pol.legitimacy = clamp(c.pol.legitimacy - 1.5, 0, 100);
       news(world, `El parlamento de ${c.name} rechaza «${def.name}».`, 'politica', [c.id], world.player?.country === c.id ? 2 : 1);
-      if (world.player?.country === c.id) timeline(world, `Rechazada en el parlamento: ${def.name}`, 'politica');
+      if (world.player?.country === c.id) { timeline(world, `Rechazada en el parlamento: ${def.name}`, 'politica'); recordPlayerAction(world, def, !!ctx.target, false); }
       return { ok: true, passed: false, text: `El parlamento ha rechazado «${def.name}». Has perdido el capital político invertido.` };
     }
   }
@@ -241,6 +242,7 @@ export function executeAction(world: World, def: ActionDef, ctx: ActionCtx): Act
     text = res.text;
   }
   applyStandard(world, def, ctx);
+  if (world.player?.country === c.id) recordPlayerAction(world, def, !!ctx.target);
   if (world.player?.country === c.id) timeline(world, `${def.name}${ctx.target ? ` (${ctx.target.name})` : ''}`, def.category);
   return { ok: true, passed: true, text };
 }

@@ -15,20 +15,17 @@ interface Step {
   waitFor?: (app: App) => boolean; // el paso avanza solo cuando se cumple
 }
 
-const KEY = 'wos:guia';
+const KEY = 'wos:guia2'; // nueva guía (con misiones): se muestra una vez también a quien vio la anterior
 const narrow = () => window.matchMedia('(max-width: 980px)').matches;
 
 const STEPS: Step[] = [
+  { sel: () => (narrow() ? '.mission-bar' : '.mission-card'), icon: '🎯', title: 'Tu misión', text: 'Aquí verás siempre qué hacer ahora. Pulsa «¡Vamos!» y te llevo al sitio. Al cumplirla ganas premio y llega la siguiente.',
+    before: (app) => { app.setTab('mando'); app.root.classList.remove('show-left'); } },
   { sel: () => (narrow() ? '.mini-gauges' : '.cmd-gauges'), icon: '🎛', title: 'Cómo va tu país', text: 'Verde: bien. Ámbar: regular. Rojo: mal. Pulsa uno para mejorarlo.',
     before: (app) => { app.setTab('mando'); app.root.classList.remove('show-left'); } },
-  { sel: '.advisors', icon: '🔔', title: 'Lo urgente', text: 'Aquí sale lo que corre prisa, con el botón para arreglarlo.',
-    before: (app) => { app.setTab('mando'); } },
-  { sel: '.dock', icon: '👇', title: 'Tus acciones', text: 'Todo lo que puedes hacer, por temas. Pulsa uno.',
+  { sel: '.dock', icon: '👇', title: 'Todo lo que puedes hacer', text: 'Tus acciones, por temas. Y si pulsas un país del mapa: comerciar, aliarte… o atacar.',
     before: (app) => { app.root.classList.remove('show-left'); } },
-  { sel: '.topbar .speed', icon: '⏱', title: 'El tiempo corre solo', text: 'Pausa cuando quieras pensar (barra espaciadora).' },
-  { sel: 'main.center', icon: '🌍', title: 'Otros países', text: 'Pulsa un país del mapa para comerciar, aliarte… o atacar.',
-    before: (app) => { app.root.classList.remove('show-left'); },
-    waitFor: (app) => !!app.selected && app.selected !== app.player?.id },
+  { sel: '.topbar .speed', icon: '⏱', title: 'El tiempo corre solo', text: 'Pausa cuando quieras pensar (barra espaciadora). Ahora, ¡a por tu primera misión!' },
 ];
 
 export function showTutorial(app: App, step = 0) {
@@ -44,7 +41,7 @@ export function showTutorial(app: App, step = 0) {
     h('div', { class: 'row' },
       h('span', { class: 'dots', 'aria-label': `Paso ${step + 1} de ${STEPS.length}` }, STEPS.map((_, i) => h('i', { class: i === step ? 'on' : '' }))),
       h('span', { class: 'row', style: 'margin:0;gap:6px' },
-        h('button', { class: 'btn ghost sm', onclick: () => { done(); remember(); } }, 'Saltar'),
+        h('button', { class: 'btn ghost sm', onclick: () => { done(); remember(); app.ui.missionFresh = Date.now() + 12000; app.refresh(); } }, 'Saltar'),
         s.waitFor ? h('span', { class: 'small muted' }, '👆 Pulsa uno…') : next)));
   document.body.append(spot, tipEl);
   let raf = 0, ended = false;
@@ -78,7 +75,7 @@ export function showTutorial(app: App, step = 0) {
   next.addEventListener('click', () => {
     done();
     if (step < STEPS.length - 1) showTutorial(app, step + 1);
-    else { remember(); app.root.classList.remove('show-left'); }
+    else { remember(); app.root.classList.remove('show-left'); app.ui.missionFresh = Date.now() + 12000; app.refresh(); }
   });
   raf = requestAnimationFrame(place);
 }

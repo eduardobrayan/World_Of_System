@@ -11,6 +11,9 @@ programa biológico secreto.
 
 ## Cómo jugar
 
+Siempre tienes una **misión** a la vista que te dice qué hacer ahora: pulsa «¡Vamos!» y el juego te lleva al sitio
+donde se cumple. Al completarla ganas capital político y prestigio (que te sube de rango) y llega la siguiente.
+
 Al empezar, una guía corta te enseña lo básico. El **Panel de mando** resume tu país en seis medidores de color y
 tus **consejeros** te proponen lo más urgente con un botón. Haz clic en otro país del mapa para comerciar, aliarte,
 ayudar, sancionar, espiar o atacar, y mira el efecto en el mapa. Todo el detalle sigue ahí, en «Avanzado» y en las

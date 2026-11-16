@@ -340,6 +340,19 @@ intercambia con el gobierno saliente) o con uno **nuevo** (nombre, ideología y 
 mayoría del gobierno saliente, que se queda con el 35 % de sus escaños. Se aplica antes de calcular relaciones y
 calibrar, así que la partida empieza estable con la ideología elegida.
 
+### 4.16 Misiones y rangos (F11, `missions.ts`, `missions.json`, `gauges.ts`)
+- Siempre hay **una** misión en curso (`player.missions.current`). Se comprueba al final de cada mes y tras cada
+  acción del jugador. Al cumplirla: `ap += premio.ap` (tope 15), `prestigio += premio.prestige` y se asigna la siguiente.
+- Tipos de comprobación: `acts` (nº de acciones del jugador desde que empezó; por lista, categoría, «sobre otro país»
+  o contando intentos tumbados por el parlamento), `metric` (un indicador llega a `inicio + delta`, con tope),
+  `election` (hay elecciones y sigues gobernando) y `peace` (dejas de estar en guerra).
+- Elección de la siguiente: primero las de aprendizaje, en orden. Después, entre las posibles ahora (`when` y margen
+  de mejora), la de mayor puntuación = `priority` + 15 si encaja con el objetivo de la partida + hasta 20 según lo mal
+  que esté su indicador − 60/25 si se hizo hace poco − 4 por cada vez ya hecha (máx. 24). Sin azar.
+- Plazo opcional (`months`): al vencer se cierra sin premio ni castigo y llega otra. El jugador puede cambiarla gratis.
+- Rango = tramo de prestigio (0, 60, 200, 450, 900). Un jugador que sigue las misiones cumple ~1–1,5 al año.
+- Los seis medidores 0–100 del panel de mando se calculan en la simulación (`gaugeValues`) porque las misiones los usan.
+
 ## 5. Sistema local (regiones)
 
 - Los 43 países tienen 4–9 regiones definidas en datos (ciudad principal, coordenadas, peso de
@@ -383,6 +396,10 @@ calibrar, así que la partida empieza estable con la ideología elegida.
 10. **Previsiones**: la previsión de presupuesto/impuestos simula 12 meses con y sin el cambio
     (sin eventos ni IA) para mostrar el efecto aislado; las previsiones de reacciones usan la misma
     función de evaluación de la IA sin ruido.
+15. **Misiones sin castigo**: una misión caducada o cambiada no penaliza; son guía, no obligación. Un jugador que
+    no actúa conserva la misma misión y el mundo evoluciona exactamente igual (no consumen azar).
+16. **Primeras misiones a prueba de parlamento**: las dos primeras se dan por cumplidas con el intento, aunque el
+    parlamento lo rechace, para que el primer contacto con el juego no sea un fracaso.
 
 ### Tiempo real sobre una simulación mensual (F8)
 
@@ -420,6 +437,5 @@ calibrar, así que la partida empieza estable con la ideología elegida.
 - **Respuesta visual** (`src/ui/fx.ts`): cada acción deja un efecto en el mapa (flecha curva verde/roja/violeta entre
   países, pulso, explosión en ataques, nube de contagio, rótulo flotante); cada mes, explosiones en guerras nuevas,
   nubes en brotes detectados y la variación de tu aprobación flotando sobre tu país. Las cifras animan su cambio.
-- **Guía interactiva** (`tutorial.ts`): 6 pasos que resaltan el elemento real; el paso del mapa espera a que el
-  jugador elija un país. Repetible desde el menú ⚙.
-
+- **Guía interactiva** (`tutorial.ts`): 4 pasos que resaltan el elemento real, empezando por la misión; lo demás
+  lo enseñan las propias misiones de «Primeros pasos». Repetible desde el menú ⚙.

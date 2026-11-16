@@ -10,6 +10,7 @@ import { updateTech } from './tech';
 import { processScheduled, tickModifiers } from './effects';
 import { updateGlobals, updatePandemic } from './globals';
 import { checkGoals } from './goals';
+import { updateMissions } from './missions';
 import { snapshot, worldSnapshot } from './history';
 import { applyAidFlows } from './init';
 import { fiscalAutopilot } from './autopilot';
@@ -80,4 +81,5 @@ export function advanceTurn(world: World) {
   worldSnapshot(world);
   if (!world.gameOver) generateEvents(world);
   checkGoals(world);
+  updateMissions(world);
 }

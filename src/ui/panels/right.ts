@@ -1,4 +1,6 @@
 /** Panel derecho: país seleccionado (información percibida) o región seleccionada en el mapa local. */
+import { checkMissions } from '../missions';
+import { missionRecIds } from '../../sim/missions';
 import type { App } from '../app';
 import type { Country, Region } from '../../sim/types';
 import { h } from '../dom';
@@ -153,6 +155,7 @@ function regionPanel(app: App, c: Country, r: Region): HTMLElement[] {
       const btn = h('button', { class: 'btn sm', disabled: !!why, onclick: () => {
         const res = orderBuilding(w, c, r.id, b.id);
         toast(res.text, res.ok ? 'good' : 'bad');
+        checkMissions(app);
         app.refresh();
       } }, 'Construir');
       const row = h('div', { class: 'item' },
@@ -192,11 +195,12 @@ const QUICK: { id: string; icon: string; label: string; cls: string }[] = [
 
 function quickActions(app: App, c: Country): HTMLElement {
   const me = app.player!;
+  const rec = new Set(missionRecIds(app.world));
   return h('div', { class: 'quick-actions', role: 'group', 'aria-label': `Acciones sobre ${c.name}` }, QUICK.map((q) => {
     const def = ACTION_BY_ID[q.id];
     if (!def) return null;
     const pv = previewAction(app.world, def, { actor: me, target: c });
-    const b = h('button', { class: `qa ${q.cls} ${pv.ok ? '' : 'locked'}`, 'aria-disabled': String(!pv.ok), onclick: () => openAction(app, def, { target: c }) },
+    const b = h('button', { class: `qa ${q.cls} ${pv.ok ? '' : 'locked'} ${pv.ok && rec.has(q.id) ? 'star' : ''}`, 'data-action': q.id, 'aria-disabled': String(!pv.ok), onclick: () => openAction(app, def, { target: c }) },
       h('span', { class: 'ic' }, q.icon), h('span', null, q.label), h('span', { class: 'ap' }, pv.ok ? `⚡${pv.ap}` : '🔒'));
     tip(b, () => h('div', null, h('div', { class: 't' }, def.name), h('div', { class: 'small' }, pv.ok ? def.desc : pv.unmet.join(' · '))));
     return b;

@@ -9,6 +9,7 @@ import type { ActionDef, Contribution, Country } from '../sim/types';
 import { h, modal, mount } from './dom';
 import { ACTIONS, ACTION_BY_ID, previewAction } from '../sim/actions';
 import { actionIcon, effectPill, openAction } from './actionui';
+import { missionRecIds } from '../sim/missions';
 
 interface Link { icon: string; name: string; text: string; run: (app: App) => void; words?: string }
 export interface Goal { id: string; icon: string; name: string; hint: string; color: string; actions: string[]; links?: Link[]; explain?: string; words: string }
@@ -27,7 +28,7 @@ export const GOALS: Goal[] = [
   { id: 'politica', icon: '🏛', name: 'Política', hint: 'Apoyos, leyes, elecciones', color: '#3987e5', explain: 'stability', words: 'gobierno estabilidad aprobación elecciones protestas ministros leyes golpe parlamento',
     actions: ['dialogo_social', 'campana_comunicacion', 'referendum', 'elecciones_anticipadas', 'concesiones_militares', 'amnistia', 'estado_emergencia', 'reprimir_protestas', 'purga_militar', 'reforma_constitucional', 'apertura_democratica', 'clientelismo', 'manipular_elecciones'],
     links: [{ icon: '👔', name: 'Ministros y políticas', text: 'Cambia ministros y el rumbo del país.', run: go('gobierno'), words: 'ministros políticas banco central servicio militar' },
-      { icon: '🎯', name: 'Tu objetivo', text: 'Cuánto te falta para ganar.', run: go('objetivos'), words: 'objetivo ganar victoria' }] },
+      { icon: '🎯', name: 'Tus misiones y tu rango', text: 'Qué toca ahora y cuánto llevas.', run: go('objetivos'), words: 'objetivo ganar victoria misión misiones rango prestigio mandato' }] },
   { id: 'seguridad', icon: '🚓', name: 'Policía', hint: 'Delincuencia y orden', color: '#5598e7', explain: 'crime', words: 'policía crimen delincuencia seguridad agentes',
     actions: ['reclutar_policias', 'formacion_policial', 'depuracion_policial', 'policia_comunitaria', 'militarizar_policia', 'ley_seguridad'],
     links: [{ icon: '📋', name: 'Informe de seguridad', text: 'Policía, corrupción y narco al detalle.', run: go('seguridad') }] },
@@ -66,12 +67,13 @@ function firstSentence(s: string): string {
 }
 
 /** Tarjeta visual de una acción: nombre, frase corta, efectos principales y coste. */
-export function actionCard(app: App, c: Country, def: ActionDef, icon: string, onPick?: () => void, color?: string): HTMLElement {
+export function actionCard(app: App, c: Country, def: ActionDef, icon: string, onPick?: () => void, color?: string, star = false): HTMLElement {
   const pv = previewAction(app.world, def, { actor: c });
   const done = !!(def.params?.law && c.pol.flags[def.id]);
   const chips = pv.lines.filter((l) => !l.hidden && l.good !== undefined).slice(0, 3).map((l) => effectPill(l, true));
   const why = done ? 'Ya está en vigor' : pv.unmet[0];
-  return h('button', { class: `acard ${done ? 'done' : pv.ok ? '' : 'off'}`, title: def.desc, onclick: () => { onPick?.(); openAction(app, def, {}); } },
+  return h('button', { class: `acard ${done ? 'done' : pv.ok ? '' : 'off'} ${star && !done ? 'star' : ''}`, title: def.desc, 'data-action': def.id, onclick: () => { onPick?.(); openAction(app, def, {}); } },
+    star && !done ? h('span', { class: 'ac-star' }, '⭐ Para tu misión') : null,
     h('span', { class: 'ac-ic', style: `--gc:${color ?? '#9aa4b2'}` }, done ? '✅' : actionIcon(def) || icon),
     h('span', { class: 'ac-body' },
       h('b', null, def.name),
@@ -95,8 +97,8 @@ function causes(parts: Contribution[] | undefined): HTMLElement | null {
     top.map((p) => h('span', { class: `chip ${p.value >= 0 ? 'good' : 'bad'}` }, `${p.value >= 0 ? '▲' : '▼'} ${p.label}`)));
 }
 
-/** Abre el catálogo de un objetivo. */
-export function openGoal(app: App, id: string) {
+/** Abre el catálogo de un objetivo. Las acciones que sirven a la misión en curso van primero y con ⭐. */
+export function openGoal(app: App, id: string, rec: Set<string> = new Set(missionRecIds(app.world))) {
   const c = app.player;
   const g = GOALS.find((x) => x.id === id);
   if (!c || !g) return;
@@ -105,11 +107,14 @@ export function openGoal(app: App, id: string) {
   const pick = () => close();
   const defs = g.actions.map((a) => ACTION_BY_ID[a]).filter((d) => d && (!d.regimes || d.regimes.includes(c.pol.regime)));
   const ok = (d: ActionDef) => (previewAction(app.world, d, { actor: c }).ok ? 0 : c.pol.flags[d.id] ? 2 : 1);
-  defs.sort((a, b) => ok(a) - ok(b));
+  // Con ⭐ solo lo que se puede hacer ya; entre ellas, primero las que el parlamento aprobará con más facilidad
+  const starred = (d: ActionDef) => rec.has(d.id) && ok(d) === 0;
+  const odds = (d: ActionDef) => previewAction(app.world, d, { actor: c }).vote?.prob ?? 1;
+  defs.sort((a, b) => Number(starred(b)) - Number(starred(a)) || (starred(a) && starred(b) ? odds(b) - odds(a) : 0) || ok(a) - ok(b));
   const body = h('div', null,
     g.explain === 'crime' ? null : causes(g.explain ? c.explain[g.explain] : undefined),
     g.links?.length ? h('div', { class: 'alinks' }, g.links.map((l) => linkCard(app, l, pick))) : null,
-    h('div', { class: 'acards' }, defs.map((d) => actionCard(app, c, d, g.icon, pick, g.color))),
+    h('div', { class: 'acards' }, defs.map((d) => actionCard(app, c, d, g.icon, pick, g.color, starred(d)))),
     h('div', { class: 'cat-foot' }, `⚡ Tienes ${c.pol.ap.toFixed(1)} de capital político · pulsa una tarjeta para ver qué pasará antes de hacerlo.`));
   close = modal({ title: g.name, kicker: g.hint, icon: g.icon, body, wide: true, footer: null, onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); } });
 }

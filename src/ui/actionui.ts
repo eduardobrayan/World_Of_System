@@ -10,6 +10,7 @@ import { h, modal, toast } from './dom';
 import type { App } from './app';
 import { flushNewsToasts } from './hooks';
 import { actionFx } from './fx';
+import { checkMissions } from './missions';
 
 const CAT_ICON: Record<string, string> = {
   ley: '📜', economia: '💰', social: '😊', gobierno: '🏛️', politica: '🏛️', gobierno_ministro: '👔', diplomacia: '🤝', organismo: '🌐',
@@ -125,6 +126,7 @@ export function openAction(app: App, def: ActionDef, ctx: Omit<ActionCtx, 'actor
         close();
         if (res.ok) actionFx(app, def, ctx.target, yes);
         flushNewsToasts(app);
+        checkMissions(app);
         after?.();
         app.refresh();
       } }, p.ok ? `✔ Hacerlo · ⚡${p.ap}` : '🔒 No disponible'),

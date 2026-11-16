@@ -19,6 +19,7 @@ import { initTech } from './tech';
 import { snapshot } from './history';
 import { ensureHandlers } from './registry';
 import { baselineMetrics } from './goals';
+import { newMissionState, updateMissions } from './missions';
 import { initSecurity } from './security';
 import { initNeeds } from './needs';
 
@@ -413,7 +414,7 @@ function calibrate(world: World, c: Country) {
 export function createWorld(opts: NewGameOptions): World {
   ensureHandlers();
   const world: World = {
-    version: 2, seed: opts.seed, rng: seedRng(opts.seed), turn: 0, countries: {}, order: [], rel: {}, trade: {},
+    version: 3, seed: opts.seed, rng: seedRng(opts.seed), turn: 0, countries: {}, order: [], rel: {}, trade: {},
     treaties: [], orgs: {}, resolutions: [], sanctions: [], tariffs: {}, wars: [],
     market: { price: {} as never, base: {} as never, supply: {} as never, demand: {} as never, history: {} as never, shock: {} as never, ema: {} as never, access: {} as never },
     global: { tension: 45, temperature: 1.45, emissions: 0, pandemic: null, worldGrowth: 3.1, worldInflation: 3.5, worldRealRate: 1.0, outbreaks: [] },
@@ -479,12 +480,13 @@ export function createWorld(opts: NewGameOptions): World {
     world.player = {
       country: c.id, difficulty: opts.difficulty ?? 'normal', objective: opts.objective ?? 'libre',
       objectiveStart: baselineMetrics(world, c), objectiveHistory: [{ turn: 0, objective: opts.objective ?? 'libre', reason: 'Elegido al inicio' }],
-      actionsThisTurn: 0, intelAccuracy: {},
+      actionsThisTurn: 0, intelAccuracy: {}, missions: newMissionState(),
     };
     c.pol.ap = 5;
   }
   world.rng = rng.state;
   for (const id of world.order) snapshot(world, world.countries[id], true);
+  updateMissions(world); // la primera misión está lista desde el primer día
   return world;
 }
 

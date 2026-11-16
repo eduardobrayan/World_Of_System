@@ -4,6 +4,7 @@ import { toast } from './dom';
 import { afterTurnExtras, beforeTurnExtras } from './turnflow';
 import { newsSince } from './live';
 import type { NewsItem } from '../sim/types';
+import { checkMissions } from './missions';
 
 export function hookBeforeTurn(app: App): boolean {
   return beforeTurnExtras(app);
@@ -23,5 +24,6 @@ export function flushNewsToasts(app: App) {
 
 export function hookAfterTurn(app: App) {
   flushNewsToasts(app);
+  checkMissions(app);
   afterTurnExtras(app);
 }

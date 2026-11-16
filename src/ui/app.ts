@@ -9,6 +9,7 @@ import { renderRight } from './panels/right';
 import { TABS, SECTIONS, SECTION_OF } from './panels/tabs';
 import { LAYERS, LOCAL_LAYERS } from './layers';
 import { dockEl, openSearch } from './hub';
+import { markMissionsSeen, missionBar } from './missions';
 
 const LAYER_ICONS: Record<string, string> = { politico: '🗺', alianzas: '🤝', relaciones: '❤', pib: '💰', crecimiento: '📈', inflacion: '🏷', estabilidad: '🏛', corrupcion: '💼', narco: '💀', brotes: '🦠', regimen: '🗳', ideologia: '🎭', conflictos: '⚔' };
 import { flagEl } from './flags';
@@ -54,6 +55,7 @@ export class App implements MapHost {
     this.selected = world.player?.country ?? null;
     if (world.gameOver) this.speed = 0;
     this.ui.newsLast = world.news[world.news.length - 1] ?? null; // marca para los avisos de noticias
+    markMissionsSeen(this);
     this.build();
     this.refresh();
     this.loop();
@@ -115,8 +117,8 @@ export class App implements MapHost {
     const sec = SECTION_OF[this.tab];
     // Carril de secciones: «Mando» arriba, el resto («Más») debajo; en móvil, botón para volver al mapa
     mount(this.tabsEl, this.visibleSections().map((s, i) => [
-      i === 1 ? h('span', { class: 'rail-sep', 'aria-hidden': 'true' }) : null,
-      i === 1 ? h('span', { class: 'rail-more' }, 'Más') : null,
+      i === 2 ? h('span', { class: 'rail-sep', 'aria-hidden': 'true' }) : null,
+      i === 2 ? h('span', { class: 'rail-more' }, 'Más') : null,
       h('button', { class: sec?.id === s.id ? 'on' : '', title: s.name, 'aria-current': sec?.id === s.id ? 'page' : undefined, onclick: () => this.openSection(s.id) },
         h('span', { class: 'ic' }, s.icon), s.short)]),
     h('button', { class: 'rail-close mobile-only', title: 'Volver al mapa', onclick: () => this.root.classList.remove('show-left') }, h('span', { class: 'ic' }, '🗺️'), 'Mapa'));
@@ -124,7 +126,9 @@ export class App implements MapHost {
     this.leftBody.scrollTop = scroll;
     // Las pestañas detalladas necesitan más anchura que el panel de mando
     this.root.classList.toggle('wide-left', !!this.player && sec?.id !== 'mando');
+    this.root.classList.toggle('tab-mando', sec?.id === 'mando' || sec?.id === 'misiones'); // la tarjeta de misión ya se ve en el panel
     // El panel derecho solo aparece cuando hay algo que mirar: otro país o una región
+    this.root.classList.toggle('local-view', this.view === 'local');
     this.root.classList.toggle('right-collapsed', !this.selectedRegion && (!this.selected || this.selected === this.player?.id));
     mount(this.rightEl, renderRight(this));
     mount(this.bottomEl, renderBottom(this));
@@ -157,7 +161,8 @@ export class App implements MapHost {
         zoom,
         h('div', { class: 'legend' }, h('div', { class: 'ink2' }, `${ll.name} por región`),
           h('div', { class: 'small muted' }, ll.invert ? 'Azul claro = mejor (menos)' : 'Azul claro = más alto'),
-          h('div', { class: 'small muted' }, '★ capital · 🏗 obras en curso · rayado: ocupada')));
+          h('div', { class: 'small muted' }, '★ capital · 🏗 obras en curso · rayado: ocupada')),
+        missionBar(this));
     } else {
       mount(this.mapUi,
         h('div', { class: 'layer-pick' },
@@ -168,6 +173,7 @@ export class App implements MapHost {
               h('span', { class: 'lg-ic' }, LAYER_ICONS[l.id] ?? '🗺'), l.name))) : null),
         zoom,
         this.layer === 'politico' ? null : h('div', { class: 'legend above-dock' }, legendLayer.legend(ctx)),
+        missionBar(this),
         dockEl(this));
     }
   }

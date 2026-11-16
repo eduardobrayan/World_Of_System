@@ -5,6 +5,7 @@ import { section, bar } from '../components';
 import { OBJECTIVES, OBJECTIVE_BY_ID, MAX_TURNS, changeObjective, objectiveProgress } from '../../sim/goals';
 import { dateLabel } from '../../sim/util';
 import { regimeOf } from '../../sim/data';
+import { mandatePanel } from '../missions';
 
 export function renderObjectives(app: App): HTMLElement[] {
   const c = app.player;
@@ -13,7 +14,7 @@ export function renderObjectives(app: App): HTMLElement[] {
   const p = w.player;
   const o = OBJECTIVE_BY_ID[p.objective];
   const prog = objectiveProgress(w, c, p.objective);
-  const out: HTMLElement[] = [h('h2', null, '🎯 Objetivos')];
+  const out: HTMLElement[] = [...mandatePanel(app), h('h2', { style: 'margin-top:22px' }, '🏁 Meta de la partida')];
   out.push(h('div', { class: 'card', style: 'border-color:#2a4a70' }, h('h3', null, `${o.icon} ${o.name}`), h('p', { class: 'small ink2' }, o.desc),
     prog.items.map((it) => h('div', { style: 'margin-bottom:6px' }, h('div', { class: 'row between small' }, h('span', null, it.label), h('b', null, it.value)), bar(it.ratio * 100, 100, it.ratio >= 1 ? '#0ca30c' : undefined))),
     h('div', { class: 'small muted' }, `La partida termina en ${dateLabel(MAX_TURNS)} (${MAX_TURNS - w.turn} meses).`)));

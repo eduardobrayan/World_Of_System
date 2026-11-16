@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createWorld } from '../src/sim/init';
 import { advanceTurn } from '../src/sim/turn';
 import { ACTION_BY_ID, executeAction, previewAction } from '../src/sim/actions';
-import { cloneWorld, deserialize, serialize } from '../src/sim/save';
+import { cloneWorld, deserialize, serialize, SAVE_VERSION } from '../src/sim/save';
 import { CORRUPTION_INFO, overallCorruption } from '../src/sim/security';
 import { CORRUPTION_TYPES } from '../src/sim/types';
 import { attributeOutbreak, designCapacity } from '../src/sim/bio';
@@ -178,7 +178,7 @@ describe('F7: partidas antiguas', () => {
     delete raw.global.outbreaks;
     for (const id of raw.order) { const c = raw.countries[id]; delete c.police; delete c.corr; delete c.narco; delete c.bio; delete c.mil.designs; delete c.soc.needs; }
     const m = deserialize(JSON.stringify(raw));
-    expect(m.version).toBe(2);
+    expect(m.version).toBe(SAVE_VERSION);
     expect(m.countries.FRA.police.size).toBeGreaterThan(0);
     expect(m.countries.FRA.soc.needs.alimentacion).toBeGreaterThan(0);
     run(m, 3);

@@ -4,6 +4,7 @@ import { h, modal } from './dom';
 import { dateLabel } from '../sim/util';
 import { histChart } from './components';
 import { endExtras } from './endExtras';
+import { missionSummary } from './missions';
 
 export function showGameOver(app: App) {
   const w = app.world;
@@ -17,6 +18,7 @@ export function showGameOver(app: App) {
     onClose: () => { app.modalOpen = Math.max(0, app.modalOpen - 1); },
     body: h('div', null,
       h('p', { class: 'ev-text' }, go.text),
+      missionSummary(app),
       p ? h('div', { class: 'grid2' },
         h('div', null, h('h4', null, 'Economía'), histChart(p, ['gdp'], ['PIB'], (v) => `${(v / 1000).toFixed(1)} bill.`, 120)),
         h('div', null, h('h4', null, 'Política'), histChart(p, ['approval', 'stability'], ['Aprobación', 'Estabilidad'], (v) => v.toFixed(0), 120)),
